@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=\, initial-scale=1.0" />
+		<title>Settings</title>
+	</head>
+	<body>
+
+        <main>
+            <form>
+                <div>
+                    <label>Client ID:</label>
+                    <input type="text" value={{os.getenv('CLIENT_ID')}} readonly></input>
+                    <button>Paste</button>
+                </div>
+                
+                <div>
+                    <label>Client Secert</label>
+                    <input type="text" value={{os.getenv('CLIENT_SECRET')}} readonly></input>
+                    <button>Paste</button>
+                </div>
+
+                <label>Redirect URL Host</label>
+                <input type="text" value={{os.getenv('REDIRECT_HOST')}}></input>
+
+                <label>Redirect URL Port</label>
+                <input type="text" value={{os.getenv('REDIRECT_PORT')}} minlength="4" maxlength="4" pattern="\d+"></input>
+
+                <input type="submit" value="Save">
+		    </form>
+            <form action="/fetch_about">
+                <button>Fetch About</button>
+            </form>
+        </main>
+		
+	</body>
+</html>
