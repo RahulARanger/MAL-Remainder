@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=\, initial-scale=1.0" />
+		<title>Settings</title>
+		<link rel="stylesheet" href="../static/settings.css" />
+	</head>
+	<body data-alert="{% if error %}
+    {{ error }}
+{% endif %}">
+		<header></header>
+		<main class="center">
+			<section>
+				<img src="{{url_for('static', filename='Profile.jpg')}}" />
+			</section>
+			<section class="main">
+				<form action="./save-settings" method='POST'>
+					<div>
+						<label for="CLIENT_ID">Client ID:</label>
+						<input  name='CLIENT_ID' type="text" id="CLIENT_ID"
+						value="{{settings['CLIENT_ID']}}"/>
+					</div>
+
+					<div>
+						<label for="CLIENT_SECRET">Client Secret</label>
+						<input type="text" value="{{settings['CLIENT_SECRET']}}" name="CLIENT_SECRET"  id="CLIENT_SECRET"/>
+					</div>
+
+					<div>
+						<label for="REDIRECT_HOST">Redirect URL Host</label> <input type="text" name="REDIRECT_HOST"  id="REDIRECT_HOST"
+						value="{{settings['REDIRECT_HOST']}}">
+					</div>
+
+					<div>
+						<label for="REDIRECT_PORT">Redirect URL Port</label> <input type="text" name="REDIRECT_PORT" id="REDIRECT_PORT"
+						value="{{settings['REDIRECT_PORT']}}" minlength="4"
+						maxlength="4" pattern="\d+">
+					</div>
+					<input type="submit" value="Save" />
+				</form>
+
+				<footer>
+					<form action="/fetch_about">
+					<button>Fetch About</button>
+					</form>
+
+					<form action="/refresh_tokens">
+					<button>Refresh Tokens</button>
+					</form>
+				</footer>
+			</section>
+		</main>
+
+		<footer>
+			<a
+				href="https://myanimelist.net/animelist/{{settings['name']}}"
+				target="_blank"
+				>🌐 Redirect to your Anime list</a
+			>
+			<a href="./force-scheduler" target="_blank">🌐 Force Scheduler</a>
+		</footer>
+		<script src="../static/main.js"></script>
+		<script src="../static/alert.js"></script>
+	</body>
+</html>

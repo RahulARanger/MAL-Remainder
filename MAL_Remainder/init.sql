@@ -1,0 +1,7 @@
+CREATE TABLE  IF NOT EXISTS "SETTINGS"(
+    KEY TEXT,
+    VALUE TEXT NOT NULL,
+    PRIMARY KEY(KEY)
+);
+
+INSERT OR IGNORE INTO "Settings"(KEY,VALUE) VALUES('API', "https://api.myanimelist.net/v2/users");

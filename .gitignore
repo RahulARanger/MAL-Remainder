@@ -1,5 +1,8 @@
-.env
+# files
 *.json
-Logs/
+*.db
+
+# directories
+MAL_Remainder/Logs/
 Media/
 .idea

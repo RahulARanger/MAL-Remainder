@@ -11,8 +11,6 @@ class Server:
         ...
 
 
-
 app = Flask("Remainder Application")
-
 
 app.run()

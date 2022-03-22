@@ -1,0 +1,60 @@
+:root {
+	--bg: #212121;
+	--fg: white;
+	--light-bg: #333333;
+}
+* {
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main {
+	background-color: var(--light-bg);
+	padding-top: 3rem;
+	padding: 2rem;
+	color: var(--fg);
+
+	box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
+		rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
+		rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+.center {
+	position: absolute;
+	--width: 35%;
+	--height: 55%;
+
+	width: var(--width);
+	height: var(--height);
+
+	top: calc((100% - var(--height)) / 2);
+	left: calc((100% - var(--width)) / 2);
+}
+body {
+	background-color: var(--bg);
+}
+
+.neon {
+	animation: neonAnim 1.2s alternate-reverse infinite;
+	color: #ff5500;
+	font-family: Cursive;
+	font-size: 67px;
+}
+@keyframes neonAnim {
+	from {
+		text-shadow: 0 0 0px rgba(255, 85, 0, 0.7),
+			0 0 40px rgba(255, 85, 0, 0.7), 0 0 0px rgba(255, 85, 0, 0.7);
+	}
+	to {
+		text-shadow: 0 0 5px rgba(255, 85, 0, 0.7),
+			0 0 20px rgba(255, 85, 0, 0.7), 0 0 40px rgba(255, 85, 0, 0.7);
+	}
+}
+
+.main > footer {
+	position: relative;
+	bottom: -15%;
+	width: 100%;
+	display: flex;
+	flex-flow: row;
+	justify-content: space-evenly;
+}
