@@ -1,4 +1,5 @@
 @import url("./utils.css");
+@import url("./form.css");
 
 main {
 	display: flex;

@@ -2,7 +2,7 @@ import typing
 import pathlib
 import sqlite3
 
-from MAL_Remainder.oauth_responder import gen_session
+from MAL_Remainder.oauth_responder import gen_session, OAUTH
 from multiprocessing import Process, Queue
 
 
@@ -33,7 +33,6 @@ class Settings:
                                              container.items())
         self.connection.commit()
         cursor.close()
-
 
     def to_dict(self):
         return dict(self.connection.execute("SELECT Key, Value FROM Settings;").fetchall())
@@ -75,7 +74,7 @@ def ask_tokens(f):
 
         raw = pipe.get(block=False)
 
-        if type(raw) == str:
+        if not raw or type(raw) == str:
             raise ConnectionRefusedError(raw)
 
         return SETTINGS.from_dict(raw)

@@ -1,0 +1,12 @@
+input{
+    background-color: "transparent"
+    color: var(--fg);
+    border-style: none;
+    border-bottom: 1px solid darkorange;
+    transition: all 0.69s ease-in-out;
+    outline: none;
+}
+
+input:hover{
+border-bottom: 1px groove darkorange
+}

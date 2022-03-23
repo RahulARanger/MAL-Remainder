@@ -6,7 +6,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import webbrowser
 
 if __name__ == "__main__":
-    from MAL_Remainder.utils import get_headers, SETTINGS
+    from MAL_Remainder.utils import get_headers, SETTINGS, OAUTH
 
     session = requests.Session()
 
@@ -87,6 +87,26 @@ class Server:
         self.settings.from_dict(request.form)
         return redirect("./settings")
 
+    def fetch_abouts(self):
+        try:
+            self.abouts(True)
+        except Exception as error:
+            return abort(410, repr(error))
+        return redirect("./settings")
+
+    def refresh_tokens(self):
+        try:
+            response = session.get(f'{OAUTH}/token', data={
+                "grant_type": "refresh_token",
+                "refresh_token": self.settings("refresh_token")
+            })
+            response.raise_for_status()
+            self.settings.from_dict(response.json())
+        except Exception as _:
+            return abort(410, repr(_))
+
+        return redirect("./settings")
+
 
 def get_watching_order(sort_order="list_updated_at"):
     response = session.get(f"{API_URL}/@me/animelist", params={
@@ -107,5 +127,7 @@ if __name__ == "__main__":
 
     app.add_url_rule("/settings", view_func=SERVER.settings_page)
     app.add_url_rule("/save-settings", view_func=SERVER.save_settings, methods=["POST"])
+    app.add_url_rule("/fetch-about", view_func=SERVER.fetch_abouts)
+    app.add_url_rule("/refresh-tokens", view_func=SERVER.refresh_tokens)
 
     app.run(debug=True)

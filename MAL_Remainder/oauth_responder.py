@@ -19,7 +19,6 @@ def ensure_port(host, port):
     """
 
     # Reference: https://stackoverflow.com/a/51094879/12318454
-
     if not (host or port):
         return False
 
@@ -59,6 +58,7 @@ class Session:
         self.session_state = "I LOVE REM"
         self.tokens = {}
         self.client_things = client_id, client_secret
+        self.failed = None
 
     # Reference from https://myanimelist.net/blog.php?eid=835707
     def authorize(self):
@@ -69,7 +69,9 @@ class Session:
         raw = request.args
         if raw.get("state") != self.session_state:
             return "404 error"
-        return self.ask_and_save(raw.get("code"))
+        if "error" in raw:
+            return self.close(raw.get("message"))
+        self.ask_and_save(raw.get("code"))
 
     def ask_and_save(self, code):
         response = requests.post(
@@ -83,11 +85,17 @@ class Session:
             }
         )
 
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
 
-        self.tokens = response.json()
-        self.tokens["now"] = timedelta(datetime.now().timestamp()).total_seconds()
+            self.tokens = response.json()
+            self.tokens["now"] = datetime.now().timestamp()
+        except Exception as e:
+            return self.close(repr(e))
+        return self.close()
 
+    def close(self, msg=""):
+        self.failed = msg
         interrupt_main()
         return "you may now close this window"
 
@@ -103,7 +111,7 @@ def _gen_session(host, port, client_id, client_secret):
     app.add_url_rule("/save", view_func=req_session.redirect_uri)
 
     timers = [Timer(
-        timedelta(days=0, minutes=10, seconds=0, hours=0).total_seconds(), interrupt_main
+        timedelta(days=0, minutes=0, seconds=10, hours=0).total_seconds(), lambda: req_session.close("Time out error")
         # waits for the 10 minutes
     )]
     timers[-1].start()
@@ -121,9 +129,12 @@ def _gen_session(host, port, client_id, client_secret):
         _.cancel() for _ in timers if _.is_alive()
     ]
 
+    return req_session.failed if req_session.failed else req_session.tokens
+
 
 def gen_session(host, port, client_id, client_secret, queue: Queue):
-    try:
-        queue.put(_gen_session(host, port, client_id, client_secret))
-    except Exception as error:
-        queue.put(repr(error))
+    return queue.put(_gen_session(host, port, client_id, client_secret))
+
+
+if __name__ == "__main__":
+    gen_session("localhost", 6969, "", "", Queue())

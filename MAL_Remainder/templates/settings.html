@@ -38,15 +38,17 @@
 						value="{{settings['REDIRECT_PORT']}}" minlength="4"
 						maxlength="4" pattern="\d+">
 					</div>
-					<input type="submit" value="Save" />
-				</form>
+					<input type="submit" value="Save">
 
+				</form>
 				<footer>
-					<form action="/fetch_about">
+
+
+					<form action="./fetch_about">
 					<button>Fetch About</button>
 					</form>
 
-					<form action="/refresh_tokens">
+					<form action="./refresh_tokens">
 					<button>Refresh Tokens</button>
 					</form>
 				</footer>
