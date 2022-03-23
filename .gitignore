@@ -1,6 +1,8 @@
 # files
 *.json
 *.db
+*.csv
+*.jpg
 
 # directories
 MAL_Remainder/Logs/

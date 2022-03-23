@@ -60,30 +60,30 @@ def get_raw_tokens():
     return SETTINGS.from_keys(["access_token", "expires_in", "refresh_token", "token_type"])
 
 
+def force_oauth():
+    pipe = Queue()
+    process = Process(target=gen_session,
+                      args=(SETTINGS("REDIRECT_HOST"), SETTINGS("REDIRECT_PORT"), SETTINGS("CLIENT_ID"),
+                            SETTINGS("CLIENT_SECRET"), pipe))
+    process.start()
+    process.join()
+    if pipe.empty():
+        raise ConnectionAbortedError("Failed to authenticate for fetching tokens")
+
+    raw = pipe.get(block=False)
+
+    if not raw or type(raw) == str:
+        raise ConnectionRefusedError(raw)
+
+    return SETTINGS.from_dict(raw)
+
+
 def ask_tokens(f):
-    def rly_ask():
-        pipe = Queue()
-        process = Process(target=gen_session,
-                          args=(SETTINGS("REDIRECT_HOST"), SETTINGS("REDIRECT_PORT"), SETTINGS("CLIENT_ID"),
-                                SETTINGS("CLIENT_SECRET"), pipe))
-        process.start()
-        process.join()
-
-        if pipe.empty():
-            raise ConnectionAbortedError("Failed to authenticate for fetching tokens")
-
-        raw = pipe.get(block=False)
-
-        if not raw or type(raw) == str:
-            raise ConnectionRefusedError(raw)
-
-        return SETTINGS.from_dict(raw)
-
     def internal_work(*_, **__):
         try:
             return f(*_, **__)
         except Exception as ___:
-            rly_ask()
+            force_oauth()
             return f(*_, **__)
 
     return internal_work

@@ -3,10 +3,11 @@ import requests
 from flask import Flask, request, redirect
 from threading import Timer
 from _thread import interrupt_main
-from datetime import timedelta, datetime
 import webbrowser
 import logging
+from MAL_Remainder.token_update import update_now_in_seconds
 import socket
+from datetime import timedelta
 from queue import Queue
 
 
@@ -71,7 +72,7 @@ class Session:
             return "404 error"
         if "error" in raw:
             return self.close(raw.get("message"))
-        self.ask_and_save(raw.get("code"))
+        return self.ask_and_save(raw.get("code"))
 
     def ask_and_save(self, code):
         response = requests.post(
@@ -87,9 +88,7 @@ class Session:
 
         try:
             response.raise_for_status()
-
-            self.tokens = response.json()
-            self.tokens["now"] = datetime.now().timestamp()
+            self.tokens = update_now_in_seconds(response.json())
         except Exception as e:
             return self.close(repr(e))
         return self.close()
