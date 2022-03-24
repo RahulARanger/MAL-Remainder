@@ -2,7 +2,7 @@ import typing
 import pathlib
 import sqlite3
 
-from MAL_Remainder.oauth_responder import gen_session, OAUTH
+from oauth_responder import gen_session
 from multiprocessing import Process, Queue
 
 
@@ -11,7 +11,6 @@ class Settings:
         self.connection = sqlite3.connect(
             pathlib.Path(__file__).parent / "settings.db", timeout=6, check_same_thread=False
         )
-        self.connection.execute("BEGIN EXCLUSIVE");
         self.connection.executescript(pathlib.Path(__file__).parent.joinpath("init.sql").read_text())
 
     def __getitem__(self, key) -> str:

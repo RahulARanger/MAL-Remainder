@@ -4,8 +4,7 @@ from flask import Flask, request, redirect
 from threading import Timer
 from _thread import interrupt_main
 import webbrowser
-import logging
-from MAL_Remainder.token_update import update_now_in_seconds
+from common_utils import update_now_in_seconds
 import socket
 from datetime import timedelta
 from queue import Queue
@@ -41,9 +40,6 @@ def ensure_port(host, port):
 
 
 OAUTH = "https://myanimelist.net/v1/oauth2"
-
-logger = logging.getLogger("InternalOauth")
-logger.setLevel(logging.DEBUG)
 
 
 def get_new_code_verifier() -> str:

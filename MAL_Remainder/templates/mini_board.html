@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Updating...</title>
+		<link rel="stylesheet" href="../static/settings.css" />
+		<style>
+			main > section:first-of-type > img {
+				width: 8rem;
+				height: 10rem;
+				top: 10%;
+			}
+		</style>
+	</head>
+	<body>
+		<main class="center">
+			<section>
+				<img alt="Main Picture of the Selected Anime" />
+			</section>
+			<section class="main">
+				<form action="">
+					<select name="animes" id="animes">
+						{% for anime in reversed(watch_list)%}
+						<option
+							label="{{anime.title}}"
+							date-id="{{anime.id}}"
+							data-image="{{anime.main_picture.get('medium', anime.main_picture['large'])}}"
+							selected
+							title="{{anime.list_status['updated_at']}}"
+							data-left="{{anime.list_status['num_episodes'] - anime.list_status['num_episodes_watched']}}"
+							data-done="{{anime.list_status['num_episodes_watched']}}"
+							data-total="{{anime.list_status['num_episodes']}}"
+							min="0"
+						></option>
+						{% endfor %}
+					</select>
+					<input type="range" id="ep-range" />
+					<div>
+						<label></label>
+						+ <label for="ep-range"></label><sup>watching</sup>=
+						<label></label>
+						Eps.
+					</div>
+					<button>Update</button>
+				</form>
+			</section>
+		</main>
+		<script src="../static/mini_board.js"></script>
+	</body>
+</html>

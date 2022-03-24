@@ -1,12 +1,36 @@
-input{
-    background-color: "transparent"
-    color: var(--fg);
-    border-style: none;
-    border-bottom: 1px solid darkorange;
-    transition: all 0.69s ease-in-out;
-    outline: none;
+input {
+	background-color: "transparent";
+	color: var(--fg);
+	border-style: none;
+	border-bottom: 1px solid darkorange;
+	transition: all 0.69s ease-in-out;
+	outline: none;
 }
 
-input:hover{
-border-bottom: 1px groove darkorange
+input:hover {
+	border-bottom: 1px groove darkorange;
+}
+
+input[type="range"] {
+	width: 400px;
+	height: 15px;
+	outline: none;
+	border-radius: 15px;
+	overflow: hidden;
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 1);
+}
+input[type="range"] ::-webkit-slider-thumb {
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	background-color: #ff5500;
+	cursor: pointer;
+	border: 4px solid #333;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	row-gap: 1.2rem;
 }

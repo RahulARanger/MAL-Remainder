@@ -4,15 +4,23 @@ import pathlib
 from urllib.parse import urlparse, urljoin
 from concurrent.futures.thread import ThreadPoolExecutor
 import webbrowser
-from threading import Lock
+from threading import Lock, Timer
+import sys
 
 if __name__ == "__main__":
-    from MAL_Remainder.token_update import update_now_in_seconds, get_remaining_seconds
-    from MAL_Remainder.utils import get_headers, SETTINGS, OAUTH, force_oauth
+    from common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort
+    from oauth_responder import OAUTH
+    from utils import get_headers, SETTINGS, force_oauth
+    from mal_session import MALSession
 
     session = requests.Session()
 
-app = Flask("Remainder Settings")
+root_path = pathlib.Path(__file__).parent
+app = Flask(
+    "Remainder Settings",
+    static_folder=str(root_path / "static"),
+    template_folder=str(root_path / "templates"),
+)
 SETTINGS_LOCK = Lock()
 
 
@@ -31,9 +39,9 @@ def profile_pic(about_me: dict):
     url = about_me["picture"]
 
     save_to = (
-            pathlib.Path(__file__).parent
-            / "static"
-            / ("Profile" + pathlib.Path(urlparse(url).path).suffix)
+        pathlib.Path(__file__).parent
+        / "static"
+        / ("Profile" + pathlib.Path(urlparse(url).path).suffix)
     )
 
     with save_to.open("wb") as save_as:
@@ -70,6 +78,7 @@ class Server:
     def __init__(self):
         self.settings = SETTINGS
         self.executor = ThreadPoolExecutor(thread_name_prefix="Remainder-Server")
+        self.MAL = MALSession(session, get_headers())
 
     def settings_page(self):
         error = [""]
@@ -79,23 +88,23 @@ class Server:
         except Exception as _:
             error[-1] = repr(_)
 
-        expires_in, expired = get_remaining_seconds(int(self.settings["expires_in"]) + int(self.settings["now"]))
+        expires_in, expired = get_remaining_seconds(
+            int(self.settings["expires_in"]) + int(self.settings["now"])
+        )
         return render_template(
             "settings.html",
             name="settings.html",
             settings=self.settings,
             profile=url_for("static", filename="Profile" + self.settings["picture"]),
             error=error[-1],
-            expire_time=expires_in
+            expire_time=expires_in,
         )
 
     def abouts(self, force=False):
-        if not force and self.settings['id']:
+        if not force and self.settings["id"]:
             return
 
-        response = session.get(
-            f"{self.settings['API']}/@me", headers=get_headers()
-        )
+        response = session.get(f"{self.settings['API']}/@me", headers=get_headers())
         response.raise_for_status()
         self.settings.from_dict(profile_pic(response.json()))
 
@@ -123,12 +132,15 @@ class Server:
     @ensure_settings
     def refresh_tokens(self):
         try:
-            response = session.post(f'{OAUTH}/token', data={
-                "grant_type": "refresh_token",
-                "refresh_token": self.settings("refresh_token"),
-                "client_id": self.settings("CLIENT_ID"),
-                "client_secret": self.settings("CLIENT_SECRET")
-            })
+            response = session.post(
+                f"{OAUTH}/token",
+                data={
+                    "grant_type": "refresh_token",
+                    "refresh_token": self.settings("refresh_token"),
+                    "client_id": self.settings("CLIENT_ID"),
+                    "client_secret": self.settings("CLIENT_SECRET"),
+                },
+            )
             response.raise_for_status()
             self.settings.from_dict(update_now_in_seconds(response.json()))
 
@@ -136,10 +148,6 @@ class Server:
             return abort(404, repr(_))
 
         return redirect("./settings")
-
-    def show_schedule(self):
-        dash.layout = self.sch.html_marked_up()
-        return ...
 
     def force_oauth(self):
         return self.reset_settings()
@@ -150,19 +158,18 @@ class Server:
     def re_fetch_abouts(self):
         return self.fetch_abouts()
 
+    def update_things(self):
+        try:
+            watch_list = list(self.MAL.watching())
+        except Exception as error:
+            return abort(404, repr(error))
 
-def get_watching_order(sort_order="list_updated_at"):
-    response = session.get(f"{API_URL}/@me/animelist", params={
-        "status": "watching",
-        "sort": sort_order
-    })
+        watch_list, overflown = watch_list[: -1], watch_list[-1]
 
-    try:
-        response.raise_for_status()
-    except Exception as e:
-        return repr(e)
+        return render_template("mini_board.html", watch_list=watch_list, len=len, reversed=reversed)
 
-    return response.json()
+    def update_things_in_site(self):
+        return redirect("/settings")
 
 
 if __name__ == "__main__":
@@ -171,9 +178,24 @@ if __name__ == "__main__":
     app.add_url_rule("/settings", view_func=SERVER.settings_page)
     app.add_url_rule("/save-settings", view_func=SERVER.force_oauth, methods=["POST"])
     app.add_url_rule("/fetch_about", view_func=SERVER.re_fetch_abouts, methods=["POST"])
-    app.add_url_rule("/refresh_tokens", view_func=SERVER.fetch_fresh_tokens, methods=["POST"])
-    app.add_url_rule("/schedules", view_func=SERVER.show_schedule)
+    app.add_url_rule(
+        "/refresh_tokens", view_func=SERVER.fetch_fresh_tokens, methods=["POST"]
+    )
 
-    app.run(debug=True)
+    app.add_url_rule("/", view_func=SERVER.update_things)
+    app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
+
+    app.add_url_rule("/update-list", view_func=SERVER.update_things_in_site, methods=["POST"])
+
+    trust = EnsurePort("/force-scheduler")
+
+    if trust.deep_check():
+        sys.exit(0)
+
+    port = trust()
+    trust.acquire(port)
+
+    app.run(host="localhost", port=port, debug=False)
+    trust.release()
 
 # Reference: https://myanimelist.net/blog.php?eid=835707

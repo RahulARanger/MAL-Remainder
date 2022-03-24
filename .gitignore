@@ -3,6 +3,8 @@
 *.db
 *.csv
 *.jpg
+*.pyc
+*.ics
 
 # directories
 MAL_Remainder/Logs/
