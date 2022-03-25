@@ -1,10 +1,10 @@
 import typing
 import pathlib
 import sqlite3
-
-from oauth_responder import gen_session
 from multiprocessing import Process, Queue
-from common_utils import ensure_data
+
+from MAL_Remainder.oauth_responder import gen_session
+from MAL_Remainder.common_utils import ensure_data
 
 
 class Settings:
@@ -99,9 +99,10 @@ def force_oauth():
         raise ConnectionAbortedError("Failed to authenticate for fetching tokens")
 
     raw = pipe.get(block=False)
-
     if not raw or type(raw) == str:
         raise ConnectionRefusedError(raw)
+
+    print(raw, "fetched")
 
     return SETTINGS.from_dict(raw)
 

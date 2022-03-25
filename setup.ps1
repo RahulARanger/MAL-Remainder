@@ -29,8 +29,15 @@
 param(
     [switch]$help,
     [int]$mode=0,
-    [switch]$sch
+    [switch]$sch,
+    [String]$csv=""
 )
+
+
+if($help.IsPresent){
+    Write-Warning "If Exceuted with some other arguments, it's ignored with the -help option"
+    Get-Help -ShowWindow "./setup.ps1"
+}
 
 
 $ScriptPath = (Get-Location).Path
@@ -55,13 +62,11 @@ function Start-Remainder{
     )
     if($automatic) {} else {$arguments += $route}
     write-output $arguments
-
-    $python_path = "python.exe";
-    Start-Process $python_path -WindowStyle Minimized -WorkingDirectory $ScriptPath -ArgumentList ($arguments -Join " ")
+    Start-Process $executable -WindowStyle Minimized -WorkingDirectory $ScriptPath -ArgumentList ($arguments -Join " ")
 
 }
 
-$mode = if($sch.IsPresent) {7} else {0};
+$mode = if($sch.IsPresent) {7} else {$mode};
 
 switch($mode){
      1{ 
@@ -130,4 +135,3 @@ sys.path = sys.path[: 3]
 
      }
 }
-Start-Remainder

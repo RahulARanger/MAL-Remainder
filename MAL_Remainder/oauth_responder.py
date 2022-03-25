@@ -4,7 +4,7 @@ from flask import Flask, request, redirect
 from threading import Timer
 from _thread import interrupt_main
 import webbrowser
-from common_utils import update_now_in_seconds
+from MAL_Remainder.common_utils import update_now_in_seconds
 import socket
 from datetime import timedelta
 from queue import Queue

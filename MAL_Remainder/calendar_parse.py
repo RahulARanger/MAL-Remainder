@@ -2,9 +2,10 @@ import typing
 import pandas
 from icalevents.icaldownload import ICalDownload
 from icalevents.icalparser import parse_events, Event
-from common_utils import ensure_data
 from datetime import datetime
 from collections import namedtuple
+
+from MAL_Remainder.common_utils import ensure_data
 
 CalendarEvent = namedtuple("Event", ["uid", "name", "started", "ended"])
 

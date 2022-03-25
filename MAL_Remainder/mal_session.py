@@ -18,7 +18,8 @@ class MALSession:
 
     def watching(self, sort_order="list_updated_at"):
         response = self.session.get(
-            self.postfix() + "@me/animelist", params={"status": "watching", "sort": sort_order, "fields": "list_status"}, headers=self.headers
+            self.postfix() + "@me/animelist",
+            params={"status": "watching", "sort": sort_order, "fields": "list_status"}, headers=self.headers
         )
         response.raise_for_status()
 
@@ -43,10 +44,11 @@ class MALSession:
         return response.json()
 
     def post_changes(self, anime_id, watched, total):
-        response = self.session.patch(self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers, data={
-            "num_watched_episodes": watched,
-            "status": "completed" if watched == total else "watching"
-        })
+        response = self.session.patch(self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers,
+                                      data={
+                                          "num_watched_episodes": watched,
+                                          "status": "completed" if watched == total else "watching"
+                                      })
         response.raise_for_status()
 
         return response.json()

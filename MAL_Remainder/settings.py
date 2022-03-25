@@ -10,11 +10,11 @@ import sys
 from _thread import interrupt_main
 
 if __name__ == "__main__":
-    from common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort
-    from oauth_responder import OAUTH
-    from utils import get_headers, SETTINGS, force_oauth, is_there_token
-    from mal_session import MALSession
-    from calendar_parse import quick_save
+    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort
+    from MAL_Remainder.oauth_responder import OAUTH
+    from MAL_Remainder.utils import get_headers, SETTINGS, force_oauth, is_there_token
+    from MAL_Remainder.mal_session import MALSession
+    from MAL_Remainder.calendar_parse import quick_save
 
     session = requests.Session()
 
@@ -84,10 +84,14 @@ class Server:
         self._MAL = self.mal_session() if is_there_token() else False
 
     def mal_session(self):
+        if self._MAL:
+            return self._MAL
+
         try:
-            return MALSession(session, get_headers()) if self._MAL else self._MAL
+            self._MAL = MALSession(session, get_headers())
+            return self.mal_session()
         except Exception as _:
-            return ...
+            return False
 
     def settings_page(self):
         error = [0, ""]
@@ -110,11 +114,12 @@ class Server:
             error=error[-1],
             expire_time=error[0],
         )
-
+    
     @ensure_settings
     def fetch_abouts(self):
-        response = session.get(f"{self.settings['API']}/@me", headers=get_headers())
+        response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
         response.raise_for_status()
+
         self.settings.from_dict(profile_pic(response.json()))
 
     @ensure_settings
@@ -147,7 +152,6 @@ class Server:
             settings=self.settings,
         )
 
-    @ensure_settings
     def refresh(self):
         self.fetch_abouts()
         self.refresh_tokens()
@@ -158,10 +162,11 @@ class Server:
         try:
             quick_save(raw["calendar"]) if raw["calendar"] != self.settings["calendar"] else ...
 
-            self.settings.from_dict(request.form)
+            oauth_required = raw["CLIENT_ID"] != self.settings["CLIENT_ID"] or raw["CLIENT_SECRET"] != \
+                             self.settings["CLIENT_SECRET"]
 
-            force_oauth() if raw["CLIENT_ID"] != self.settings["CLIENT_ID"] or raw["CLIENT_SECRET"] != \
-                             self.settings["CLIENT_SECRET"] else ...
+            self.settings.from_dict(request.form)
+            force_oauth() if oauth_required else ...
 
             self.refresh() if "refresh" in raw else ...
 
