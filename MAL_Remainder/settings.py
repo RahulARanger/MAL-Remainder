@@ -1,3 +1,4 @@
+import random
 from flask import Flask, render_template, redirect, url_for, request, abort
 import requests
 import pathlib
@@ -166,9 +167,14 @@ class Server:
 
         watch_list, overflown = watch_list[: -1], watch_list[-1]
 
-        return render_template("mini_board.html", watch_list=watch_list, len=len, reversed=reversed)
+        return render_template("mini_board.html", watch_list=watch_list, len=len, reversed=reversed, settings=self.settings)
 
     def update_things_in_site(self):
+        form = request.form
+
+        if form.get("watched", 0) and "animes" in form and "up_until" in form and "total" in form:
+            self.MAL.post_changes(form["animes"], int(form["up_until"]) + int(form["watched"]), int(form["total"]))
+
         return redirect("/settings")
 
 
@@ -185,7 +191,7 @@ if __name__ == "__main__":
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
 
-    app.add_url_rule("/update-list", view_func=SERVER.update_things_in_site, methods=["POST"])
+    app.add_url_rule("/update-status", view_func=SERVER.update_things_in_site, methods=["POST"])
 
     trust = EnsurePort("/force-scheduler")
 
@@ -194,6 +200,8 @@ if __name__ == "__main__":
 
     port = trust()
     trust.acquire(port)
+
+    Timer(random.uniform(0.69, 1), lambda: webbrowser.open(f"http://localhost:{port}/")).start()
 
     app.run(host="localhost", port=port, debug=False)
     trust.release()

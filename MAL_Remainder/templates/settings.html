@@ -31,16 +31,16 @@
 						<label for="CLIENT_ID">Client ID:</label>
 						<input
 							name="CLIENT_ID"
-							type="text"
+							type="password"
 							id="CLIENT_ID"
 							value="{{settings['CLIENT_ID']}}"
 						/>
 					</div>
 
 					<div>
-						<label for="CLIENT_SECRET">Client Secret</label>
+						<label for="CLIENT_SECRET">Client Secret:&nbsp;</label>
 						<input
-							type="text"
+							type="password"
 							value="{{settings['CLIENT_SECRET']}}"
 							name="CLIENT_SECRET"
 							id="CLIENT_SECRET"
@@ -48,7 +48,9 @@
 					</div>
 
 					<div>
-						<label for="REDIRECT_HOST">Redirect URL Host</label>
+						<label for="REDIRECT_HOST" title="Redirect URL Host"
+							>Host:</label
+						>
 						<input
 							type="text"
 							name="REDIRECT_HOST"
@@ -58,7 +60,9 @@
 					</div>
 
 					<div>
-						<label for="REDIRECT_PORT">Redirect URL Port</label>
+						<label for="REDIRECT_PORT" title="Redirect URL Port"
+							>Port:</label
+						>
 						<input
 							type="text"
 							name="REDIRECT_PORT"
@@ -70,18 +74,17 @@
 						/>
 					</div>
 
-					<input type="submit" value="Reset Oauth" />
-
+					<button>Reset Oauth</button>
 				</form>
-				<footer>
-						<form action="./fetch_about" method="POST">
+				<div>
+					<form action="./fetch_about" method="POST">
 						<button>Fetch About</button>
 					</form>
 
 					<form action="./refresh_tokens" method="POST">
 						<button>Refresh Tokens</button>
 					</form>
-				</footer>
+				</div>
 			</section>
 		</main>
 
