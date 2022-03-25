@@ -7,6 +7,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import webbrowser
 from threading import Lock, Timer
 import sys
+from _thread import interrupt_main
 
 if __name__ == "__main__":
     from common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort
@@ -165,21 +166,45 @@ class Server:
         except Exception as error:
             return abort(404, repr(error))
 
-        watch_list, overflown = watch_list[: -1], watch_list[-1]
+        watch_list, overflown = watch_list[:-1], watch_list[-1]
 
-        return render_template("mini_board.html", watch_list=watch_list, len=len, reversed=reversed, settings=self.settings)
+        return render_template(
+            "mini_board.html",
+            watch_list=watch_list,
+            len=len,
+            reversed=reversed,
+            settings=self.settings,
+        )
 
     def update_things_in_site(self):
         form = request.form
 
-        if form.get("watched", 0) and "animes" in form and "up_until" in form and "total" in form:
-            self.MAL.post_changes(form["animes"], int(form["up_until"]) + int(form["watched"]), int(form["total"]))
+        if (
+            form.get("watched", 0)
+            and "animes" in form
+            and "up_until" in form
+            and "total" in form
+        ):
+            self.MAL.post_changes(
+                form["animes"],
+                int(form["up_until"]) + int(form["watched"]),
+                int(form["total"]),
+            )
+
+        if "automatic" == sys.argv[-1]:
+            # yes, it's not good pratice, but since it's not meant to be used manually, it's fine this way for now.
+            interrupt_main()
+            return abort(410)
 
         return redirect("/settings")
 
 
 if __name__ == "__main__":
     SERVER = Server()
+
+    arguments = sys.argv[1:]
+    mode = arguments[0]
+    route = "" if len(arguments) == 1 else arguments[-1]
 
     app.add_url_rule("/settings", view_func=SERVER.settings_page)
     app.add_url_rule("/save-settings", view_func=SERVER.force_oauth, methods=["POST"])
@@ -191,7 +216,9 @@ if __name__ == "__main__":
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
 
-    app.add_url_rule("/update-status", view_func=SERVER.update_things_in_site, methods=["POST"])
+    app.add_url_rule(
+        "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]
+    )
 
     trust = EnsurePort("/force-scheduler")
 
@@ -201,7 +228,10 @@ if __name__ == "__main__":
     port = trust()
     trust.acquire(port)
 
-    Timer(random.uniform(0.69, 1), lambda: webbrowser.open(f"http://localhost:{port}/")).start()
+    Timer(
+        random.uniform(0.69, 1),
+        lambda: webbrowser.open(f"http://localhost:{port}/{route}"),
+    ).start()
 
     app.run(host="localhost", port=port, debug=False)
     trust.release()
