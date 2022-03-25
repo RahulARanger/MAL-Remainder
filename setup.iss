@@ -1,5 +1,5 @@
-#define Name="RashSolo"
-#define Repo="https://github.com/RahulARanger"
+#define Name="MALRemainder"
+#define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
 #define Version="0.2.0"
 
@@ -34,17 +34,17 @@ DefaultGroupName="Project-Analysis"
 
 ; Show Selected Directory
 AlwaysShowDirOnReadyPage=yes
-AppComments="This Instsaller downloads an Application but for it's functioning it requires python Interpreter for which this installer aims to provide it"
+AppComments="Downloads Python requirements and others if any, for the MAL-Remainder"
 
 ; WHERE TO SAVE AFTER INSTALLATION
 DefaultDirName="{autopf}\{#Name}"
 
 
-OutputDir="Test"
+OutputDir="Output"
 OutputBaseFilename="{#Name}Solo"
 
 ; uninstall exe file name 
-UninstallDisplayName="RashSolo-Uninstall"
+UninstallDisplayName="Uninstall-MalRemainder"
 
 ; Compression Things
 Compression=lzma
@@ -58,7 +58,7 @@ DisableWelcomePage=no
 LicenseFile="../LICENSE"
 
 ; doesn't allow more than one setup to run at the same time
-SetupMutex="RashSoloMUTEX"
+SetupMutex="Mal-Remainder-MUTEX"
 
 
 [Files]
@@ -66,7 +66,7 @@ Source: "{tmp}\python.zip"; DestDir: "{app}"; flags: external skipifsourcedoesnt
 Source: "{tmp}\get-pip.py"; DestDir: "{app}"; flags: external skipifsourcedoesntexist;
 
 ; don't delete this ps1 file, it does some reliable work
-Source: "helper.ps1"; DestDir: "{app}";
+Source: "setup.ps1"; DestDir: "{app}";
 
 
 [UninstallDelete]

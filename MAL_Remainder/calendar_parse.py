@@ -61,45 +61,45 @@ def to_frame(events: typing.List[Event]) -> pandas.DataFrame:
                 "title": event.summary,
                 "started": event.start,
                 "ended": event.end,
-                "summary": event.description
+                "summary": event.description,
             }
-            for event in events if not event.all_day
+            for event in events
+            if not event.all_day
         ]
     )
 
 
-class SchCalendar:
-    def __init__(self, url="", is_local=False):
-        self.source = ensure_data() / "source.ics"
+def quick_save(url="", is_local=False):
+    source = ensure_data() / "source.ics"
+    source.touch()
 
-        is_local = is_local if url else True
-        url = url if url else self.source
+    is_local = is_local if url else True
+    url = url if url else source
 
-        parser = ICalDownload()
-        self.internal = parser.data_from_file(url) if is_local else parser.data_from_url(url)
-        ... if is_local else self.source.write_text(self.internal)
+    parser = ICalDownload()
+    internal = (
+        parser.data_from_file(url) if is_local else parser.data_from_url(url)
+    )
+    ... if is_local else source.write_text(internal)
 
-    def _events(self, start_date: datetime, end_date: datetime):
-        zone = start_date.astimezone().tzinfo
-        return to_frame(parse_events(
-            self.internal,
+    return internal
+
+
+def _events(internal, start_date: datetime, end_date: datetime):
+    zone = start_date.astimezone().tzinfo
+    return to_frame(
+        parse_events(
+            internal,
             start=start_date,
             end=end_date
             # don't schedule things based on the microseconds :)
-        ))
-
-    def from_now(self):
-        return self._events(datetime.now(), _end_of_day())
-
-    def today(self):
-        return self._events(_start_of_day(), _end_of_day())
-
-    def save_from_now(self):
-        return self.from_now().to_csv(self.source.parent / "from_now.csv", index=False)
+        )
+    )
 
 
-if __name__ == "__main__":
-    # calendar = SchCalendar()
-    calendar = SchCalendar(
-        "https://calendar.google.com/calendar/ical/1jh19esq880ljnl7dn6b3l8ceo%40group.calendar.google.com/public/basic.ics")
-    calendar.save_from_now()
+def from_now():
+    return _events(quick_save(), datetime.now(), _end_of_day())
+
+
+def today():
+    return _events(quick_save(), _start_of_day(), _end_of_day())

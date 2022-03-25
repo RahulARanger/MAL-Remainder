@@ -10,3 +10,5 @@
 MAL_Remainder/Logs/
 Media/
 .idea
+Output/
+.cache

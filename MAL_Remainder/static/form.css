@@ -53,6 +53,7 @@ form {
 	display: flex;
 	flex-direction: column;
 	row-gap: 0.69rem;
+	justify-content: baseline;
 }
 
 form > * {
@@ -80,6 +81,7 @@ button {
 	background-color: #fa6400;
 	box-sizing: border-box;
 	color: #fff;
+	padding: 0.45rem;
 	cursor: pointer;
 	touch-action: manipulation;
 	transform: translateY(-6px);

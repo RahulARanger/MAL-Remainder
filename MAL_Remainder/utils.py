@@ -4,41 +4,61 @@ import sqlite3
 
 from oauth_responder import gen_session
 from multiprocessing import Process, Queue
+from common_utils import ensure_data
 
 
 class Settings:
     def __init__(self):
         self.connection = sqlite3.connect(
-            pathlib.Path(__file__).parent / "settings.db", timeout=6, check_same_thread=False
+            ensure_data() / "settings.db",
+            timeout=6,
+            check_same_thread=False,
         )
-        self.connection.executescript(pathlib.Path(__file__).parent.joinpath("init.sql").read_text())
+        self.connection.executescript(
+            pathlib.Path(__file__).parent.joinpath("init.sql").read_text()
+        )
 
     def __getitem__(self, key) -> str:
-        value = self.connection.execute("SELECT Value from Settings where key = (?);", (key,)).fetchone()
+        value = self.connection.execute(
+            "SELECT Value from Settings where key = (?);", (key,)
+        ).fetchone()
         return value[-1] if value else ""
 
     def __setitem__(self, key, value):
-        cursor = self.connection.execute("INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?);", (key, value))
+        cursor = self.connection.execute(
+            "INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?);", (key, value)
+        )
         self.connection.commit()
         cursor.close()
 
     def __delitem__(self, key):
-        cursor = self.connection.execute("DELETE FROM Settings WHERE key = (?);", (key,))
+        cursor = self.connection.execute(
+            "DELETE FROM Settings WHERE key = (?);", (key,)
+        )
         self.connection.commit()
         cursor.close()
 
     def from_dict(self, container: dict):
-        cursor = self.connection.executemany("INSERT OR REPLACE INTO SETTINGS (key, value) Values(?, ?);",
-                                             container.items())
+        cursor = self.connection.executemany(
+            "INSERT OR REPLACE INTO SETTINGS (key, value) Values(?, ?);",
+            container.items(),
+        )
         self.connection.commit()
         cursor.close()
 
     def to_dict(self):
-        return dict(self.connection.execute("SELECT Key, Value FROM Settings;").fetchall())
+        return dict(
+            self.connection.execute("SELECT Key, Value FROM Settings;").fetchall()
+        )
 
     def from_keys(self, keys: typing.List[str]):
-        values = dict(self.connection.execute(
-            "SELECT Key, Value from Settings WHERE Key in (%s);" % ("?," * len(keys))[:-1], keys).fetchall())
+        values = dict(
+            self.connection.execute(
+                "SELECT Key, Value from Settings WHERE Key in (%s);"
+                % ("?," * len(keys))[:-1],
+                keys,
+            ).fetchall()
+        )
         return values
 
     def __call__(self, key):
@@ -56,14 +76,23 @@ SETTINGS = Settings()
 
 
 def get_raw_tokens():
-    return SETTINGS.from_keys(["access_token", "expires_in", "refresh_token", "token_type"])
+    return SETTINGS.from_keys(
+        ["access_token", "expires_in", "refresh_token", "token_type"]
+    )
 
 
 def force_oauth():
     pipe = Queue()
-    process = Process(target=gen_session,
-                      args=(SETTINGS("REDIRECT_HOST"), SETTINGS("REDIRECT_PORT"), SETTINGS("CLIENT_ID"),
-                            SETTINGS("CLIENT_SECRET"), pipe))
+    process = Process(
+        target=gen_session,
+        args=(
+            SETTINGS("REDIRECT_HOST"),
+            SETTINGS("REDIRECT_PORT"),
+            SETTINGS("CLIENT_ID"),
+            SETTINGS("CLIENT_SECRET"),
+            pipe,
+        ),
+    )
     process.start()
     process.join()
     if pipe.empty():
@@ -75,6 +104,10 @@ def force_oauth():
         raise ConnectionRefusedError(raw)
 
     return SETTINGS.from_dict(raw)
+
+
+def is_there_token():
+    return SETTINGS["token_type"] and SETTINGS["access_token"] and SETTINGS["CLIENT_ID"] and SETTINGS["CLIENT_SECRET"]
 
 
 def ask_tokens(f):

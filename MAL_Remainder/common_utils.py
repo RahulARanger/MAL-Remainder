@@ -25,7 +25,7 @@ def ensure_data():
 # we can't have 2 EnsurePorts, since we only made 1 ports.db
 class EnsurePort:
     def __init__(self, fall_back):
-        self.root = ensure_data().parent / "ports.db"
+        self.root = ensure_data() / "ports.db"
         self.conn = None
         self.fall_back = "http://localhost:"
         self.revive()
@@ -70,7 +70,7 @@ class EnsurePort:
 
         self.conn = connect(self.root)
         self.conn.executescript(
-            self.root.parent.joinpath("lock_script.sql").read_text()
+            self.root.parent.parent.joinpath("lock_script.sql").read_text()
         )
 
     def __call__(self):

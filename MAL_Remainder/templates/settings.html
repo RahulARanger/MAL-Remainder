@@ -73,18 +73,23 @@
 							pattern="\d+"
 						/>
 					</div>
+					<div>
+						<label
+							for="CALENDAR"
+							title="ICS Calender File path or URL"
+						>
+							Calendar:
+						</label>
+						<input
+							type="text"
+							name="calendar"
+							value="{{settings['calendar']}}"
+						/>
+					</div>
 
-					<button>Reset Oauth</button>
+					<button name="save" style="margin-top: 2rem">Save</button>
+					<button name="refresh">Refresh Tokens</button>
 				</form>
-				<div>
-					<form action="./fetch_about" method="POST">
-						<button>Fetch About</button>
-					</form>
-
-					<form action="./refresh_tokens" method="POST">
-						<button>Refresh Tokens</button>
-					</form>
-				</div>
 			</section>
 		</main>
 

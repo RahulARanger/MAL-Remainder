@@ -106,7 +106,7 @@ def _gen_session(host, port, client_id, client_secret):
     app.add_url_rule("/save", view_func=req_session.redirect_uri)
 
     timers = [Timer(
-        timedelta(days=0, minutes=0, seconds=10, hours=0).total_seconds(), lambda: req_session.close("Time out error")
+        timedelta(days=0, minutes=6, seconds=0, hours=0).total_seconds(), lambda: req_session.close("Time out error")
         # waits for the 10 minutes
     )]
     timers[-1].start()

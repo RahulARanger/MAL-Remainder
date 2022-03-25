@@ -22,7 +22,7 @@
 .center {
 	position: absolute;
 	--width: 35%;
-	--height: 55%;
+	--height: 75%;
 
 	width: var(--width);
 	height: var(--height);
