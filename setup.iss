@@ -62,6 +62,7 @@ SetupMutex="Mal-Remainder-MUTEX"
 
 
 [Files]
+Source: "MAL_Remainder"
 Source: "{tmp}\python.zip"; DestDir: "{app}"; flags: external skipifsourcedoesntexist;
 Source: "{tmp}\get-pip.py"; DestDir: "{app}"; flags: external skipifsourcedoesntexist;
 

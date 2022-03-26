@@ -81,6 +81,7 @@ class Server:
     def __init__(self):
         self.settings = SETTINGS
         self.executor = ThreadPoolExecutor(thread_name_prefix="Remainder-Server")
+        self._MAL = None
         self._MAL = self.mal_session() if is_there_token() else False
 
     def mal_session(self):
@@ -218,7 +219,7 @@ if __name__ == "__main__":
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]
     )
 
-    trust = EnsurePort("/settings")
+    trust = EnsurePort("/settings", "mal-remainder")
 
     if trust.deep_check():
         sys.exit(0)

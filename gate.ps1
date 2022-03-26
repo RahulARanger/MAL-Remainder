@@ -30,13 +30,15 @@ param(
     [switch]$help,
     [int]$mode=0,
     [switch]$sch,
-    [String]$csv=""
+    [String]$name="",
+    [String]$id=""
 )
 
 
 if($help.IsPresent){
-    Write-Warning "If Exceuted with some other arguments, it's ignored with the -help option"
+    Write-Warning "If Executed with some other arguments, it's ignored with the -help option"
     Get-Help -ShowWindow "./setup.ps1"
+    Exit;
 }
 
 
@@ -51,14 +53,15 @@ function Get-RunningProjects{
 function Start-Remainder{
     param(
         [bool]$automatic=$true,
-        [String]$route=""
+        [String]$route="",
+        [String]$file="settings"
 
     )
 
     $first = if($automatic){"automatic"} else {"manual"}
     
     $arguments = @(
-        "./MAL_Remainder/settings.py", $first
+        "./MAL_Remainder/$file.py", $first
     )
     if($automatic) {} else {$arguments += $route}
     write-output $arguments
@@ -66,7 +69,16 @@ function Start-Remainder{
 
 }
 
-$mode = if($sch.IsPresent) {7} else {$mode};
+
+function Deploy-Remainder{
+    $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -WorkingDirectory $ScriptPath -Argument "./setup.ps1";
+    New-ScheduledTaskTrigger -Once -At 
+
+    
+}
+
+
+$mode = if($sch.IsPresent) {8} else {$mode};
 
 switch($mode){
      1{ 
@@ -126,6 +138,11 @@ sys.path = sys.path[: 3]
      9{
          Start-Remainder $false "dashboard";
         # TODO: Create a Dash Board for the MAL - Remainder
+     }
+
+     10{
+         Start-Remainder $false "on_start";
+         
      }
 
      Default{

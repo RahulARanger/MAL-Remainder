@@ -1,7 +1,9 @@
+import subprocess
 from datetime import datetime
 import pathlib
 from sqlite3 import connect
 import webbrowser
+import sys
 import socket
 
 
@@ -22,10 +24,9 @@ def ensure_data():
     return data
 
 
-# we can't have 2 EnsurePorts, since we only made 1 ports.db
 class EnsurePort:
-    def __init__(self, fall_back):
-        self.root = ensure_data() / "ports.db"
+    def __init__(self, fall_back, file_name_prefix):
+        self.root = ensure_data() / (file_name_prefix + "ports.db")
         self.conn = None
         self.fall_back = "http://localhost:"
         self.revive()
@@ -83,3 +84,23 @@ class EnsurePort:
         self.conn.close()
         del self.conn
         return self.root.unlink()
+
+
+class CurrentExecutable:
+    def __init__(self):
+        super().__init__()
+        self.root = pathlib.Path(__file__).parent.parent
+
+    def get_shell(self, *args):
+        print(self.root)
+        subprocess.Popen(
+            ["./setup.ps1", *args], executable="powershell.exe", cwd=self.root
+        )
+
+    def test(self):
+        self.get_shell("-help")
+
+
+if __name__ == "__main__":
+    exe = CurrentExecutable()
+    exe.test()

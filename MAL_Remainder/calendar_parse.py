@@ -1,7 +1,7 @@
 import typing
 import pandas
 from icalevents.icaldownload import ICalDownload
-from icalevents.icalparser import parse_events, Event
+from icalevents.icalparser import parse_events, Event, normalize
 from datetime import datetime
 from collections import namedtuple
 
@@ -55,13 +55,14 @@ def to_frame(events: typing.List[Event]) -> pandas.DataFrame:
     """
     converts a list of events to a pandas dataframe
     """
+    local_zone = datetime.today().astimezone().tzinfo
     return pandas.DataFrame(
         [
             {
                 "uid": event.uid,
                 "title": event.summary,
-                "started": event.start,
-                "ended": event.end,
+                "started": normalize(event.start, local_zone),
+                "ended": normalize(event.end, local_zone),
                 "summary": event.description,
             }
             for event in events
@@ -87,12 +88,12 @@ def quick_save(url="", is_local=False):
 
 
 def _events(internal, start_date: datetime, end_date: datetime):
-    zone = start_date.astimezone().tzinfo
+
     return to_frame(
         parse_events(
             internal,
-            start=start_date,
-            end=end_date
+            start=normalize(start_date),
+            end=normalize(end_date)
             # don't schedule things based on the microseconds :)
         )
     )
