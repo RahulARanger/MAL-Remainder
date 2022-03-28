@@ -13,6 +13,14 @@
 {% endif %}"
 	>
 		<header>
+			<a
+				href="https://myanimelist.net/animelist/{{settings['name']}}"
+				target="_blank"
+				>➡️ Redirect to your Anime list</a
+			>
+			<a href="./save-events">📅 ReSchedule</a>
+			<a href="./">📦 Remainder</a>
+			<a href="./dash-board" target="_blank">📊 DashBoard</a>
 			<div data-time="{{expire_time}}">
 				<span>Expires in:&nbsp;</span>
 				<span id="days"></span> day<span></span>
@@ -93,14 +101,7 @@
 			</section>
 		</main>
 
-		<footer>
-			<a
-				href="https://myanimelist.net/animelist/{{settings['name']}}"
-				target="_blank"
-				>🌐 Redirect to your Anime list</a
-			>
-			<a href="./force-scheduler" target="_blank">🌐 Force Scheduler</a>
-		</footer>
+		<footer></footer>
 		<script src="../static/main.js"></script>
 		<script src="../static/alert.js"></script>
 	</body>

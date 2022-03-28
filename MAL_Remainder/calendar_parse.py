@@ -11,34 +11,22 @@ CalendarEvent = namedtuple("Event", ["uid", "name", "started", "ended"])
 
 """
 NOTES regarding the ics file,
-
 every line in ics is of form; name, parameter, value
 common to see lines are (name, value); parameter is optional 
-
 examples:
 ~~~~~~~~~
-
 VERSION:6.9
 ATTENDEE;CN=Max Rasmussen;ROLE=REQ-PARTICIPANT:MAILTO:example@example.com
-
-
 Calendar has Components in which each component has a sub-component
-
 Root Component is like this ...
-
 BEGIN:VCALENDAR
 ... vcalendar properties ...
 END:VCALENDAR
-
-
 VEVENT is a component(which we need)
-
 it looks like this 
-
 BEGIN:VEVENT
 ... vevent properties ...
 END:VEVENT
-
 # NOTE: we won't edit the properties of the VCALENDAR, but we may for the VEVENT
 """
 
@@ -88,7 +76,6 @@ def quick_save(url="", is_local=False):
 
 
 def _events(internal, start_date: datetime, end_date: datetime):
-
     return to_frame(
         parse_events(
             internal,

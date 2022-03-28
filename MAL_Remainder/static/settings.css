@@ -22,3 +22,18 @@ main > section:first-of-type > img {
 
 .tool-button {
 }
+
+#days,
+#days ~ span {
+	font-size: 1.5rem;
+	color: red;
+}
+
+#days[text="0"],
+#days ~ span[value="0"] {
+	color: red;
+}
+
+header > div {
+	box-shadow: rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;
+}

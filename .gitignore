@@ -13,3 +13,9 @@ Media/
 Output/
 .cache
 Python/
+
+Docs/_site
+Docs/.sass-cache
+Docs/.jekyll-cache
+Docs/.jekyll-metadata
+Docs/vendor

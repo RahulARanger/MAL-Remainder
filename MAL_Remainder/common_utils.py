@@ -5,6 +5,7 @@ from sqlite3 import connect
 import webbrowser
 import sys
 import socket
+import os
 
 
 def get_remaining_seconds(seconds):
@@ -86,21 +87,20 @@ class EnsurePort:
         return self.root.unlink()
 
 
-class CurrentExecutable:
-    def __init__(self):
-        super().__init__()
-        self.root = pathlib.Path(__file__).parent.parent
+def current_executable(*args):
+    store = []
+    try:
+        store.append(subprocess.run(
+            ["setup", *args],
+            cwd=pathlib.Path(__file__).parent.parent,
+            shell=True,
+            capture_output=True,
+            check=True
+        ))
 
-    def get_shell(self, *args):
-        print(self.root)
-        subprocess.Popen(
-            ["./setup.ps1", *args], executable="powershell.exe", cwd=self.root
-        )
-
-    def test(self):
-        self.get_shell("-help")
+    except subprocess.CalledProcessError:
+        return store[-1].stderr.decode()
 
 
 if __name__ == "__main__":
-    exe = CurrentExecutable()
-    exe.test()
+    current_executable("-help")

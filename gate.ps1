@@ -25,60 +25,113 @@
     Again, its internally used by the Scripts in order to let the application use the system's Scheduler. 
     Don't use it manually, you can always use TaskScheduler in your own system which is way more better than this.
 
+.PARAMETER settings
+    Opens the Server with the settings page opened instead of the home page which is not default thing to do
+
 #>
 param(
     [switch]$help,
-    [int]$mode=0,
     [switch]$sch,
-    [String]$name="",
-    [String]$id=""
+    [switch]$settings,
+    [switch]$dashboard,
+    [String[]]$triggers_for_end,
+    [int]$mode=0
 )
 
+write-output "here"
 
 if($help.IsPresent){
     Write-Warning "If Executed with some other arguments, it's ignored with the -help option"
-    Get-Help -ShowWindow "./setup.ps1"
+    Get-Help -ShowWindow $MyInvocation.MyCommand.Definition
     Exit;
 }
 
+
+# Some Static Constants
+
+$TaskName = "MAL-Remainder"
+$TaskDescription = "Remainder for updating your watch status regularly or maybe used to remind you to take a break before hand"
+
+
+# Some Dynamic Constants
 
 $ScriptPath = (Get-Location).Path
 $PythonPath = Join-Path -Path $ScriptPath -ChildPath "Python";
 $executable = Join-Path -Path $PythonPath -ChildPath "python.exe";
 
+
 function Get-RunningProjects{
     $Pythons = Join-Path -Path $PythonPath -ChildPath "*";
     return  Get-WmiObject -Class "Win32_Process" -ComputerName "." | where-object {$_.Path -like $Pythons};
 }
-function Start-Remainder{
+
+
+function Start-PythonScript{
     param(
-        [bool]$automatic=$true,
-        [String]$route="",
-        [String]$file="settings"
-
+        [String]$file="settings",
+        [String[]]$arguments=@()
     )
 
-    $first = if($automatic){"automatic"} else {"manual"}
-    
-    $arguments = @(
-        "./MAL_Remainder/$file.py", $first
-    )
-    if($automatic) {} else {$arguments += $route}
-    write-output $arguments
+    $arguments = "./MAL_Remainder/$file.py " + $arguments
     Start-Process $executable -WindowStyle Minimized -WorkingDirectory $ScriptPath -ArgumentList ($arguments -Join " ")
+}
 
+
+function Get-UserName{
+    # format: <host-name>\<user-name>
+    # host-name has alphanumeric, hyphen only
+    
+    # Most secured way: https://stackoverflow.com/a/29955210/12318454
+    $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    return $user.SubString($user.indexOf("\") + 1) 
 }
 
 
 function Deploy-Remainder{
-    $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -WorkingDirectory $ScriptPath -Argument "./setup.ps1";
-    New-ScheduledTaskTrigger -Once -At 
 
+    # Task = Action + Trigger(s) + Settings + Prinicpal
+    # Task = "What to do" + "When to do" + "With some config." + "for whom we need to do, security things"
     
+    $action = New-ScheduledTaskAction -Execute (Join-Path -Path $ScriptPath -ChildPath "setup.cmd") -WorkingDirectory $ScriptPath -Argument "-mode 6"
+
+    # Creating Triggers from the time stamps
+    $action_triggers = $triggers_for_end | % {
+        New-ScheduledTaskTrigger -Once -At (Get-Date $_)
+    }
+    
+    # Running only if connected to network
+    $settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable
+    
+    # Using the Local. Currently Signed Account UserName
+    $principal =  New-ScheduledTaskPrincipal  -UserId (Get-UserName) -LogonType ServiceAccount
+
+    # -Force if already Task Exists, Deletes the Old one by replacing with the new one
+    Register-ScheduledTask -TaskName $TaskName -Description $TaskDescription -Action $action -Trigger $action_triggers -Settings $settings -Principal $principal -Force
 }
 
 
-$mode = if($sch.IsPresent) {8} else {$mode};
+
+function UnRegister-Remainder{
+    $Task = Get-ScheduledTask | Where-Object {$_.TaskName -like $TaskName }
+
+    if(-not $Task){
+        Write-Output "Not Registered in the first place"
+        return 
+    }
+    Unregister-ScheduledTask -InputObject $Task -Confirm:$false
+    
+}
+
+switch($true){
+{$sch.IsPresent}{
+    $mode = 8;
+}
+{$settings.IsPresent}{
+    $mode = 7;
+}
+}
+
+write-output $mode
 
 switch($mode){
      1{ 
@@ -124,26 +177,29 @@ sys.path = sys.path[: 3]
         if (Test-Path -Path $requirements) {& $executable @("-m", "pip", "install", "-r", $requirements)} else {}
      }
      6{
-        Start-Remainder;
-
+        Start-PythonScript -arguments @("automatic");
      }
 
      7{
-         Start-Remainder $false;
+         Start-PythonScript -file "settings" -arguments @("-manual", "settings");
      }
 
      8{
-         
+        Deploy-Remainder
      }
      9{
-         Start-Remainder $false "dashboard";
-        # TODO: Create a Dash Board for the MAL - Remainder
+         # TODO: Create a Dash Board for the MAL - Remainder
      }
 
      10{
-         Start-Remainder $false "on_start";
-         
-     }
+        Start-PythonScript -file "on_start"
+    }
+
+    11{
+        # Make sure to run this with Admin Rights
+        UnRegister-Remainder
+        
+    }
 
      Default{
         $store = @(Get-RunningProjects);
@@ -152,3 +208,4 @@ sys.path = sys.path[: 3]
 
      }
 }
+

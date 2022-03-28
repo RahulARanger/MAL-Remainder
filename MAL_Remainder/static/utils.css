@@ -64,14 +64,35 @@ header {
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
+	top: 0.5%;
+	left: 0.5%;
+	position: fixed;
+	width: 100%;
+	color: #ff5500;
 }
 
-footer {
-	bottom: 0.5%;
-	position: fixed;
-	display: flex;
-	flex-flow: row;
-	justify-content: space-between;
-	width: 100%;
-	left: 0%;
+header > a {
+	color: #ff5500;
+	animation: neonAnim 1.2s alternate-reverse infinite;
+	border: 1px solid transparent;
+	padding: 6.9px;
+	transition: all 0.39s ease-out;
+	border-radius: 0.4rem;
+	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+	opacity: 0.89;
+}
+
+header > a:hover {
+	border: 1px solid rgba(255, 85, 0, 0.7);
+	transform: scale(1.069, 1.069) translateY(2px);
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+	opacity: 1;
+}
+
+header > a:visited {
+	color: rgba(255, 85, 0, 0.7);
+}
+
+header > a:active {
+	transform: translateX(1px) translateY(-1px);
 }

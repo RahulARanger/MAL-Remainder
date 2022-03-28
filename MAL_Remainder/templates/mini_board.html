@@ -8,6 +8,14 @@
 		<link rel="stylesheet" href="../static/mini_board.css" />
 	</head>
 	<body>
+		<header>
+			<a
+				href="https://myanimelist.net/animelist/{{settings['name']}}?status=1"
+				target="_blank"
+				>↪️Redirect to your Anime list</a
+			>
+			<a href="./settings">⚙️Settings</a>
+		</header>
 		<main class="center">
 			<section>
 				<img alt="Main Picture of the Selected Anime" src="" />
@@ -54,14 +62,7 @@
 				</form>
 			</section>
 		</main>
-		<footer>
-			<a
-				href="https://myanimelist.net/animelist/{{settings['name']}}?status=1"
-				target="_blank"
-				>↪️Redirect to your Anime list</a
-			>
-			<a href="./settings" target="_blank">⚙️Settings</a>
-		</footer>
+
 		<script src="../static/mini_board.js"></script>
 	</body>
 </html>

@@ -1,0 +1,99 @@
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that.
+
+# If you need help with YAML syntax, here are some quick references for you:
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+
+title: MAL-Remainder
+
+email: saihanumarahul66@gmail.com
+
+description: >- # this means to ignore newlines until "baseurl:"
+    Write an awesome description for your new site here. You can edit this
+    line in _config.yml. It will appear in your document head meta (for
+    Google search results) and in your feed.xml site description.
+
+# should change based on the domain provided by the github pages
+baseurl: ""
+
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+
+github_username: RahulARanger
+
+# Build settings
+theme: "just-the-docs"
+
+remote_theme: just-the-docs/just-the-docs
+
+plugins:
+    - jekyll-feed
+    - jekyll-seo-tag
+
+kramdown:
+    syntax_highlighter_opts:
+        block:
+            line_numbers: false
+
+compress_html:
+    clippings: all
+    comments: all
+    endings: all
+    startings: []
+    blanklines: false
+    profile: false
+    # ignore:
+    #   envs: all
+
+# uncomment the below line in future for the logo
+# logo: "/assets/images/just-the-docs.png"
+
+search_enabled: true
+
+search:
+    # Split pages into sections that can be searched individually
+    # Supports 1 - 6, default: 2
+    heading_level: 2
+    # Maximum amount of previews per search result
+    # Default: 3
+    previews: 3
+    # Maximum amount of words to display before a matched word in the preview
+    # Default: 5
+    preview_words_before: 5
+    # Maximum amount of words to display after a matched word in the preview
+    # Default: 10
+    preview_words_after: 10
+    # Set the search token separator
+    # Default: /[\s\-/]+/
+    # Example: enable support for hyphenated search words
+    tokenizer_separator: /[\s/]+/
+    # Display the relative url in search results
+    # Supports true (default) or false
+    rel_url: true
+    # Enable or disable the search button that appears in the bottom right corner of every page
+    # Supports true or false (default)
+    button: false
+
+# page configurations
+
+color_scheme: dark
+
+aux_links:
+    "GitHub":
+        - "https://github.com/RahulARanger/MAL-Remainder"
+
+# Makes Aux links open in a new tab. Default is false
+aux_links_new_tab: true
+heading_anchors: true
+
+# footer things
+
+footer_content: "Copyright (c) 2021 RahulARanger, Distributed by <a href='https://github.com/RahulARanger/MAL-Remainder/blob/master/LICENSE.txt'>MIT LICENSE.</a>"
+last_edit_timestamp: true
+last_edit_time_format: "%b %e %Y at %I:%M %p" # i like this default format
