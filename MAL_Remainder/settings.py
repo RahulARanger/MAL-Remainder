@@ -8,13 +8,14 @@ import webbrowser
 from threading import Lock, Timer
 import sys
 from _thread import interrupt_main
+import traceback
 
 if __name__ == "__main__":
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort
     from MAL_Remainder.oauth_responder import OAUTH
     from MAL_Remainder.utils import get_headers, SETTINGS, force_oauth, is_there_token
     from MAL_Remainder.mal_session import MALSession
-    from MAL_Remainder.calendar_parse import quick_save
+    from MAL_Remainder.calendar_parse import quick_save, schedule_events
 
     session = requests.Session()
 
@@ -115,7 +116,7 @@ class Server:
             error=error[-1],
             expire_time=error[0],
         )
-    
+
     @ensure_settings
     def fetch_abouts(self):
         response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
@@ -153,6 +154,16 @@ class Server:
             settings=self.settings,
         )
 
+    def refresh_events(self, url=""):
+        try:
+            quick_save(url if url else self.settings("calendar"), False)
+        except Exception as _:
+            abort(404, traceback.format_exc())
+
+        failed = schedule_events(True)
+
+        return abort(404, failed) if failed else redirect("./settings")
+
     def refresh(self):
         self.fetch_abouts()
         self.refresh_tokens()
@@ -161,7 +172,8 @@ class Server:
         raw = request.form
 
         try:
-            quick_save(raw["calendar"]) if raw["calendar"] != self.settings["calendar"] else ...
+            self.refresh_events(raw["calendar"]) if raw["calendar"] != self.settings[
+                "calendar"] else ...
 
             oauth_required = raw["CLIENT_ID"] != self.settings["CLIENT_ID"] or raw["CLIENT_SECRET"] != \
                              self.settings["CLIENT_SECRET"]
@@ -171,8 +183,8 @@ class Server:
 
             self.refresh() if "refresh" in raw else ...
 
-        except Exception as error:
-            return abort(404, repr(error))
+        except Exception as _:
+            return abort(404, traceback.format_exc())
 
         return redirect("/settings")
 
@@ -214,6 +226,8 @@ if __name__ == "__main__":
 
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
+
+    app.add_url_rule("/save-events", view_func=SERVER.refresh_events)
 
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]

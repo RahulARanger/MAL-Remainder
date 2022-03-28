@@ -3,9 +3,7 @@ from datetime import datetime
 import pathlib
 from sqlite3 import connect
 import webbrowser
-import sys
 import socket
-import os
 
 
 def get_remaining_seconds(seconds):
@@ -88,18 +86,13 @@ class EnsurePort:
 
 
 def current_executable(*args):
-    store = []
-    try:
-        store.append(subprocess.run(
-            ["setup", *args],
-            cwd=pathlib.Path(__file__).parent.parent,
-            shell=True,
-            capture_output=True,
-            check=True
-        ))
-
-    except subprocess.CalledProcessError:
-        return store[-1].stderr.decode()
+    check = subprocess.run(
+        ["setup", *args],
+        cwd=pathlib.Path(__file__).parent.parent,
+        shell=True,
+        capture_output=True
+    )
+    return check.stderr.decode("utf-8")
 
 
 if __name__ == "__main__":

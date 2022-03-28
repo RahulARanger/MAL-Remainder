@@ -1,13 +1,12 @@
 import typing
 import pandas
+from datetime import datetime
+
 from icalevents.icaldownload import ICalDownload
 from icalevents.icalparser import parse_events, Event, normalize
-from datetime import datetime
-from collections import namedtuple
 
-from MAL_Remainder.common_utils import ensure_data
-
-CalendarEvent = namedtuple("Event", ["uid", "name", "started", "ended"])
+from MAL_Remainder.common_utils import ensure_data, current_executable
+from MAL_Remainder.utils import SETTINGS
 
 """
 NOTES regarding the ics file,
@@ -46,32 +45,33 @@ def to_frame(events: typing.List[Event]) -> pandas.DataFrame:
     local_zone = datetime.today().astimezone().tzinfo
     return pandas.DataFrame(
         [
-            {
-                "uid": event.uid,
-                "title": event.summary,
-                "started": normalize(event.start, local_zone),
-                "ended": normalize(event.end, local_zone),
-                "summary": event.description,
-            }
+            (
+                event.uid,
+                event.summary,
+                normalize(event.start, local_zone),
+                normalize(event.end, local_zone),
+                event.description
+            )
             for event in events
             if not event.all_day
-        ]
+        ], columns=["uid", "title", "started", "ended", "summary"]
     )
 
 
-def quick_save(url="", is_local=False):
+def quick_save(url="", is_local=True):
     source = ensure_data() / "source.ics"
     source.touch()
 
-    is_local = is_local if url else True
     url = url if url else source
 
     parser = ICalDownload()
-    internal = (
-        parser.data_from_file(url) if is_local else parser.data_from_url(url)
-    )
-    ... if is_local else source.write_text(internal)
+    if not is_local:
+        internal = parser.data_from_url(url)
+        source.write_text(internal)
+        return internal
 
+    internal = url.read_text()
+    parser.data_from_file(url) if internal else ...
     return internal
 
 
@@ -82,7 +82,7 @@ def _events(internal, start_date: datetime, end_date: datetime):
             start=normalize(start_date),
             end=normalize(end_date)
             # don't schedule things based on the microseconds :)
-        )
+        ) if internal else []
     )
 
 
@@ -92,3 +92,35 @@ def from_now():
 
 def today():
     return _events(quick_save(), _start_of_day(), _end_of_day())
+
+
+FORMAT = "%Y-%m-%d %H:%M:%S"
+
+
+def say_we_are_done_today():
+    SETTINGS["schedule_events"] = datetime.now().strftime(FORMAT)
+
+
+def are_we_done_today():
+    event_stamp = SETTINGS["schedule_events"]
+
+    if not event_stamp:
+        return False
+
+    return (datetime.today() - datetime.strptime(event_stamp, FORMAT)).days == 0
+
+
+def schedule_events(force=False):
+    if are_we_done_today() and not force:
+        return
+
+    frame = from_now()
+    triggers_for_end = ",".join(frame["ended"].dt.strftime("%H:%M:%S") if frame["ended"].size else [])
+    reason_for_failure = current_executable("-sch", "-triggers_for_end", triggers_for_end)
+
+    say_we_are_done_today()
+    return reason_for_failure
+
+
+if __name__ == "__main__":
+    schedule_events()

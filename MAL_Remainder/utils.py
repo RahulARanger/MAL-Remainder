@@ -102,8 +102,6 @@ def force_oauth():
     if not raw or type(raw) == str:
         raise ConnectionRefusedError(raw)
 
-    print(raw, "fetched")
-
     return SETTINGS.from_dict(raw)
 
 
