@@ -5,12 +5,12 @@
 *.jpg
 *.pyc
 *.ics
+*.exe
 
 # directories
 MAL_Remainder/Logs/
 Media/
 .idea
-Output/
 .cache
 Python/
 
@@ -19,3 +19,4 @@ Docs/.sass-cache
 Docs/.jekyll-cache
 Docs/.jekyll-metadata
 Docs/vendor
+

@@ -1,5 +1,4 @@
 import typing
-import pandas
 from datetime import datetime
 
 from icalevents.icaldownload import ICalDownload
@@ -30,32 +29,26 @@ END:VEVENT
 """
 
 
-def _start_of_day(date=datetime.now()):
-    return date.replace(hour=0, minute=0, second=0, microsecond=0)
-
-
 def _end_of_day(date=datetime.now()):
     return date.replace(hour=23, minute=59, second=59, microsecond=0)
 
 
-def to_frame(events: typing.List[Event]) -> pandas.DataFrame:
+def to_frame(events: typing.List[Event]) -> typing.Tuple[list, list]:
     """
     converts a list of events to a pandas dataframe
     """
     local_zone = datetime.today().astimezone().tzinfo
-    return pandas.DataFrame(
-        [
-            (
-                event.uid,
-                event.summary,
-                normalize(event.start, local_zone),
-                normalize(event.end, local_zone),
-                event.description
-            )
-            for event in events
-            if not event.all_day
-        ], columns=["uid", "title", "started", "ended", "summary"]
-    )
+    started = []
+    ended = []
+
+    [
+        started.append(normalize(event.start, local_zone))
+        or ended.append(normalize(event.end, local_zone))
+        for event in events
+        if not event.all_day
+    ]
+
+    return started, ended
 
 
 def quick_save(url="", is_local=True):
@@ -82,16 +75,14 @@ def _events(internal, start_date: datetime, end_date: datetime):
             start=normalize(start_date),
             end=normalize(end_date)
             # don't schedule things based on the microseconds :)
-        ) if internal else []
+        )
+        if internal
+        else []
     )
 
 
 def from_now():
     return _events(quick_save(), datetime.now(), _end_of_day())
-
-
-def today():
-    return _events(quick_save(), _start_of_day(), _end_of_day())
 
 
 FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -114,9 +105,13 @@ def schedule_events(force=False):
     if are_we_done_today() and not force:
         return
 
-    frame = from_now()
-    triggers_for_end = ",".join(frame["ended"].dt.strftime("%H:%M:%S") if frame["ended"].size else [])
-    reason_for_failure = current_executable("-sch", "-triggers_for_end", triggers_for_end)
+    started, ended = from_now()
+    triggers_for_end = ",".join(
+        event_time.strftime("%H:%M:%S") for event_time in ended
+    )
+    reason_for_failure = current_executable(
+        "-sch", "-triggers_for_end", triggers_for_end
+    )
 
     say_we_are_done_today()
     return reason_for_failure

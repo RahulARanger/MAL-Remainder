@@ -38,8 +38,6 @@ param(
     [int]$mode=0
 )
 
-write-output "here"
-
 if($help.IsPresent){
     Write-Warning "If Executed with some other arguments, it's ignored with the -help option"
     Get-Help -ShowWindow $MyInvocation.MyCommand.Definition
@@ -131,51 +129,7 @@ switch($true){
 }
 }
 
-write-output $mode
-
 switch($mode){
-     1{ 
-        $pythonZip = Join-Path -Path $ScriptPath -ChildPath "python.zip";
-        Expand-Archive -Path $pythonZip -DestinationPath $PythonPath;
-        Remove-Item -Path $pythonZip;
-     }
-
-     2{
-        $pipFile = Join-Path -Path $ScriptPath -ChildPath "get-pip.py";
-        & $executable $pipFile;
-        Remove-Item -Path $pipFile;
-     }
-
-     3{
-         $sitePath = Get-ChildItem -Path $PythonPath -Filter "*._pth"
-         Set-Content -Path $sitePath.FullName -Value "
-Lib
-Lib/site-packages
-.
-import site
-"
-         $sitePath = Join-Path -Path $PythonPath -ChildPath "sitecustomize.py"
-         if(Test-Path -Path $sitePath) {Remove-Item -Path $sitePath} else {}
-         New-Item -Path $sitePath -ItemType "file"
-         
-         Set-Content -Path $sitePath -Value "
-import sys;
-import sys;
-sys.path = sys.path[: 3]
-"}
-
-     4{
-        $internalModules = (Get-ChildItem -Path $PythonPath -Filter "*.zip")
-        $unzipped = Join-Path -Path $PythonPath -ChildPath "Lib"
-    
-        Expand-Archive -Path $internalModules.FullName -DestinationPath $unzipped
-        Remove-Item -Path $internalModules.Fullname
-     }
-
-     5{
-        $requirements = Join-Path -Path (Join-Path -Path $ScriptPath -ChildPath "ProjectAnalysis") -ChildPath "requirements.txt";
-        if (Test-Path -Path $requirements) {& $executable @("-m", "pip", "install", "-r", $requirements)} else {}
-     }
      6{
         Start-PythonScript -arguments @("automatic");
      }
@@ -209,3 +163,30 @@ sys.path = sys.path[: 3]
      }
 }
 
+# if CurPageID <> 1 then begin
+#   // don't check before evening starting that's BAD ðŸ¥²
+#   CheckRunning(False);
+#   end;
+
+
+# function CheckRunning(FromUninstaller: Boolean): Boolean;
+# var 
+# AppDir: String;
+# begin
+#   Result := True;
+#   if FromUninstaller then
+#     AppDir := ExpandConstant('{app}') 
+#   else
+#     AppDir := WizardDirValue();
+  
+#   if not ShellExec(Format('-ExecutionPolicy ByPass -File "%s\gate.ps1" -Mode 0', [AppDir]), AppDir) then 
+#   begin
+   
+#     if not FromUninstaller then
+#       CloseSetup('Application is Running in background, check the processes and close them and try again!')
+#       // raises Null Pointer Exception in case of the Uninstaller
+#     else
+#       MsgBox('MAL-Remainder is Running, Please close them and try again!', mbError, MB_OK);
+#     Result := False;
+#   end;
+# end;
