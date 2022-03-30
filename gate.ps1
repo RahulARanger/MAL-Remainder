@@ -162,31 +162,3 @@ switch($mode){
 
      }
 }
-
-# if CurPageID <> 1 then begin
-#   // don't check before evening starting that's BAD ðŸ¥²
-#   CheckRunning(False);
-#   end;
-
-
-# function CheckRunning(FromUninstaller: Boolean): Boolean;
-# var 
-# AppDir: String;
-# begin
-#   Result := True;
-#   if FromUninstaller then
-#     AppDir := ExpandConstant('{app}') 
-#   else
-#     AppDir := WizardDirValue();
-  
-#   if not ShellExec(Format('-ExecutionPolicy ByPass -File "%s\gate.ps1" -Mode 0', [AppDir]), AppDir) then 
-#   begin
-   
-#     if not FromUninstaller then
-#       CloseSetup('Application is Running in background, check the processes and close them and try again!')
-#       // raises Null Pointer Exception in case of the Uninstaller
-#     else
-#       MsgBox('MAL-Remainder is Running, Please close them and try again!', mbError, MB_OK);
-#     Result := False;
-#   end;
-# end;

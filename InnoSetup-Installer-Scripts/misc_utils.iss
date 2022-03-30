@@ -2,10 +2,7 @@
 
 var       
   DownloadPage: TDownloadWizardPage;  // downloads packages
-   SettingThingsUp: TOutputMarqueeProgressWizardPage; // loading ===== progress bar 
 
-  Downloaded: Boolean; // downloaded python or not 
-  
   Ask: Boolean;   // Ask is Flag for like, say we click Click button to exit setup
   // Ask = true for asking confirmation else False [we set False if we need to exit by force]
 
@@ -34,6 +31,9 @@ end;
 
 // Checks for the Python Directory, if found it says Downloaded else it downloads it
 function CheckAndDownloadPython(): String;
+var
+Downloaded: Boolean;
+
 begin
     Downloaded := DirExists(ExpandConstant('{app}/python'));
     Result := '';
@@ -63,35 +63,15 @@ begin
 
 end;
 
-procedure UndoThings(Message: String; ResultCode: Integer);
-
-var 
-
-Passed: Boolean;
-
-begin
-  
-  CloseSetup(Message)
-  
-  repeat 
-
-  Passed := Exec(ExpandConstant('{app}/unins000.exe'),'/VERYSILENT', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, ResultCode)
-
-  if not Passed then
-    MsgBox('Failed to open Uninstaller!, retrying..., close in Task manager if reapeating again and again and i am sorry for letting this installer led u here.', mbError, MB_OK);
-  
-  until Passed
-end;
-
-
 procedure PostInstall;
 
 var 
-ResultCode: Integer;
-ResultString: String;
+  ResultCode: Integer;
+  ResultString: String;
+  PythonPath: String;
 
 begin
-    SettingThingsUp.Show;
+    WizardForm.Hide;
     
     repeat
     
@@ -106,25 +86,52 @@ begin
       
        ResultString := 'It seems we can''t run setup.ps1, maybe that file was not installed! anyways please raise the issue in the repo!';
       
-      
-      MsgBox(IntToStr(ResultCode), mbInformation, MB_OK);
       if ResultCode = ImplicitExitCode then
+        begin
           if MsgBox('While in Verbose Mode, Powershell script is not silent and it sets things up. Since you have interprutted it, Do you want to cancel the installation ?', mbError, MB_YESNO) = IDYES then 
             begin 
               ResultCode := -1
               ResultString := 'Closed as requested'
-            end
-      
+            end;
+        end
       else if ResultCode <> 0 then 
         ResultString := 'Setup Script didn''t return the favorable result. Maybe there was some unexpected error, which shouldn''t have happended causally. Please raise this issue in the repo';
  
     until ResultCode <> ImplicitExitCode
 
-    if ResultCode <> 0 then
-      SettingThingsUp.setText('Silently Uninstalling', 'As Requested or due to post install failure, Uninstalling the application');
-      UndoThings(ResultString, ResultCode);
+    WizardForm.Show;
 
-    
-    SettingThingsUp.Hide;
+    if ResultCode <> 0 then
+      begin 
+        PythonPath := ExpandConstant('{app}/python');
+
+        if DirExists(PythonPath) then
+          DelTree(PythonPath, True, True, True); // deleting everything that setup  did if failed
+        
+        CloseSetup(ResultString);
+      end;
 end;
 
+function CheckAndQuit: Integer;
+var
+Script: String;
+
+begin
+    Script := ExpandConstant('{app}/gate.ps1');
+
+    if FileExists(Script) then
+    begin 
+    
+      ShellExec(
+        '','powershell', 
+        Format('-ExecutionPolicy ByPass -File "%s" -Mode 0', [Script]),
+         ExpandConstant('{app}'),
+          SW_HIDE,
+           ewWaitUntilTerminated,
+            Result
+      );
+      MsgBox(IntToStr(Result), mbInformation, MB_OK);
+
+     
+    end;
+end;

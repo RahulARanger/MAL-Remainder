@@ -3,7 +3,8 @@
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.2.0"
+#define Version="0.5.0"
+#define Mutex="Mal-Remainder"
 
 [Setup]
 ; Basic Meta
@@ -12,6 +13,7 @@ AppVersion="{#Version}"
 AppPublisher="{#Author}"
 AppPublisherURL="{#Repo}"
 AppSupportURL="{#Repo}"
+AppUpdatesURL="{#Repo}"
 AppContact="{#Repo}"
 
 
@@ -46,7 +48,7 @@ OutputDir="Output"
 OutputBaseFilename="{#Name}"
 
 ; uninstall exe file name 
-UninstallDisplayName="Uninstall-Mal-Remainder"
+UninstallDisplayName="Mal-Remainder-Uninstall"
 
 ; Compression Things
 Compression=lzma
@@ -60,17 +62,21 @@ DisableWelcomePage=no
 LicenseFile="../LICENSE.txt"
 
 ; doesn't allow more than one setup to run at the same time
-SetupMutex="Mal-Remainder"
+SetupMutex={#Mutex}
+AppMutex={#Mutex}
 
-InfoBeforeFile="../README.rtf"
+InfoBeforeFile="README.rtf"
+
+; Below Value is Oberserved Value
+ExtraDiskSpaceRequired=58576896 
+
 
 
 [Files]
 Source: "{tmp}\python.zip"; DestDir: "{app}"; flags: external skipifsourcedoesntexist; Permissions: users-modify;
 Source: "{tmp}\get-pip.py"; DestDir: "{app}"; flags: external skipifsourcedoesntexist; Permissions: users-modify;
-
 Source: "./setup.ps1"; DestDir: "{app}"; Permissions: users-modify;
-Source: "../requirements.txt"; DestDir: "{app}"; Flags: deleteafterinstall; Permissions: users-modify;
+Source: "../requirements.txt"; DestDir: "{app}"; Flags: deleteafterinstall; Permissions: users-modify; AfterInstall: PostInstall
 
 
 ; don't delete this ps1 file, it does some reliable work
@@ -91,18 +97,50 @@ Name: "{app}/python/__pycache__"; Permissions: everyone-modify;
 Name: "{app}/python/scripts"; Permissions: everyone-full;
 Name: "{app}/python/pip"; Permissions: everyone-modify;
 
+Name: "{app}/python/Lib/asyncio";
+Name: "{app}/python/Lib/collections";
+Name: "{app}/python/Lib/concurrent";
+Name: "{app}/python/Lib/ctypes";
+Name: "{app}/python/Lib/curses";
+Name: "{app}/python/Lib/dbm";
+Name: "{app}/python/Lib/distutils";
+Name: "{app}/python/Lib/email";
+Name: "{app}/python/Lib/encodings";
+Name: "{app}/python/Lib/html";
+Name: "{app}/python/Lib/http";
+Name: "{app}/python/Lib/importlib";
+Name: "{app}/python/Lib/json";
+Name: "{app}/python/Lib/lib2to3";
+Name: "{app}/python/Lib/logging";
+Name: "{app}/python/Lib/msilib";
+Name: "{app}/python/Lib/multiprocessing";
+Name: "{app}/python/Lib/pydoc_data";
+Name: "{app}/python/Lib/sqlite3";
+Name: "{app}/python/Lib/unittest";
+Name: "{app}/python/Lib/urllib";
+Name: "{app}/python/Lib/wsgiref";
+Name: "{app}/python/Lib/xml";
+Name: "{app}/python/Lib/xmlrpc";
+
 
 
 [UninstallDelete]
 ; files which have been skipped must be explicitly mentioned in this section 
-Type: filesandordirs; Name: "{app}\python"
-Type: files; Name: "{app}\requirements.txt"
-Type: files; Name: "{app}\setup.ps1"
-Type: files; Name: "{app}\get-pip.py"  
-Type: files; Name: "{app}\python.zip"
+Type: filesandordirs; Name: "{app}\python";
+
+Type: files; Name: "{app}\requirements.txt";
+Type: files; Name: "{app}\setup.ps1";
+Type: files; Name: "{app}\get-pip.py";  
+Type: files; Name: "{app}\python.zip";
+Type: files; Name: "{app}\python\lib\*.pyc";
+
+Type: filesandordirs; Name: "{app}\MAL_Remainder\__pycache__";
+Type: filesandordirs; Name: "{app}\MAL_Remainder\data";
+
+Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
 
 [Icons]
-Name: "{group}\MAL-Remainder"; Filename: "{cmd}"; Parameters: """{app}/setup.cmd"" -mode 6"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized
+Name: "{group}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-mode 6"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized
 
 
 [Code]
@@ -111,23 +149,26 @@ Name: "{group}\MAL-Remainder"; Filename: "{cmd}"; Parameters: """{app}/setup.cmd
 // we start with this event
 procedure InitializeWizard;
 begin
-  
   Ask := True;
   ImplicitExitCode := -1073741510
 
   DownloadPage := CreateDownloadPage('Downloading Python...', 'Downloading & Extracting Embedded python 3.8.9.zip', @OnDownloadProgress);
-  SettingThingsUp := CreateOutputMarqueeProgressPage('Setting up Python Environment', 'Setting up PIP and site-packages');
-  
-    
 end;
-
-
-                                          
+                                    
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
-  Result := CheckAndDownloadPython();
+  if CheckAndQuit() <> 0 then 
+    Result := 'Please Close the necessary running applications to proceed forward'
+  else 
+    Result := CheckAndDownloadPython();
 end;
 
+procedure CurStepChanged(CurStep: TSetupStep);
+
+begin
+  if CurStep = ssPostInstall then 
+    PostInstall;
+end;
 
 // one needs to copy this event function as it is or modify them as they need
 procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
@@ -135,12 +176,11 @@ begin
   Confirm := Confirm and Ask;
 end;
 
-
-
-procedure CurStepChanged(CurStep: TSetupStep);
-
+function InitializeUninstall: Boolean;
 begin
+  Result := CheckAndQuit() = 0;
 
-if CurStep = ssPostInstall then 
-    PostInstall;
-end;
+  if not Result then
+      MsgBox('Please close the necessary applications before uninstalling this application!', mbError, MB_OK);
+
+end;      

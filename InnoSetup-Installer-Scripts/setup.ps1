@@ -1,5 +1,6 @@
 $DebugPreference = 'Continue'
 $ErrorActionPreference = "Stop"
+
 $host.UI.RawUI.WindowTitle = "Don't close this window, Closing this would affect the installation process."
 
 $ScriptPath = (Get-Location).Path 
@@ -35,7 +36,6 @@ Lib/site-packages
 .
 import site
 "
-
 # creates a site-customize.py, which enables python Interpreter know the sys.path
 # we also make sure to not use any pre-existing python paths
 Write-Debug "Restriccting python to use any other path"
