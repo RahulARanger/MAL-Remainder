@@ -69,7 +69,7 @@ InfoBeforeFile="../README.rtf"
 Source: "{tmp}\python.zip"; DestDir: "{app}"; flags: external skipifsourcedoesntexist; Permissions: users-modify;
 Source: "{tmp}\get-pip.py"; DestDir: "{app}"; flags: external skipifsourcedoesntexist; Permissions: users-modify;
 
-Source: "./setup.ps1"; Flags: noencryption dontcopy; Permissions: users-modify;
+Source: "./setup.ps1"; DestDir: "{app}"; Permissions: users-modify;
 Source: "../requirements.txt"; DestDir: "{app}"; Flags: deleteafterinstall; Permissions: users-modify;
 
 
@@ -96,7 +96,10 @@ Name: "{app}/python/pip"; Permissions: everyone-modify;
 [UninstallDelete]
 ; files which have been skipped must be explicitly mentioned in this section 
 Type: filesandordirs; Name: "{app}\python"
-
+Type: files; Name: "{app}\requirements.txt"
+Type: files; Name: "{app}\setup.ps1"
+Type: files; Name: "{app}\get-pip.py"  
+Type: files; Name: "{app}\python.zip"
 
 [Icons]
 Name: "{group}\MAL-Remainder"; Filename: "{cmd}"; Parameters: """{app}/setup.cmd"" -mode 6"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized
@@ -119,12 +122,7 @@ begin
 end;
 
 
-procedure CurPageChanged(CurPageID: Integer);
-begin
-  
-end; 
-
-
+                                          
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
   Result := CheckAndDownloadPython();
@@ -138,4 +136,11 @@ begin
 end;
 
 
- 
+
+procedure CurStepChanged(CurStep: TSetupStep);
+
+begin
+
+if CurStep = ssPostInstall then 
+    PostInstall;
+end;

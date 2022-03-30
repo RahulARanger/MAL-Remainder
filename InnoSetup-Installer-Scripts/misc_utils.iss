@@ -5,8 +5,7 @@ var
    SettingThingsUp: TOutputMarqueeProgressWizardPage; // loading ===== progress bar 
 
   Downloaded: Boolean; // downloaded python or not 
-  EC: Integer;   // temp for Error Code
-  Prefix: String; // prefix for powershell script params
+  
   Ask: Boolean;   // Ask is Flag for like, say we click Click button to exit setup
   // Ask = true for asking confirmation else False [we set False if we need to exit by force]
 
@@ -35,11 +34,6 @@ end;
 
 // Checks for the Python Directory, if found it says Downloaded else it downloads it
 function CheckAndDownloadPython(): String;
-
-var
-ResultCode: Integer;
-TempResult: Boolean;
-
 begin
     Downloaded := DirExists(ExpandConstant('{app}/python'));
     Result := '';
@@ -57,33 +51,80 @@ begin
         
         DownloadPage.Download;
         DownloadPage.Hide;
-        SettingThingsUp.Show;
-
-        
-        ExtractTemporaryFile('setup.ps1')
-
-        if not ShellExec('', ExpandConstant('{cmd}'), ExpandConstant('/c powershell -ExecutionPolicy ByPass -file "{tmp}/setup.ps1"'), ExpandConstant('{app}'), SW_SHOW,
-         ewWaitUntilTerminated, ResultCode) then
-         Result := 'It seems we can''t run setup.ps1, please raise this issue in the repo';
-    
-        if ResultCode = ImplicitExitCode then
-          Result := 'It seems you have closed the shell script, which is necessary for setup!'
-        
-        else if ResultCode <> 0 then 
-          Result := 'Setup Script didn''t return the favorable result. Maybe there was some unexpected error, which shouldn''t have happended causally. Please raise this issue in the repo';
-
       except 
-
         Result := AddPeriod(GetExceptionMessage);
 
       finally
-
         DownloadPage.Hide;
-        SettingThingsUp.Hide;
 
-      end;                            
+  end;
     
     end;
 
+end;
+
+procedure UndoThings(Message: String; ResultCode: Integer);
+
+var 
+
+Passed: Boolean;
+
+begin
+  
+  CloseSetup(Message)
+  
+  repeat 
+
+  Passed := Exec(ExpandConstant('{app}/unins000.exe'),'/VERYSILENT', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, ResultCode)
+
+  if not Passed then
+    MsgBox('Failed to open Uninstaller!, retrying..., close in Task manager if reapeating again and again and i am sorry for letting this installer led u here.', mbError, MB_OK);
+  
+  until Passed
+end;
+
+
+procedure PostInstall;
+
+var 
+ResultCode: Integer;
+ResultString: String;
+
+begin
+    SettingThingsUp.Show;
+    
+    repeat
+    
+      if not ShellExec(
+      '','powershell', 
+      ExpandConstant('-ExecutionPolicy ByPass -file "{app}/setup.ps1"'),
+       ExpandConstant('{app}'),
+        SW_SHOW,
+         ewWaitUntilTerminated,
+          ResultCode
+      ) then
+      
+       ResultString := 'It seems we can''t run setup.ps1, maybe that file was not installed! anyways please raise the issue in the repo!';
+      
+      
+      MsgBox(IntToStr(ResultCode), mbInformation, MB_OK);
+      if ResultCode = ImplicitExitCode then
+          if MsgBox('While in Verbose Mode, Powershell script is not silent and it sets things up. Since you have interprutted it, Do you want to cancel the installation ?', mbError, MB_YESNO) = IDYES then 
+            begin 
+              ResultCode := -1
+              ResultString := 'Closed as requested'
+            end
+      
+      else if ResultCode <> 0 then 
+        ResultString := 'Setup Script didn''t return the favorable result. Maybe there was some unexpected error, which shouldn''t have happended causally. Please raise this issue in the repo';
+ 
+    until ResultCode <> ImplicitExitCode
+
+    if ResultCode <> 0 then
+      SettingThingsUp.setText('Silently Uninstalling', 'As Requested or due to post install failure, Uninstalling the application');
+      UndoThings(ResultString, ResultCode);
+
+    
+    SettingThingsUp.Hide;
 end;
 
