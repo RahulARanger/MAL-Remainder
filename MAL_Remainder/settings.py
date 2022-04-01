@@ -5,13 +5,13 @@ import pathlib
 from urllib.parse import urlparse, urljoin
 from concurrent.futures.thread import ThreadPoolExecutor
 import webbrowser
-from threading import Lock, Timer
+from threading import Timer
 import sys
 from _thread import interrupt_main
 import traceback
 
 if __name__ == "__main__":
-    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort
+    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort
     from MAL_Remainder.oauth_responder import OAUTH
     from MAL_Remainder.utils import get_headers, SETTINGS, force_oauth, is_there_token
     from MAL_Remainder.mal_session import MALSession
@@ -25,18 +25,6 @@ app = Flask(
     static_folder=str(root_path / "static"),
     template_folder=str(root_path / "templates"),
 )
-SETTINGS_LOCK = Lock()
-
-
-def ensure_settings(f):
-    def ensure(*args, **kwargs):
-        if SETTINGS_LOCK.locked():
-            return abort(410, "Settings Lock is already Locked")
-
-        with SETTINGS_LOCK:
-            return f(*args, **kwargs)
-
-    return ensure
 
 
 def profile_pic(about_me: dict):
@@ -78,6 +66,10 @@ def show_exception(message):
     return webbrowser.open(urljoin(request.url_root, "404/?failed=" + message))
 
 
+def traceback_error():
+    return _404(traceback.format_exc())
+
+
 class Server:
     def __init__(self):
         self.settings = SETTINGS
@@ -106,7 +98,7 @@ class Server:
             error[0] = expires_in
             self.refresh_tokens() if expired else ...
         except Exception as _:
-            error[-1] = repr(_)
+            error[-1] = traceback.format_exc()
 
         return render_template(
             "settings.html",
@@ -117,14 +109,19 @@ class Server:
             expire_time=error[0],
         )
 
-    @ensure_settings
+    def refer_settings(self):
+        try:
+            current_executable("-ask")
+            return redirect("/settings")
+        except Exception as _:
+            return abort(404, traceback.format_exc())
+
     def fetch_abouts(self):
         response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
         response.raise_for_status()
 
         self.settings.from_dict(profile_pic(response.json()))
 
-    @ensure_settings
     def refresh_tokens(self):
         response = session.post(
             f"{OAUTH}/token",
@@ -232,6 +229,7 @@ if __name__ == "__main__":
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]
     )
+    app.add_url_rule("/import-settings", view_func=SERVER.refer_settings)
 
     trust = EnsurePort("/settings", "mal-remainder")
 
@@ -250,3 +248,5 @@ if __name__ == "__main__":
     trust.release()
 
 # Reference: https://myanimelist.net/blog.php?eid=835707
+
+# # C:\Users\Rahul\AppData\Local\Programs\PowerShell Universal

@@ -91,12 +91,18 @@
 						<input
 							type="text"
 							name="calendar"
+							id="CALENDAR"
 							value="{{settings['calendar']}}"
 						/>
 					</div>
 
 					<button name="save" style="margin-top: 2rem">Save</button>
 					<button name="refresh">Refresh Tokens</button>
+				</form>
+				<form action="./import-settings">
+					<button style="margin-top: 1rem" name="settings">
+						Import Settings
+					</button>
 				</form>
 			</section>
 		</main>

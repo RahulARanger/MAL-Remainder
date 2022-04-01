@@ -71,3 +71,11 @@ function count_down(id, value) {
 
 	clearInterval(timer_id);
 }
+
+document
+	.querySelector("button[name='settings']")
+	.addEventListener("click", function (e) {
+		confirm(
+			"Importing External Settings might replace the current settings"
+		) || e.preventDefault();
+	});

@@ -8,8 +8,38 @@ var
 
   ImplicitExitCode: Integer; // like this has ability to dected implicit closes of powershell scripts
 
+  Downloaded: Boolean;
 
-  // handles progress for the Download Page 
+
+function ExecPSScript(file: String; show: Boolean; Params: String; var ResultCode: Integer): Boolean;
+var
+ShowCmd: Integer;
+
+begin
+
+  if show then
+    ShowCmd := SW_SHOW
+  else
+    ShowCmd := SW_HIDE;
+
+
+  Result := ShellExec(
+              '',
+              'powershell',
+              ExpandConstant(
+                Format(
+                  '-NoLogo -ExecutionPolicy ByPass -File "{app}/%s" %s', [file, Params]
+                  )
+                ),
+              ExpandConstant('{app}'),
+              ShowCmd,
+              ewWaitUntilTerminated,
+              ResultCode
+          );
+  
+end;      
+
+
 function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
 begin
   if Progress = ProgressMax then
@@ -31,36 +61,27 @@ end;
 
 // Checks for the Python Directory, if found it says Downloaded else it downloads it
 function CheckAndDownloadPython(): String;
-var
-Downloaded: Boolean;
 
 begin
     Downloaded := DirExists(ExpandConstant('{app}/python'));
     Result := '';
 
     if not Downloaded then
-    begin
-    
-      DownloadPage.Clear;
-      
-      DownloadPage.Add('https://www.python.org/ftp/python/3.8.9/python-3.8.9-embed-amd64.zip', 'python.zip', '');
-      DownloadPage.Add('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py', '');
-      DownloadPage.Show;
-    
-      try
-        
-        DownloadPage.Download;
-        DownloadPage.Hide;
-      except 
-        Result := AddPeriod(GetExceptionMessage);
+      begin 
+        DownloadPage.Clear;
+        DownloadPage.Add('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py', '');
+        DownloadPage.Add('https://www.python.org/ftp/python/3.8.9/python-3.8.9-embed-amd64.zip', 'python.zip', '');
+        DownloadPage.Show;
 
-      finally
-        DownloadPage.Hide;
+        try 
+          DownloadPage.Download;
+        except 
+          Result := AddPeriod(GetExceptionMessage);
+        finally
+          DownloadPage.Hide;
+        end;
 
-  end;
-    
-    end;
-
+      end;
 end;
 
 procedure PostInstall;
@@ -71,24 +92,26 @@ var
   PythonPath: String;
 
 begin
-    WizardForm.Hide;
+
+    if not Downloaded then 
     
-    repeat
+    begin
     
-      if not ShellExec(
-      '','powershell', 
-      ExpandConstant('-ExecutionPolicy ByPass -file "{app}/setup.ps1"'),
-       ExpandConstant('{app}'),
-        SW_SHOW,
-         ewWaitUntilTerminated,
-          ResultCode
-      ) then
+      WizardForm.Hide;
+      
+      repeat
+  
+      if not ExecPSScript('setup.ps1', True, '', ResultCode) then
       
        ResultString := 'It seems we can''t run setup.ps1, maybe that file was not installed! anyways please raise the issue in the repo!';
       
       if ResultCode = ImplicitExitCode then
         begin
-          if MsgBox('While in Verbose Mode, Powershell script is not silent and it sets things up. Since you have interprutted it, Do you want to cancel the installation ?', mbError, MB_YESNO) = IDYES then 
+          if SuppressibleMsgBox
+          ('Do you want cancel the Installation ?'#13#10''#13#10'Installer uses Powershell script as a part of Installation'#13#10'',
+           mbConfirmation,
+            MB_YESNO,
+             IDNO) = IDYES then 
             begin 
               ResultCode := -1
               ResultString := 'Closed as requested'
@@ -97,19 +120,21 @@ begin
       else if ResultCode <> 0 then 
         ResultString := 'Setup Script didn''t return the favorable result. Maybe there was some unexpected error, which shouldn''t have happended causally. Please raise this issue in the repo';
  
-    until ResultCode <> ImplicitExitCode
+      until ResultCode <> ImplicitExitCode
 
-    WizardForm.Show;
+      WizardForm.Show;
+    
+      if ResultCode <> 0 then
+        begin 
+          PythonPath := ExpandConstant('{app}/python');
 
-    if ResultCode <> 0 then
-      begin 
-        PythonPath := ExpandConstant('{app}/python');
+          if DirExists(PythonPath) then
+            DelTree(PythonPath, True, True, True); // deleting everything that setup  did if failed
+          
+          CloseSetup(ResultString);
+        end;
 
-        if DirExists(PythonPath) then
-          DelTree(PythonPath, True, True, True); // deleting everything that setup  did if failed
-        
-        CloseSetup(ResultString);
-      end;
+    end;
 end;
 
 function CheckAndQuit: Integer;
@@ -117,21 +142,7 @@ var
 Script: String;
 
 begin
-    Script := ExpandConstant('{app}/gate.ps1');
-
-    if FileExists(Script) then
-    begin 
     
-      ShellExec(
-        '','powershell', 
-        Format('-ExecutionPolicy ByPass -File "%s" -Mode 0', [Script]),
-         ExpandConstant('{app}'),
-          SW_HIDE,
-           ewWaitUntilTerminated,
-            Result
-      );
-      MsgBox(IntToStr(Result), mbInformation, MB_OK);
-
-     
-    end;
+    if FileExists(Script) then
+      ExecPSScript('gate.ps1', False, '', Result)
 end;

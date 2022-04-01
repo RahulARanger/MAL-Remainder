@@ -73,17 +73,18 @@ header {
 
 header > a {
 	color: #ff5500;
-	animation: neonAnim 1.2s alternate-reverse infinite;
-	border: 1px solid transparent;
+	animation: neonAnim 1.5s alternate-reverse infinite;
 	padding: 6.9px;
-	transition: all 0.39s ease-out;
+	transition: all 0.09s ease-out;
 	border-radius: 0.4rem;
 	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+	border: 2px solid rgba(0, 0, 0, 0.3);
 	opacity: 0.89;
 }
 
 header > a:hover {
-	border: 1px solid rgba(255, 85, 0, 0.7);
+	border: 2px solid transparent;
+
 	transform: scale(1.069, 1.069) translateY(2px);
 	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 	opacity: 1;

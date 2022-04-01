@@ -106,11 +106,14 @@ def schedule_events(force=False):
         return
 
     started, ended = from_now()
+    if not ended:
+        return 
+    
     triggers_for_end = ",".join(
         event_time.strftime("%H:%M:%S") for event_time in ended
     )
     reason_for_failure = current_executable(
-        "-sch", "-triggers_for_end", triggers_for_end
+        "-sch", "-arguments", triggers_for_end
     )
 
     say_we_are_done_today()

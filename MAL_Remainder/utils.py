@@ -8,9 +8,9 @@ from MAL_Remainder.common_utils import ensure_data
 
 
 class Settings:
-    def __init__(self):
+    def __init__(self, source=None):
         self.connection = sqlite3.connect(
-            ensure_data() / "settings.db",
+            source if source else (ensure_data() / "settings.db"),
             timeout=6,
             check_same_thread=False,
         )
@@ -41,7 +41,7 @@ class Settings:
     def from_dict(self, container: dict):
         cursor = self.connection.executemany(
             "INSERT OR REPLACE INTO SETTINGS (key, value) Values(?, ?);",
-            container.items(),
+            {_: container[_] for _ in container if container[_]}.items(),
         )
         self.connection.commit()
         cursor.close()
