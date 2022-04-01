@@ -3,7 +3,7 @@
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.6.1"
+#define Version="0.6.2"
 #define Mutex="Mal-Remainder"
 
 [Setup]
@@ -110,9 +110,11 @@ Type: files; Name: "{app}\python\lib\*.pyc";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\__pycache__";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\data";
 Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
+Type: files; Name: "{app}\MAL_Remainder\static\Profile*";
 
 [Icons]
 Name: "{group}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-open"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized
+Name: "{autostartup}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
 
 [Run]
 Filename: "{app}\setup.cmd"; Description: "Open MAL-Remainder"; Parameters: "-settings"; WorkingDir: "{app}"; Flags: postinstall
