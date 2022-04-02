@@ -89,12 +89,17 @@ class Server:
 
     def settings_page(self):
         error = [0, ""]
-        expires_in, expired = get_remaining_seconds(
-            int(self.settings["expires_in"]) + int(self.settings["now"])
-        )
 
         try:
+            expires_in, expired = get_remaining_seconds(
+                int(self.settings["expires_in"]) + int(self.settings["now"])
+            )
+            error[0] = expires_in
+
             ... if self.settings["id"] or expired else self.refresh(self.settings.to_dict())
+        except ValueError:
+            error[
+                -1] = "Failed to check the expiry date of the refresh tokens!, Maybe we don't have your refresh token.\nGo get one!"
         except Exception as _:
             error[-1] = traceback.format_exc()
 
@@ -104,7 +109,7 @@ class Server:
             settings=self.settings,
             profile=url_for("static", filename="Profile" + self.settings["picture"]),
             error=error[-1],
-            expire_time=expires_in,
+            expire_time=error[0],
         )
 
     def reset_settings(self):
@@ -161,6 +166,9 @@ class Server:
     def update_things(self):
         try:
             watch_list = list(self.mal_session().watching())
+        except AttributeError:
+            return abort(404,
+                         "Failed to fetch your watch list! Maybe you don't have a valid token? Are you sure it's not expired\nGo to Settings to know more!")
         except Exception as error:
             return abort(404, repr(error))
 
@@ -175,19 +183,26 @@ class Server:
         )
 
     def refresh_events(self, url=""):
-        quick_save(url if url else self.settings("calendar"), False)
-
         url = url if url else self.settings["calendar"]
         if not url:
             return
 
-        quick_save(url)
+        quick_save(url if url else self.settings("calendar"), False)
+
         failed = schedule_events(True)
 
         if failed:
             raise ProcessError(failed)
         else:
             self.settings["calendar"] = url
+
+    def calendar_refresh(self):
+        try:
+            self.refresh_events()
+        except ProcessError:
+            return abort(404, "Failed to schedule events!, Here's the logs:\n" + traceback.format_exc())
+
+        return redirect("/settings")
 
     def update_things_in_site(self):
         form = request.form
@@ -228,7 +243,8 @@ class Server:
         process.join()
 
         if pipe.empty():
-            raise ConnectionAbortedError("Failed to contact the server, Probably the server is busy!!! try to close that")
+            raise ConnectionAbortedError(
+                "Failed to contact the server, Probably the server is busy!!! try to close that")
 
         raw = pipe.get(block=False)
         if not raw or type(raw) == str:
@@ -271,7 +287,7 @@ if __name__ == "__main__":
 
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
-    app.add_url_rule("/save-events", view_func=SERVER.refresh_events)
+    app.add_url_rule("/save-events", view_func=SERVER.calendar_refresh)
 
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]

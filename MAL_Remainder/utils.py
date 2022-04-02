@@ -20,7 +20,7 @@ class Settings:
         value = self.connection.execute(
             "SELECT Value from Settings where key = (?);", (key,)
         ).fetchone()
-        return value[-1] if value else False
+        return value[-1] if value else ""
 
     def __setitem__(self, key, value):
         cursor = self.connection.execute(

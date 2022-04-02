@@ -3,7 +3,7 @@
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.6.2"
+#define Version="0.6.3"
 #define Mutex="Mal-Remainder"
 
 [Setup]
