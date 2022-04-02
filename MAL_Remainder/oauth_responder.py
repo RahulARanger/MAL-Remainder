@@ -1,6 +1,6 @@
 import random
 import requests
-from flask import Flask, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from threading import Timer
 from _thread import interrupt_main
 import webbrowser
@@ -8,6 +8,9 @@ from MAL_Remainder.common_utils import update_now_in_seconds
 import socket
 from datetime import timedelta
 from queue import Queue
+
+
+
 
 
 def ensure_port(host, port):
@@ -50,17 +53,18 @@ def get_new_code_verifier() -> str:
 
 # https://www.oauth.com/oauth2-servers/making-authenticated-requests/refreshing-an-access-token/
 class Session:
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id, client_secret, url):
         self.code_challenge = get_new_code_verifier()
         self.session_state = "I LOVE REM"
         self.tokens = {}
+        self.redirect_to = url
         self.client_things = client_id, client_secret
         self.failed = None
 
     # Reference from https://myanimelist.net/blog.php?eid=835707
     def authorize(self):
         return redirect(
-            f"{OAUTH}/authorize?response_type=code&client_id={self.client_things[0]}&code_challenge={self.code_challenge}&state={self.session_state}")
+            f"{OAUTH}/authorize?response_type=code&client_id={self.client_things[0]}&code_challenge={self.code_challenge}&state={self.session_state}&redirect_uri={self.redirect_to}/save")
 
     def redirect_uri(self):
         raw = request.args
@@ -100,10 +104,21 @@ def _gen_session(host, port, client_id, client_secret):
 
     app = Flask("MyAnimeList Session For Watcher")
 
-    req_session = Session(client_id, client_secret)
+
+    
+    req_session = Session(client_id, client_secret, f'http://{host}:{port}/')
+
+    @app.errorhandler(404)
+    def quit_this(message):
+        requests.post(req_session.redirect_to + "/save", params={
+            "error": "Quited"
+        })
+
+        return redirect('/save?error=Quitted as per request, You may try open the session again')
 
     app.add_url_rule("/", view_func=req_session.authorize)
     app.add_url_rule("/save", view_func=req_session.redirect_uri)
+    
 
     timers = [Timer(
         timedelta(days=0, minutes=6, seconds=0, hours=0).total_seconds(), lambda: req_session.close("Time out error")
@@ -113,7 +128,7 @@ def _gen_session(host, port, client_id, client_secret):
 
     timers.append(Timer(
         timedelta(days=0, minutes=0, seconds=random.uniform(1, 2), hours=0).total_seconds(),
-        lambda: webbrowser.open(f"http://{host}:{port}/")
+        lambda: webbrowser.open(req_session.redirect_to)
     ))
 
     timers[-1].start()

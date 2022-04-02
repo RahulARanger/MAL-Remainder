@@ -18,8 +18,14 @@
 				target="_blank"
 				>➡️ Redirect to your Anime list</a
 			>
-			<a href="./save-events" title="Change the Timings on ur Local Machine's Scheduler">📅 ReSchedule</a>
-			<a href="./" title="Opens up a Force Scheduler Page">⏰ Force-Remainder</a>
+			<a
+				href="./save-events"
+				title="Change the Timings on ur Local Machine's Scheduler"
+				>📅 ReSchedule</a
+			>
+			<a href="./" title="Opens up a Force Scheduler Page"
+				>⏰ Force-Remainder</a
+			>
 			<!--<a href="./dash-board" target="_blank">Save Data</a> !-->
 			<div data-time="{{expire_time}}">
 				<span>Expires in:&nbsp;</span>
@@ -95,14 +101,18 @@
 							value="{{settings['calendar']}}"
 						/>
 					</div>
-
-					<button name="save" style="margin-top: 2rem">Save</button>
-					<button name="refresh">Refresh Tokens</button>
+					<a
+						href="./close-oauth_session"
+						title="Click this to close the session"
+						style="display: none"
+						id="close-link"
+						>./close-oauth_session</a
+					>
+					<button name="reset">Reset Oauth</button>
+					<button name="refresh">Refresh</button>
 				</form>
 				<form action="./import-settings">
-					<button style="margin-top: 1rem" name="settings">
-						Import Settings
-					</button>
+					<button name="settings">Import Settings</button>
 				</form>
 			</section>
 		</main>

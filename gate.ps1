@@ -146,7 +146,7 @@ public static extern bool SetWindowPos(
 }
 
 
-function Ask-Settings{
+function Get-Settings{
 write-output "asked"
     Add-Type -AssemblyName PresentationFramework
     # https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.openfiledialog?view=windowsdesktop-6.0
@@ -177,7 +177,7 @@ switch($true){
     }
     
     {$ask.IsPresent}{
-        $asked = Ask-Settings
+        $asked = Get-Settings
         if (-not ($asked -eq "")) {& $executable (Get-ProjectPyPath -file "import_settings") $asked} else {}
     }
 

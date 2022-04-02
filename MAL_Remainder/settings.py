@@ -1,9 +1,11 @@
+from multiprocessing import ProcessError
 import random
 from flask import Flask, render_template, redirect, url_for, request, abort
 import requests
 import pathlib
 from urllib.parse import urlparse, urljoin
 from concurrent.futures.thread import ThreadPoolExecutor
+from multiprocessing import Process, Queue
 import webbrowser
 from threading import Timer
 import sys
@@ -11,21 +13,17 @@ from _thread import interrupt_main
 import traceback
 
 if __name__ == "__main__":
-    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort
-    from MAL_Remainder.oauth_responder import OAUTH
-    from MAL_Remainder.utils import get_headers, SETTINGS, force_oauth, is_there_token
+    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort, ROOT
+    from MAL_Remainder.oauth_responder import OAUTH, gen_session
+    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token
     from MAL_Remainder.mal_session import MALSession
     from MAL_Remainder.calendar_parse import quick_save, schedule_events
 
     session = requests.Session()
 
-root_path = pathlib.Path(__file__).parent
 app = Flask(
-    "Remainder Settings",
-    static_folder=str(root_path / "static"),
-    template_folder=str(root_path / "templates"),
+    "Remainder Settings"
 )
-
 
 def profile_pic(about_me: dict):
     url = about_me["picture"]
@@ -76,6 +74,7 @@ class Server:
         self.executor = ThreadPoolExecutor(thread_name_prefix="Remainder-Server")
         self._MAL = None
         self._MAL = self.mal_session() if is_there_token() else False
+        self.OAUTH_process = None
 
     def mal_session(self):
         if self._MAL:
@@ -91,12 +90,7 @@ class Server:
         error = [0, ""]
 
         try:
-            ... if self.settings["id"] else self.fetch_abouts()
-            expires_in, expired = get_remaining_seconds(
-                int(self.settings["expires_in"]) + int(self.settings["now"])
-            )
-            error[0] = expires_in
-            self.refresh_tokens() if expired else ...
+            ... if self.settings["id"] else self.refresh()
         except Exception as _:
             error[-1] = traceback.format_exc()
 
@@ -108,6 +102,24 @@ class Server:
             error=error[-1],
             expire_time=error[0],
         )
+    
+    def reset_settings(self):
+        raw = request.form
+
+        if "refresh" in raw:
+            return self.refresh()
+
+        try:
+            self.settings.from_dict(request.form, False)
+            
+            self.force_oauth()
+            self.refresh()
+
+        except Exception as _:
+            return traceback_error()
+
+        self.settings.connection.commit()
+        return redirect("/settings")
 
     def refer_settings(self):
         try:
@@ -116,13 +128,11 @@ class Server:
         except Exception as _:
             return abort(404, traceback.format_exc())
 
-    def fetch_abouts(self):
-        response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
-        response.raise_for_status()
-
-        self.settings.from_dict(profile_pic(response.json()))
-
-    def refresh_tokens(self):
+    def refresh(self):
+        # Refreshing Tokens...
+        raw = request.form
+        refresh_cal = raw["calendar"] and raw["calendar"] != self.settings["calendar"]
+         
         response = session.post(
             f"{OAUTH}/token",
             data={
@@ -134,6 +144,16 @@ class Server:
         )
         response.raise_for_status()
         self.settings.from_dict(update_now_in_seconds(response.json()))
+
+
+        # Fetching your name and profile picture
+        response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
+        response.raise_for_status()
+
+        self.settings.from_dict(profile_pic(response.json()))
+        
+        self.refresh_events(raw["calendar"]) if refresh_cal else ...
+        
 
     def update_things(self):
         try:
@@ -152,38 +172,20 @@ class Server:
         )
 
     def refresh_events(self, url=""):
-        try:
-            quick_save(url if url else self.settings("calendar"), False)
-        except Exception as _:
-            abort(404, traceback.format_exc())
+        quick_save(url if url else self.settings("calendar"), False)
 
+        
+        url = url if url else self.settings["calendar"]
+        if not url:
+            return
+        
+        quick_save(url)
         failed = schedule_events(True)
 
-        return abort(404, failed) if failed else redirect("./settings")
-
-    def refresh(self):
-        self.fetch_abouts()
-        self.refresh_tokens()
-
-    def redirect_path(self):
-        raw = request.form
-
-        try:
-            self.refresh_events(raw["calendar"]) if raw["calendar"] != self.settings[
-                "calendar"] else ...
-
-            oauth_required = raw["CLIENT_ID"] != self.settings["CLIENT_ID"] or raw["CLIENT_SECRET"] != \
-                             self.settings["CLIENT_SECRET"]
-
-            self.settings.from_dict(request.form)
-            force_oauth() if oauth_required else ...
-
-            self.refresh() if "refresh" in raw else ...
-
-        except Exception as _:
-            return abort(404, traceback.format_exc())
-
-        return redirect("/settings")
+        if failed:
+            raise ProcessError(failed)
+        else:
+            self.settings["calendar"] = url
 
     def update_things_in_site(self):
         form = request.form
@@ -205,6 +207,39 @@ class Server:
             return abort(410)
 
         return redirect("/settings")
+    
+    def force_oauth(self):
+        pipe = Queue()
+        process = Process(
+            target=gen_session,
+            args=(
+                SETTINGS("REDIRECT_HOST"),
+                SETTINGS("REDIRECT_PORT"),
+                SETTINGS("CLIENT_ID"),
+                SETTINGS("CLIENT_SECRET"),
+                pipe,
+            ),
+        )
+        self.OAUTH_process = pipe, process
+        process.start()
+        process.join()
+
+        if pipe.empty():
+            raise ConnectionAbortedError("Failed to authenticate for fetching tokens")
+
+        raw = pipe.get(block=False)
+        if not raw or type(raw) == str:
+            raise ConnectionRefusedError(raw)
+
+        return SETTINGS.from_dict(raw)
+    
+    def close_oauth(self):
+        if self.OAUTH_process:
+            pipe, process = self.OAUTH_process
+            pipe.close()
+            process.terminate()
+        
+        return redirect("/settings")
 
 
 def gen_url(_port):
@@ -216,20 +251,25 @@ def gen_url(_port):
 
 
 if __name__ == "__main__":
+    app.static_folder = str(ROOT / "static")
+    app.template_folder = str(ROOT / "templates")
+
     SERVER = Server()
 
     app.add_url_rule("/settings", view_func=SERVER.settings_page)
-    app.add_url_rule("/save-settings", view_func=SERVER.redirect_path, methods=["POST"])
+    app.add_url_rule("/save-settings", view_func=SERVER.reset_settings, methods=["POST"])
+    app.add_url_rule("/import-settings", view_func=SERVER.refer_settings)
 
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
-
     app.add_url_rule("/save-events", view_func=SERVER.refresh_events)
 
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]
     )
-    app.add_url_rule("/import-settings", view_func=SERVER.refer_settings)
+    app.add_url_rule("/close-oauth_session", view_func=SERVER.close_oauth)
+
+    
 
     trust = EnsurePort("/settings", "mal-remainder")
 

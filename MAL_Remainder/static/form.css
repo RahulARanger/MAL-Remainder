@@ -104,3 +104,7 @@ button,
 span {
 	user-select: none;
 }
+
+form > button {
+	margin-top: 0.6rem;
+}

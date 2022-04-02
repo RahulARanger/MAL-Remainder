@@ -79,3 +79,10 @@ document
 			"Importing External Settings might replace the current settings"
 		) || e.preventDefault();
 	});
+
+document
+	.querySelector("form")
+	.addEventListener(
+		"submit",
+		() => (document.getElementById("close-link").style.display = "block")
+	);

@@ -30,7 +30,7 @@ github_username: RahulARanger
 # Build settings
 theme: "just-the-docs"
 
-remote_theme: just-the-docs/just-the-docs
+remote_theme: pdmosses/just-the-docs@callouts
 
 plugins:
     - jekyll-feed
@@ -97,3 +97,39 @@ heading_anchors: true
 footer_content: "Copyright (c) 2021 RahulARanger, Distributed by <a href='https://github.com/RahulARanger/MAL-Remainder/blob/master/LICENSE.txt'>MIT LICENSE.</a>"
 last_edit_timestamp: true
 last_edit_time_format: "%b %e %Y at %I:%M %p" # i like this default format
+
+callouts:
+    comfy:
+        # title:
+        color: pink
+        opacity: 0.34
+    attention:
+        title: Attention
+        color: purple
+    caution:
+        title: Caution
+        color: yellow
+    danger:
+        title: Danger
+        color: red
+    error:
+        title: Error
+        color: red
+    highlight:
+        color: yellow
+        opacity: 0.5
+    hint:
+        title: Hint
+        color: grey-dk
+    important:
+        title: Important
+        color: green
+    note:
+        title: Note
+        color: blue
+    tip:
+        title: Tip
+        color: grey-dk
+    warning:
+        title: Warning
+        color: red

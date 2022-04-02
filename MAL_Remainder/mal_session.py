@@ -1,7 +1,6 @@
 import requests
 from collections import namedtuple
 
-
 class MALSession:
     def __init__(self, session: requests.Session, headers: dict):
         self.api_url = "https://api.myanimelist.net/v2/"
@@ -52,3 +51,7 @@ class MALSession:
         response.raise_for_status()
 
         return response.json()
+    
+    
+    
+    

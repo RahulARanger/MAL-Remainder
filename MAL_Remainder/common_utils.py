@@ -5,6 +5,7 @@ from sqlite3 import connect
 import webbrowser
 import socket
 
+ROOT = pathlib.Path(__file__).parent
 
 def get_remaining_seconds(seconds):
     expired = int(seconds - datetime.now().timestamp())
@@ -17,7 +18,7 @@ def update_now_in_seconds(x: dict):
 
 
 def ensure_data():
-    data = pathlib.Path(__file__).parent / "data"
+    data = ROOT / "data"
     data.mkdir(exist_ok=True)
 
     return data

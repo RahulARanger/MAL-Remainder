@@ -1,9 +1,7 @@
 import typing
 import pathlib
 import sqlite3
-from multiprocessing import Process, Queue
 
-from MAL_Remainder.oauth_responder import gen_session
 from MAL_Remainder.common_utils import ensure_data
 
 
@@ -38,12 +36,12 @@ class Settings:
         self.connection.commit()
         cursor.close()
 
-    def from_dict(self, container: dict):
+    def from_dict(self, container: dict, commit: bool=True):
         cursor = self.connection.executemany(
             "INSERT OR REPLACE INTO SETTINGS (key, value) Values(?, ?);",
             {_: container[_] for _ in container if container[_]}.items(),
         )
-        self.connection.commit()
+        self.connection.commit() if commit else ... 
         cursor.close()
 
     def to_dict(self):
@@ -81,46 +79,10 @@ def get_raw_tokens():
     )
 
 
-def force_oauth():
-    pipe = Queue()
-    process = Process(
-        target=gen_session,
-        args=(
-            SETTINGS("REDIRECT_HOST"),
-            SETTINGS("REDIRECT_PORT"),
-            SETTINGS("CLIENT_ID"),
-            SETTINGS("CLIENT_SECRET"),
-            pipe,
-        ),
-    )
-    process.start()
-    process.join()
-    if pipe.empty():
-        raise ConnectionAbortedError("Failed to authenticate for fetching tokens")
-
-    raw = pipe.get(block=False)
-    if not raw or type(raw) == str:
-        raise ConnectionRefusedError(raw)
-
-    return SETTINGS.from_dict(raw)
-
-
 def is_there_token():
     return SETTINGS["token_type"] and SETTINGS["access_token"] and SETTINGS["CLIENT_ID"] and SETTINGS["CLIENT_SECRET"]
 
 
-def ask_tokens(f):
-    def internal_work(*_, **__):
-        try:
-            return f(*_, **__)
-        except Exception as ___:
-            force_oauth()
-            return f(*_, **__)
-
-    return internal_work
-
-
-@ask_tokens
 def get_token():
     raw = get_raw_tokens()
     return f'{raw["token_type"]} {raw["access_token"]}'

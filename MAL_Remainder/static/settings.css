@@ -34,6 +34,10 @@ main > section:first-of-type > img {
 	color: red;
 }
 
-header > div {
-	box-shadow: rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;
+button[name="reset"] {
+	border: 2px groove red;
+}
+
+form > a {
+	color: red;
 }
