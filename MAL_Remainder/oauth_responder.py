@@ -10,9 +10,6 @@ from datetime import timedelta
 from queue import Queue
 
 
-
-
-
 def ensure_port(host, port):
     """
     Closes the Script if port found
@@ -57,14 +54,14 @@ class Session:
         self.code_challenge = get_new_code_verifier()
         self.session_state = "I LOVE REM"
         self.tokens = {}
-        self.redirect_to = url
+        self.redirect_to = url + "/save"
         self.client_things = client_id, client_secret
         self.failed = None
 
     # Reference from https://myanimelist.net/blog.php?eid=835707
     def authorize(self):
         return redirect(
-            f"{OAUTH}/authorize?response_type=code&client_id={self.client_things[0]}&code_challenge={self.code_challenge}&state={self.session_state}&redirect_uri={self.redirect_to}/save")
+            f"{OAUTH}/authorize?response_type=code&client_id={self.client_things[0]}&code_challenge={self.code_challenge}&state={self.session_state}&redirect_uri={self.redirect_to}")
 
     def redirect_uri(self):
         raw = request.args
@@ -82,7 +79,8 @@ class Session:
                 "client_id": self.client_things[0],
                 "client_secret": self.client_things[-1],
                 "code": code,
-                "code_verifier": self.code_challenge
+                "code_verifier": self.code_challenge,
+                "redirect_uri": self.redirect_to
             }
         )
 
@@ -90,7 +88,7 @@ class Session:
             response.raise_for_status()
             self.tokens = update_now_in_seconds(response.json())
         except Exception as e:
-            return self.close(repr(e))
+            return self.close("Failed to ask for the tokens\n\n" + repr(e))
         return self.close()
 
     def close(self, msg=""):
@@ -104,21 +102,10 @@ def _gen_session(host, port, client_id, client_secret):
 
     app = Flask("MyAnimeList Session For Watcher")
 
-
-    
     req_session = Session(client_id, client_secret, f'http://{host}:{port}/')
-
-    @app.errorhandler(404)
-    def quit_this(message):
-        requests.post(req_session.redirect_to + "/save", params={
-            "error": "Quited"
-        })
-
-        return redirect('/save?error=Quitted as per request, You may try open the session again')
 
     app.add_url_rule("/", view_func=req_session.authorize)
     app.add_url_rule("/save", view_func=req_session.redirect_uri)
-    
 
     timers = [Timer(
         timedelta(days=0, minutes=6, seconds=0, hours=0).total_seconds(), lambda: req_session.close("Time out error")
@@ -128,7 +115,7 @@ def _gen_session(host, port, client_id, client_secret):
 
     timers.append(Timer(
         timedelta(days=0, minutes=0, seconds=random.uniform(1, 2), hours=0).total_seconds(),
-        lambda: webbrowser.open(req_session.redirect_to)
+        lambda: webbrowser.open(f'http://{host}:{port}/')
     ))
 
     timers[-1].start()

@@ -1,11 +1,10 @@
-from multiprocessing import ProcessError
 import random
 from flask import Flask, render_template, redirect, url_for, request, abort
 import requests
 import pathlib
 from urllib.parse import urlparse, urljoin
 from concurrent.futures.thread import ThreadPoolExecutor
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, ProcessError
 import webbrowser
 from threading import Timer
 import sys
@@ -13,7 +12,8 @@ from _thread import interrupt_main
 import traceback
 
 if __name__ == "__main__":
-    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort, ROOT
+    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort, \
+        ROOT
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
     from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token
     from MAL_Remainder.mal_session import MALSession
@@ -24,6 +24,7 @@ if __name__ == "__main__":
 app = Flask(
     "Remainder Settings"
 )
+
 
 def profile_pic(about_me: dict):
     url = about_me["picture"]
@@ -88,9 +89,12 @@ class Server:
 
     def settings_page(self):
         error = [0, ""]
+        expires_in, expired = get_remaining_seconds(
+            int(self.settings["expires_in"]) + int(self.settings["now"])
+        )
 
         try:
-            ... if self.settings["id"] else self.refresh()
+            ... if self.settings["id"] or expired else self.refresh(self.settings.to_dict())
         except Exception as _:
             error[-1] = traceback.format_exc()
 
@@ -100,18 +104,18 @@ class Server:
             settings=self.settings,
             profile=url_for("static", filename="Profile" + self.settings["picture"]),
             error=error[-1],
-            expire_time=error[0],
+            expire_time=expires_in,
         )
-    
+
     def reset_settings(self):
         raw = request.form
 
         if "refresh" in raw:
-            return self.refresh()
+            return self.refresh(raw)
 
         try:
             self.settings.from_dict(request.form, False)
-            
+            self.close_oauth()
             self.force_oauth()
             self.refresh()
 
@@ -128,11 +132,10 @@ class Server:
         except Exception as _:
             return abort(404, traceback.format_exc())
 
-    def refresh(self):
+    def refresh(self, raw):
         # Refreshing Tokens...
-        raw = request.form
-        refresh_cal = raw["calendar"] and raw["calendar"] != self.settings["calendar"]
-         
+        refresh_cal = "calendar" in raw and raw["calendar"] and raw["calendar"] != self.settings["calendar"]
+
         response = session.post(
             f"{OAUTH}/token",
             data={
@@ -145,15 +148,15 @@ class Server:
         response.raise_for_status()
         self.settings.from_dict(update_now_in_seconds(response.json()))
 
-
         # Fetching your name and profile picture
         response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
         response.raise_for_status()
 
         self.settings.from_dict(profile_pic(response.json()))
-        
+
         self.refresh_events(raw["calendar"]) if refresh_cal else ...
-        
+
+        return redirect("./settings")
 
     def update_things(self):
         try:
@@ -174,11 +177,10 @@ class Server:
     def refresh_events(self, url=""):
         quick_save(url if url else self.settings("calendar"), False)
 
-        
         url = url if url else self.settings["calendar"]
         if not url:
             return
-        
+
         quick_save(url)
         failed = schedule_events(True)
 
@@ -206,8 +208,8 @@ class Server:
             interrupt_main()
             return abort(410)
 
-        return redirect("/settings")
-    
+        return redirect("./settings")
+
     def force_oauth(self):
         pipe = Queue()
         process = Process(
@@ -221,25 +223,32 @@ class Server:
             ),
         )
         self.OAUTH_process = pipe, process
+
         process.start()
         process.join()
 
         if pipe.empty():
-            raise ConnectionAbortedError("Failed to authenticate for fetching tokens")
+            raise ConnectionAbortedError("Failed to contact the server, Probably the server is busy!!! try to close that")
 
         raw = pipe.get(block=False)
         if not raw or type(raw) == str:
             raise ConnectionRefusedError(raw)
 
         return SETTINGS.from_dict(raw)
-    
+
     def close_oauth(self):
         if self.OAUTH_process:
             pipe, process = self.OAUTH_process
             pipe.close()
             process.terminate()
-        
-        return redirect("/settings")
+            self.OAUTH_process = None
+
+        return redirect("./settings")
+
+    def dep_db(self):
+        print(self.settings.to_dict())
+
+        return redirect("./settings")
 
 
 def gen_url(_port):
@@ -269,7 +278,7 @@ if __name__ == "__main__":
     )
     app.add_url_rule("/close-oauth_session", view_func=SERVER.close_oauth)
 
-    
+    app.add_url_rule("/dep-db", view_func=SERVER.dep_db)
 
     trust = EnsurePort("/settings", "mal-remainder")
 
@@ -288,5 +297,3 @@ if __name__ == "__main__":
     trust.release()
 
 # Reference: https://myanimelist.net/blog.php?eid=835707
-
-# # C:\Users\Rahul\AppData\Local\Programs\PowerShell Universal
