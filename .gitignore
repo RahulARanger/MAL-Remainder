@@ -2,10 +2,10 @@
 *.json
 *.db
 *.csv
-*.jpg
 *.pyc
 *.ics
 *.exe
+*Profile.jpg
 
 # directories
 MAL_Remainder/Logs/
