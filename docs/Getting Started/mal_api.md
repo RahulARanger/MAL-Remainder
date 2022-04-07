@@ -31,10 +31,10 @@ Other than `App type` and `App Redirect URL`, you can fill the rest with your ow
 1. Profile -> Account Settings
 2. you will see the below page, then go to _API_ tab.
 3. Then do notice this 
-> ![Creating API ID](../../../assets/create.jpg "Creating API ID")
+> ![Creating API ID](../../assets/create.jpg "Creating API ID")
 
 4. Then just look at the rest of the details _for reference._
-> ![Rest of the details](../../../assets/rest_details.jpg "Rest of the details")
+> ![Rest of the details](../../assets/rest_details.jpg "Rest of the details")
 5. Read & Accept the License Agreement
 
 
@@ -46,4 +46,4 @@ In case if you already have any `web` type app, just make sure to just **append*
 
 {: .note}
 
-Note `Client ID` and `Client Secret` Values. <br><br> ![Note](../../../assets/note.jpg "Note those values")
+Note `Client ID` and `Client Secret` Values. <br><br> ![Note](../../assets/note.jpg "Note those values")

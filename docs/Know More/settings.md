@@ -8,7 +8,7 @@ nav_order: 3
 
 As seen before, this is the settings page.
 
-![Settings Page](../../../assets/settings.jpg "Settings page")
+![Settings Page](../../assets/settings.jpg "Settings page")
 
 # Features
 

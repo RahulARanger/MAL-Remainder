@@ -17,7 +17,8 @@ You may have to do this only for first time.
 
 In this page, we provide the required values.
 <br><br>
-![Settings Page](../../../assets/settings.jpg "Settings Page")
+
+![Settings Page](../../assets/settings.jpg "Settings Page")
 
 {: .important}
 After feeding values, `Reset OAuth` it does what it supposed to [do](../Know More/api)

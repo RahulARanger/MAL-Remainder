@@ -37,13 +37,13 @@ It is sometimes possible for your anti-virus software to warn you about this app
 
 
 {: .warning}
-Since this Application is not signed you will definitely see this error <br><br> ![warning before installation](../../../assets/warning_installation.jpeg "you may see this warning before installation")<br> If you want to install, `More Info` -> `Run Anyway`
+Since this Application is not signed you will definitely see this error <br><br> ![warning before installation](../../assets/warning_installation.jpeg "you may see this warning before installation")<br> If you want to install, `More Info` -> `Run Anyway`
 
 
 ## Here some of the screenshots:
 ---
 
-* ![Shell Window while Installation](../../../assets/shell_installation.jpg "Shell Window shows up in mid of installation for setting up python env")
+* ![Shell Window while Installation](../../assets/shell_installation.jpg "Shell Window shows up in mid of installation for setting up python env")
 
 ----
 
