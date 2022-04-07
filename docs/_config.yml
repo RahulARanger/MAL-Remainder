@@ -26,8 +26,6 @@ baseurl: "/MAL-Remainder"
 # for local uncomment below
 # baseurl: ""
 
-url: "https://mal_remainder.com" # the base hostname & protocol for your site, e.g. http://example.com
-
 github_username: RahulARanger
 
 # Build settings
