@@ -8,7 +8,9 @@ gem "jekyll", "~> 4.2.2"
 source "https://rubygems.org"
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
+  # START FOR GITHUB PAGES
   gem "github-pages"
+  # END FOR GITHUB-PAGES
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -29,3 +31,4 @@ gem "webrick", "~> 1.7"
 
 gem "jekyll-remote-theme"
 gem "just-the-docs", github: "pdmosses/just-the-docs", branch: "callouts"
+

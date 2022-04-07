@@ -47,12 +47,12 @@ Since this Application is not signed you will definitely see this error <br><br>
 
 ----
 
-* ![Rolling Back](../../../assets/rolling_back.jpg "Rolls back if installation fails")
+* ![Rolling Back](../../assets/rolling_back.jpg "Rolls back if installation fails")
 
 ----
 
 * Here we close the shell Window which shows while installation so it asks for confirmation and we agree to stop the installation which would result in,<br><br>
-![Closed as request](../../../assets/closed_as_requested.jpg "Closed as per request")
+![Closed as request](../../assets/closed_as_requested.jpg "Closed as per request")
 
 
 Most of the errors that could occur while installation would raise this message box but with different message.

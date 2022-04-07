@@ -34,8 +34,8 @@ If sometimes, Oauth Session is stuck for some reason, You can always click on `.
 
 
 {: .error}
-Would happen if either `Client ID` or `Client Secret` is invalid <br><br> ![Invalid Client ID or Client Secret](../../assets/error_oauth.jpg "Invalid Client ID or Client Secret")
+Would happen if either `Client ID` or `Client Secret` is invalid <br><br> ![Invalid Client ID or Client Secret](../../../assets/error_oauth.jpg "Invalid Client ID or Client Secret")
 
 
 {: .error}
-Time out error for Oauth Session <br><br> ![Time out Error](../../assets/time-out.jpg "time out error")
+Time out error for Oauth Session <br><br> ![Time out Error](../../../assets/time-out.jpg "time out error")

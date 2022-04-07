@@ -20,18 +20,19 @@ description: >- # this means to ignore newlines until "baseurl:"
     line in _config.yml. It will appear in your document head meta (for
     Google search results) and in your feed.xml site description.
 
-# should change based on the domain provided by the github pages
+# FOR GITHUB-PAGES
 baseurl: "/MAL-Remainder/"
 url: "https://rahularanger.github.io/"
+# END FOR GITHUB - PAGES
 
-# for local uncomment below
+# FOR LOCAL SETUP
+# url: ""
 # baseurl: ""
+# theme: "just-the-docs"
+# END FOR LOCAL SETUP
 
 github_username: RahulARanger
 
-# Build settings
-# not supported in github pages
-# theme: "just-the-docs"
 
 remote_theme: pdmosses/just-the-docs@callouts
 
