@@ -1,11 +1,14 @@
 import requests
 from collections import namedtuple
+import typing
+
 
 class MALSession:
-    def __init__(self, session: requests.Session, headers: dict):
+    def __init__(self, session: requests.Session, headers: dict, refresh_func: typing.Callable):
         self.api_url = "https://api.myanimelist.net/v2/"
         self.session = session
         self.headers = headers
+        self.prevent = refresh_func
 
         self.core_info = namedtuple(
             "Anime",
@@ -16,6 +19,8 @@ class MALSession:
         return self.api_url + fix + "/" + "/".join(then)
 
     def watching(self, sort_order="list_updated_at"):
+        self.prevent()
+
         response = self.session.get(
             self.postfix() + "@me/animelist",
             params={"status": "watching", "sort": sort_order, "fields": "list_status"}, headers=self.headers
@@ -32,6 +37,8 @@ class MALSession:
         yield bool(raw["paging"])
 
     def total_episodes(self, anime_id):
+        self.prevent()
+
         response = self.session.get(
             self.postfix("anime", str(anime_id)), headers=self.headers, params={
                 "fields": "num_episodes,start_date,end_date"
@@ -43,6 +50,8 @@ class MALSession:
         return response.json()
 
     def post_changes(self, anime_id, watched, total):
+        self.prevent()
+
         response = self.session.patch(self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers,
                                       data={
                                           "num_watched_episodes": watched,
@@ -51,7 +60,3 @@ class MALSession:
         response.raise_for_status()
 
         return response.json()
-    
-    
-    
-    

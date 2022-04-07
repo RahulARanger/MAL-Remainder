@@ -47,6 +47,12 @@ function changeRange() {
 
 	range.previousElementSibling.previousElementSibling.value = option.done;
 	range.nextElementSibling.nextElementSibling.value = option.total;
+	range.max = option.left;
+	
+	const new_min = "-" + option.done;
+	
+	range.min = new_min;
+	ep_range.min = new_min;
 }
 
 ep_range.addEventListener("change", changeRange);

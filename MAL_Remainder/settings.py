@@ -82,24 +82,28 @@ class Server:
             return self._MAL
 
         try:
-            self._MAL = MALSession(session, get_headers())
+            self._MAL = MALSession(session, get_headers(), self.check_and_ask_for_refresh_token)
             return self.mal_session()
         except Exception as _:
             return False
+
+    def check_and_ask_for_refresh_token(self):
+        expires_in, expired = get_remaining_seconds(
+            int(self.settings["expires_in"]) + int(self.settings["now"])
+        )
+        self.refresh(self.settings.to_dict()) if expired else ...
+        return expires_in
 
     def settings_page(self):
         error = [0, ""]
 
         try:
-            expires_in, expired = get_remaining_seconds(
-                int(self.settings["expires_in"]) + int(self.settings["now"])
-            )
-            error[0] = expires_in
+            error[0] = self.check_and_ask_for_refresh_token()
 
-            ... if self.settings["id"] or expired else self.refresh(self.settings.to_dict())
         except ValueError:
-            error[
-                -1] = "Failed to check the expiry date of the refresh tokens!, Maybe we don't have your refresh token.\nGo get one!"
+            error[-1] = "Failed to check the expiry date of the refresh tokens!," \
+                        "Maybe we don't have your refresh token.\nGo get one! "
+
         except Exception as _:
             error[-1] = traceback.format_exc()
 
@@ -218,7 +222,7 @@ class Server:
                 and "total" in form
         ) else ...
 
-        if len(sys.argv) == 2:
+        if sys.argv[0] == "automatic":
             # yes, it's not good practice, but since it's not meant to be used manually, it's fine this way for now.
             interrupt_main()
             return abort(410)
@@ -263,8 +267,11 @@ class Server:
 
     def dep_db(self):
         print(self.settings.to_dict())
-
         return redirect("./settings")
+
+    def refresh_and_update(self):
+        self.refresh(self.settings.to_dict())
+        return redirect("./")
 
 
 def gen_url(_port):
@@ -286,7 +293,7 @@ if __name__ == "__main__":
     app.add_url_rule("/import-settings", view_func=SERVER.refer_settings)
 
     app.add_url_rule("/", view_func=SERVER.update_things)
-    app.add_url_rule("/force-scheduler", view_func=SERVER.update_things)
+    app.add_url_rule("/force-scheduler", view_func=SERVER.refresh_and_update)
     app.add_url_rule("/save-events", view_func=SERVER.calendar_refresh)
 
     app.add_url_rule(

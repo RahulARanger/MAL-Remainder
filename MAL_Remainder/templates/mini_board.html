@@ -38,22 +38,25 @@
 					</select>
 					<input type="range" name="watched" id="ep-range" min="0" />
 					<div>
+						
 						<input
 							type="text"
 							name="up_until"
+							readonly
 							title="Up Until, you have watched"
 						/>
 						<span>+</span>
 						<input
 							type="number"
-							disabled
 							name="ep-range"
+							min="0"
 							title="update this many episodes"
 						/>
 						<span>=</span>
 						<input
 							type="text"
 							name="total"
+							readonly
 							title="Total Episodes"
 						/>
 						<span>Eps.</span>

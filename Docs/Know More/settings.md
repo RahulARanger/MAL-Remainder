@@ -2,7 +2,7 @@
 layout: default
 title: Settings
 parent: Know More
-nav_order: /docs/Know More/settings
+permalink: /docs/Know More/settings
 nav_order: 3
 ---
 
@@ -26,3 +26,7 @@ And other it redirects to your AnimeList in [MyAnimeList](https://myanimelist.ne
 ## Force a Remainder
 
 As it sounds, it would trigger [Remainder](./Remainder)
+
+## Resetting OAuth
+
+
