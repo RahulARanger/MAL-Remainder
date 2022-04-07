@@ -31,7 +31,8 @@ url: "https://mal_remainder.com" # the base hostname & protocol for your site, e
 github_username: RahulARanger
 
 # Build settings
-theme: "just-the-docs"
+# not supported in github pages
+# theme: "just-the-docs"
 
 remote_theme: pdmosses/just-the-docs@callouts
 
