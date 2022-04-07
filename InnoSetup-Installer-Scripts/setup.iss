@@ -3,7 +3,7 @@
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.6.3"
+#define Version="0.6.4"
 #define Mutex="Mal-Remainder"
 
 [Setup]
@@ -15,6 +15,10 @@ AppPublisherURL="{#Repo}"
 AppSupportURL="{#Repo}"
 AppUpdatesURL="{#Repo}"
 AppContact="{#Repo}"
+
+
+BackColor=clBlue
+BackColor2=clBlack
 
 
 ; IMPORTANT
@@ -68,7 +72,8 @@ AppMutex={#Mutex}
 InfoBeforeFile="README.rtf"
 
 ; Below Value is Oberserved Value
-ExtraDiskSpaceRequired=58576896 
+ExtraDiskSpaceRequired=40022016
+ReserveBytes=58576896
 
 
 

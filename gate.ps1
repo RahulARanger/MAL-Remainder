@@ -203,11 +203,10 @@ switch($true){
         
         $index = 0
         $total = $collected.Length
-
         foreach ($file in $collected) {
             Remove-Item -path $file -Force
             $index += 1;
-            Write-Progress -Activity "Removing Components of Python..." -Status "Deleted Files $index / $total" -PercentComplete (($index / $total) * 100)
+            Write-Progress -Activity "Removing Components of Python...`nDeleted:$file" -Status "Deleted Files $index / $total" -PercentComplete (($index / $total) * 100)
         }
 
         Write-Debug "Completed..."

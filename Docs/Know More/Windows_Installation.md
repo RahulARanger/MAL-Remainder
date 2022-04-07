@@ -2,24 +2,21 @@
 layout: default
 title: Windows Installation
 parent: Know More
+nav_order: 1
+permalink: /docs/Know More/Win_Installation
 ---
-
-{: .important }
-![Checking]()<br><br>You might be seeing this while installing the Application, because i didn't have signed license.
-
 # Why Shell Scripts?
 
 ---
 
 This Application depends on the Shell Scripts for the following reasons:
 
--   FileDialog: for selecting the path of the local file.
+-   used local FileDialog for importing Settings.
 -   **Adding a Task on your system's scheduler**
 -   Supporting script for setup [_Unzipping folder, deleting a directory, etc..._]
 
-This can't be achieved efficiently in python. even if it exists, it takes a lot of space in your disk which is what i want to avoid the most of small application.
+I believe this makes our application consume less space than before.
 
-You can view the source code, if you want more trust.
 
 # Roles
 
@@ -45,7 +42,7 @@ subprocess.run([
 
 #### 💖 Powershell, made this application light and also look kinda evil but it isn't evil.
 
--   Helper script for the setup
+-   Helper script for the setup q
 -   Executes Python Scripts whenever required
 -   Registers Tasks
 -   Edits Tasks

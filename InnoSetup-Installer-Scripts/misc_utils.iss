@@ -138,11 +138,7 @@ begin
 end;
 
 function CheckAndQuit: Integer;
-var
-Script: String;
-
 begin
-    
-    if FileExists(Script) then
-      ExecPSScript('gate.ps1', False, '', Result)
+    if FileExists(ExpandConstant('{app}/gate.ps1')) then 
+      ExecPSScript('gate.ps1', False, '-check', Result)
 end;

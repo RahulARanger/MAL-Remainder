@@ -122,7 +122,7 @@ class Server:
             self.settings.from_dict(request.form, False)
             self.close_oauth()
             self.force_oauth()
-            self.refresh()
+            self.refresh(raw)
 
         except Exception as _:
             return traceback_error()
