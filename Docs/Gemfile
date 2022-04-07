@@ -5,10 +5,10 @@ source "https://rubygems.org"
 gem "jekyll", "~> 4.2.2"
 
 # below is for the Github Pages only for local, comment that line
-gem "github-pages", group: :jekyll_plugins
-
+source "https://rubygems.org"
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
+  gem "github-pages"
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
