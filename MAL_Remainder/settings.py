@@ -2,7 +2,7 @@ import os
 import pathlib
 import random
 import tempfile
-from flask import Flask, render_template, redirect, url_for, request, abort, send_from_directory
+from flask import Flask, render_template, redirect, url_for, request, abort
 import requests
 from urllib.parse import urljoin
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -12,12 +12,13 @@ from threading import Timer
 import sys
 from _thread import interrupt_main
 import traceback
+import csv
 
 if __name__ == "__main__":
-    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort, \
-        ROOT, raise_top
+    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
+        ROOT, raise_top, current_executable
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
-    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, ensure_data, Settings
+    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, Tock
     from MAL_Remainder.mal_session import MALSession
     from MAL_Remainder.calendar_parse import quick_save, schedule_events
 
@@ -67,11 +68,16 @@ class Server(ErrorPages):
 
     def update_things(self):
         try:
+            if not self.settings["name"]:
+                self.update_profile()
+
             watch_list = list(self.mal_session().watching())
         except AttributeError:
-            return abort(404,
-                         "Failed to fetch your watch list! Maybe you don't have a valid token? Are you sure it's not expired\nGo to Settings to know more!"
-                         )
+            return abort(
+                404,
+                "Failed to fetch your watch list! Maybe you don't have a valid token? Are you sure it's not expired\n"
+                "Go to Settings to know more!"
+            )
 
         except Exception as _:
             return abort(404)
@@ -146,7 +152,7 @@ class Server(ErrorPages):
 
     # Settings Page
 
-    def settings_page(self, failed=""):
+    def settings_page(self, failed: str = ""):
         error = [0, failed]
 
         try:
@@ -213,6 +219,7 @@ class Server(ErrorPages):
 
     def update_things_in_site(self):
         form = request.form
+        print(form)
 
         self.mal_session().post_changes(
             form["animes"],
@@ -292,16 +299,23 @@ class Server(ErrorPages):
         temp = pathlib.Path(path)
         file.save(temp)
 
+        store = [""]
         try:
             _ = Settings(temp)
             self.settings.from_dict(_.to_dict())
             _.close()
+            store[-1] = "Successfully imported settings"
         except Exception as _:
-            return self.settings_page("Failed to import settings")
+            store[-1] = "Failed to import settings"
         else:
-            return self.settings_page("Successfully imported settings")
+            try:
+                self.update_profile()
+            except Exception as _:
+                store[-1] = "Failed to update profile"
         finally:
             temp.unlink()
+
+        return self.settings_page(store[-1])
 
 
 if __name__ == "__main__":
@@ -343,5 +357,7 @@ if __name__ == "__main__":
 
     app.run(host="localhost", port=port, debug=False)
     trust.release()
+
+    current_executable("-update")
 
 # Reference: https://myanimelist.net/blog.php?eid=835707

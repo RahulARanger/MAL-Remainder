@@ -51,7 +51,7 @@ class MALSession:
 
         return sanity_check(self.session.get(
             self.postfix("anime", str(anime_id)), headers=self.headers(), params={
-                "fields": "num_episodes,start_date,end_date"
+                "fields": "num_episodes,genres,rank,popularity,mean"
             }
         ))
 

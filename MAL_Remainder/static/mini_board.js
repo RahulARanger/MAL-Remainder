@@ -30,10 +30,19 @@ const optionDataset = () =>
 	).dataset;
 
 function indexChange() {
+	const name_of_anime = document.querySelector("input[name='name']")
+	const image_of_anime = document.querySelector("input[name='image']")
+
+
 	const option = optionDataset();
 	document.querySelector(".center > section > img").src = option.image;
 	ep_range.max = option.left;
 	ep_range.value = 0;
+	name_of_anime.value = document.querySelector(
+		`#animes>option:nth-of-type(${anime_list.selectedIndex + 1})`
+	).value;
+
+	image_of_anime = option.image;
 	changeRange();
 }
 

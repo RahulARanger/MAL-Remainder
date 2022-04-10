@@ -93,7 +93,7 @@ Source: "../MAL_Remainder\*"; DestDir: "{app}/MAL_Remainder";
 
 
 [Dirs]
-Name: "{app}/MAL_Remainder"; Permissions: everyone-modify;
+Name: "{app}/MAL_Remainder"; Permissions: everyone-modify;
 
 ; For more quality progress while uninistalling
 Name: "{app}/python"; Permissions: everyone-full;
@@ -114,6 +114,7 @@ Type: files; Name: "{app}\python\lib\*.pyc";
 
 Type: filesandordirs; Name: "{app}\MAL_Remainder\__pycache__";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\static\data";
+Type: filesandordirs; Name: "{app}\MAL_Remainder\static";
 Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
 Type: files; Name: "{app}\MAL_Remainder\static\Profile*";
 

@@ -92,6 +92,20 @@ def get_headers():
     return {"Authorization": get_token()}
 
 
+class Tock:
+    def __init__(self, source=ensure_data() / "tock.csv"):
+        self.source = source
+        self.source.touch()
+
+    def headers(self):
+        return [
+            "ID", "Title", "Image", "Done", "Total", "Genre"
+        ]
+
+
+
+
+
 if __name__ == "__main__":
     check = Settings()
     print(check.to_dict())

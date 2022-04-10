@@ -34,6 +34,7 @@ param(
     [switch]$sch,
     [switch]$set,
     [switch]$evil,
+    [switch]$update,
     [String[]]$arguments
 )
 
@@ -43,6 +44,7 @@ if($help.IsPresent){
     Exit;
 }
 
+$VERSION = "0.6.6"
 
 # Some Static Constants
 
@@ -146,6 +148,27 @@ public static extern bool SetWindowPos(
 }
 
 
+function Get-Update{
+        
+    $response = Invoke-RestMethod -Uri "https://api.github.com/repos/RahulARanger/MAL-Remainder/releases/latest" -Method "GET" 
+
+    if (-not $update_it){
+        return
+    }
+
+    $update_it = $response.tag_name -gt $VERSION
+    $download_url = $response.assets.browser_download_url
+    $temp = Join-Path -Path $env:TEMP -ChildPath $response.assets.Name
+    write-Output $temp
+
+    Invoke-WebRequest -Uri $download_url -OutFile $temp
+
+    Start-Process -FilePath $temp -Wait
+    Remove-Item -Path $temp 
+    
+}
+
+
 switch($true){
     {$open.IsPresent}{
         Start-PythonScript -arguments @("automatic");
@@ -189,9 +212,17 @@ switch($true){
 
         Write-Debug "Completed..."
     }
+
+    {$update.IsPresent}{
+        Write-Debug "Checking for any updates";
+        Get-Update;
+    }
+
      Default{
         $store = @(Get-RunningProjects);
         if($store.length -gt 0){$store | Out-GridView -passthru -Title "These processes must be closed in-order to proceed forward!"}
         if($store.length -gt 0){exit 5} else {}  # exiting with the bad mood 😤
      }
 }
+
+
