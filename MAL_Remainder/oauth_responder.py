@@ -1,6 +1,6 @@
 import random
 import requests
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, request, redirect, abort, render_template
 from threading import Timer
 from _thread import interrupt_main
 import webbrowser
@@ -94,14 +94,13 @@ class Session:
     def close(self, msg=""):
         self.failed = msg
         interrupt_main()
-        return "you may now close this window"
+        return "You may close this window!"
 
 
 def _gen_session(host, port, client_id, client_secret):
     assert ensure_port(host, port), "%s is already hosted in %s" % (port, host)
 
     app = Flask("MyAnimeList Session For Watcher")
-
     req_session = Session(client_id, client_secret, f'http://{host}:{port}/')
 
     app.add_url_rule("/", view_func=req_session.authorize)

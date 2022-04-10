@@ -1,54 +1,99 @@
-button,
-input {
+@import url("./animations.css");
+
+:root{
+	--tight-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
+		rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
+		rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+input{
+	outline: none;
+}
+
+
+input[type=file]::file-selector-button , input {
 	background-color: var(--bg);
 	color: var(--fg);
 	transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
-	outline: none;
 	opacity: 0.69;
+	box-shadow: var(--tight-shadow);
 	border: 0px solid;
-	box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
-		rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-	padding: 3px;
+	padding: 3.69px;
 }
 
-button:hover,
 input:hover {
-	opacity: 1;
-	transform: translateY(-1px);
-	box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
-		rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px,
-		rgba(0, 0, 0, 0.09) 0px 32px 16px;
+  opacity: 1;
 }
+
+
+
+.button{
+  color: #ffa260;
+  background: none;
+  border: 2px solid;
+  line-height: 1;
+  margin: 0.5em;
+  padding: 1em 2em;
+  transition: 0.25s;
+  text-decoration: none;
+}
+.small{
+	margin: 0.2em;
+  padding: 0.25em 0.5em;
+
+}
+
+
+.button:hover{
+	box-shadow: 0 0.5em 0.5em -0.4em #e5ff60;
+	color: white;
+	transform: translateY(-0.25em);
+}
+
 
 input[type="range"] {
-	-webkit-appearance: none !important;
-	width: 400px;
-	height: 15px;
+	appearance: none;
 	outline: none;
-	border-radius: 15px;
-	background-color: rgb(210, 100, 10);
+	padding: 0;
+	margin: 0;
+
+	width: 400px;
+	border-radius: 5px;
 	overflow: hidden;
 	box-shadow: inset 0 0 5px rgba(0, 0, 0, 1);
 	transition: all 0.5s ease;
+	background-image: linear-gradient(
+  270deg,
+  hsl(328deg 97% 46%) 1%,
+  hsl(358deg 97% 46%) 50%,
+  hsl(29deg 97% 46%) 99%
+);
 }
 input[type="range"]::-webkit-slider-thumb {
-	-webkit-appearance: none !important;
-	background-color: var(--light-bg);
-	width: 4%;
-	height: 14.5px;
-	border-radius: 30px;
-	box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
-		rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+	appearance: none;
+	width:20px ;
+	height: 20px ;
+	/* border-radius: 50%; */
+	border-top-left-radius: 50%;
+	border-top-right-radius: 50%;
+	border-bottom-right-radius: 200%;
+	border-bottom-left-radius: 200%;
+	
+	background-color: palevioletred;
+	border: 1px dotted black;
 	transition: all 0.5s ease;
 }
 
-input[type="range"]:hover {
-	background-color: rgb(255, 100, 15);
+input[type="range"]::-webkit-slider-thumb:hover {
+	background-color: dodgerblue;
+	border: 1px double black;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-	background-color: rgba(0, 0, 0);
+input[type="range"]:active {
+	animation: var(--pulse);
+	box-shadow: 0 0 0 2em transparent;
 }
+
 
 form {
 	display: flex;
@@ -71,40 +116,36 @@ label {
 		rgba(17, 17, 26, 0.1) 0px 0px 8px;
 }
 
-button {
-	border: 1px darkorange solid;
-}
 
-button:hover {
-	border: 1px darkorange double;
-}
-
-button {
-	background-color: #fa6400;
-	box-sizing: border-box;
-	color: #fff;
-	padding: 0.45rem;
-	cursor: pointer;
-	touch-action: manipulation;
-	transform: translateY(-6px);
-}
-
-button:hover {
-	background-color: darkorange;
-	border: 1px solid rgba(0, 0, 0, 0.3);
-}
-
-button:active {
-	background-color: #c85000;
-	box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
-	transform: translateY(0);
-}
 
 button,
 span {
 	user-select: none;
 }
 
-form > button {
-	margin-top: 0.6rem;
+
+input[readonly]{
+	box-shadow: none;
+}
+
+select{
+	background-color: dodgerblue;
+	color: yellow;
+	padding: 3px;
+	border: none;
+	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+	-webkit-appearance: button;
+	appearance: button;
+	outline: none;
+	
+}
+
+select option{
+	padding: 30px;
+}
+
+input[type='file']{
+	overflow: hidden;
+	width: 135px;
+	font-style: italic;
 }

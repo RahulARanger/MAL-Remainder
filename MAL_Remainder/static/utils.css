@@ -3,53 +3,48 @@
 	--bg: #212121;
 	--fg: white;
 	--light-bg: #333333;
+	
 }
 * {
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
+
+
+button, span{
+	user-select: none
+}
+
 
 .main {
 	background-color: var(--light-bg);
 	padding-top: 3rem;
 	padding: 1.3rem;
 	color: var(--fg);
-
-	box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
-		rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
-		rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
 .center {
 	position: absolute;
 	--width: 35%;
-	--height: 75%;
+	--height: 55%;
 
 	width: var(--width);
 	height: var(--height);
 
 	top: calc((100% - var(--height)) / 2);
 	left: calc((100% - var(--width)) / 2);
+	
 }
 body {
 	background-color: var(--bg);
 }
 
 .neon {
-	animation: neonAnim 1.2s alternate-reverse infinite;
+	animation: var(--glow);
 	color: #ff5500;
 	font-family: Cursive;
 	font-size: 67px;
 }
-@keyframes neonAnim {
-	from {
-		text-shadow: 0 0 0px rgba(255, 85, 0, 0.7),
-			0 0 40px rgba(255, 85, 0, 0.7), 0 0 0px rgba(255, 85, 0, 0.7);
-	}
-	to {
-		text-shadow: 0 0 5px rgba(255, 85, 0, 0.7),
-			0 0 20px rgba(255, 85, 0, 0.7), 0 0 40px rgba(255, 85, 0, 0.7);
-	}
-}
+
 
 .main > footer {
 	position: relative;
@@ -60,7 +55,7 @@ body {
 	justify-content: space-evenly;
 }
 
-header {
+footer, header {
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
@@ -71,29 +66,16 @@ header {
 	color: #ff5500;
 }
 
-header > a {
-	color: #ff5500;
-	animation: neonAnim 1.5s alternate-reverse infinite;
-	padding: 6.9px;
-	transition: all 0.09s ease-out;
-	border-radius: 0.4rem;
-	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-	border: 2px solid rgba(0, 0, 0, 0.3);
-	opacity: 0.89;
+footer{
+	top: 92%;
+	left: -1%;
+	justify-content: flex-end;
 }
 
-header > a:hover {
-	border: 2px solid transparent;
 
-	transform: scale(1.069, 1.069) translateY(2px);
-	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-	opacity: 1;
+
+.center > section > img{
+	animation: var(--float);
 }
 
-header > a:visited {
-	color: rgba(255, 85, 0, 0.7);
-}
 
-header > a:active {
-	transform: translateX(1px) translateY(-1px);
-}

@@ -18,7 +18,7 @@ def update_now_in_seconds(x: dict):
 
 
 def ensure_data():
-    data = ROOT / "data"
+    data = ROOT / "static" / "data"
     data.mkdir(exist_ok=True)
 
     return data
@@ -71,7 +71,7 @@ class EnsurePort:
 
         self.conn = connect(self.root)
         self.conn.executescript(
-            self.root.parent.parent.joinpath("lock_script.sql").read_text()
+            self.root.parent.parent.parent.joinpath("lock_script.sql").read_text()
         )
 
     def __call__(self):
@@ -94,6 +94,10 @@ def current_executable(*args):
         capture_output=True
     )
     return check.stderr.decode("utf-8")
+
+
+def raise_top():
+    current_executable("--top")
 
 
 if __name__ == "__main__":

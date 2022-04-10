@@ -29,7 +29,7 @@ param(
     [switch]$help,
     [switch]$open,
     [switch]$settings,
-    [switch]$ask,
+    [switch]$top,
     [switch]$deset,
     [switch]$sch,
     [switch]$set,
@@ -176,9 +176,8 @@ switch($true){
         Start-PythonScript -file "settings" -arguments @("-manual", "settings");
     }
     
-    {$ask.IsPresent}{
-        $asked = Get-Settings
-        if (-not ($asked -eq "")) {& $executable (Get-ProjectPyPath -file "import_settings") $asked} else {}
+    {$top.IsPresent}{
+        Show-Top
     }
 
     {$deset.IsPresent}{

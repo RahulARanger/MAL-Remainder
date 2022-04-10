@@ -1,4 +1,4 @@
-let expires_in = document.querySelector("header > div:first-of-type").dataset
+let expires_in = document.querySelector("footer > div:first-of-type").dataset
 	.time;
 
 const set_to = (id, value) => {
@@ -72,10 +72,11 @@ function count_down(id, value) {
 	clearInterval(timer_id);
 }
 
-document
-	.querySelector("button[name='settings']")
-	.addEventListener("click", function (e) {
-		confirm(
-			"Importing External Settings might replace the current settings"
-		) || e.preventDefault();
-	});
+
+document.querySelector(".corner.right").addEventListener("click", (e) =>
+	confirm("Close this session ?\nYou will need to open a new session if required") || e.preventDefault()
+);
+
+
+
+	

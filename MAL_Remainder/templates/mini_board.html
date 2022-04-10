@@ -10,17 +10,18 @@
 	<body>
 		<header>
 			<a
+			class="button"
 				href="https://myanimelist.net/animelist/{{settings['name']}}?status=1"
 				target="_blank"
 				>↪️Redirect to your Anime list</a
 			>
-			<a href="./settings">⚙️Settings</a>
+			<a class="button" href="./settings">⚙️Settings</a>
 		</header>
 		<main class="center">
 			<section>
 				<img alt="Main Picture of the Selected Anime" src="" />
 			</section>
-			<section class="main">
+			<section class="main float">
 				<form action="./update-status" method="POST">
 					<select name="animes" id="animes">
 						{% for anime in reversed(watch_list)%}
@@ -52,7 +53,7 @@
 							min="0"
 							title="update this many episodes"
 						/>
-						<span>=</span>
+						<span>/</span>
 						<input
 							type="text"
 							name="total"
@@ -61,7 +62,7 @@
 						/>
 						<span>Eps.</span>
 					</div>
-					<button>Update</button>
+					<button class="button">Update</button>
 				</form>
 			</section>
 		</main>

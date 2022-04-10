@@ -14,33 +14,27 @@
 	>
 		<header>
 			<a
+			class="small button"
 				href="https://myanimelist.net/animelist/{{settings['name']}}"
 				target="_blank"
 				>➡️ Redirect to your Anime list</a
 			>
-			<a
-				href="./save-events"
-				title="Change the Timings on ur Local Machine's Scheduler"
-				>📅 ReSchedule</a
-			>
-			<a href="./" title="Opens up a Force Scheduler Page"
+			<a href="./" title="Opens up a Force Scheduler Page" class="button"
 				>⏰ Force-Remainder</a
 			>
+			<a class="small button" href="./close-session" title="Closes the current session">Close Session ❌</a>
+			<a class="small button" href="./refresh-tokens" title="Refreshes Tokens">Refresh Tokens 🔄</a>
+			<a class="small button" href="./static/data/settings.db" title="Download Current Settings File">Save Settings ⚙️</a>
+			
 			<!--<a href="./dash-board" target="_blank">Save Data</a> !-->
-			<div data-time="{{expire_time}}">
-				<span>Expires in:&nbsp;</span>
-				<span id="days"></span> day<span></span>
-				<span id="hours"></span> hr<span></span>
-				<span id="minutes"></span> min<span></span>
-				<span id="seconds"></span> sec<span></span>
-			</div>
+			
 		</header>
 		<main class="center">
 			<section>
-				<img src="{{url_for('static', filename='Profile.jpg')}}" />
+				<img class="float" src="{{url_for('static', filename='Profile.jpg')}}" />
 			</section>
-			<section class="main">
-				<form action="./save-settings" method="POST">
+			<section class="float main">
+				<form action="./edit-settings" method="POST" enctype="multipart/form-data">
 					<div>
 						<label for="CLIENT_ID">Client ID:</label>
 						<input
@@ -88,35 +82,46 @@
 						/>
 					</div>
 					<div>
+						<label for="save-settings"><button class="small button" name="replace">Refer</button>Settings: </label>
+						<input type="file" class="small button" id="save-settings" accept=".db" name="settings-file">
+					</div>
+					<div>
 						<label
 							for="CALENDAR"
 							title="ICS Calender File path or URL"
 						>
 							Calendar:
+							<button class="small button" name="calendar" style="margin-right: 6px;" title="Updates the Calendar from URL">🔄</button>
 						</label>
 						<input
 							type="text"
-							name="calendar"
+							name="calendar_url"
 							id="CALENDAR"
 							value="{{settings['calendar']}}"
 						/>
+						
 					</div>
+					
 					<a
 						href="./close-oauth_session"
 						title="Closes OAUTH session if active"
 						id="close-link"
 						>./close-oauth_session</a
 					>
-					<button name="reset">Reset Oauth</button>
-					<button name="refresh">Refresh</button>
-				</form>
-				<form action="./import-settings">
-					<button name="settings">Import Settings</button>
+					<button class="button" name="reset">Reset Oauth</button>
 				</form>
 			</section>
 		</main>
 
-		<footer></footer>
+		<footer>
+			<div class="float" data-time="{{expire_time}}">
+				<span>Expires in:&nbsp;</span>
+				<span id="days"></span> day<span></span>
+				<span id="hours"></span> hr<span></span>
+				<span id="minutes"></span> min<span></span>
+				<span id="seconds"></span> sec<span></span>
+			</div>
+		</footer>
 		<script src="../static/main.js"></script>
 		<script src="../static/alert.js"></script>
 	</body>

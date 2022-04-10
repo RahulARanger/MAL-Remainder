@@ -1,0 +1,54 @@
+
+@keyframes pulse {
+	0% {
+	  box-shadow: 0 0 0 0 #ef6eae;
+	}
+  }
+
+
+  
+@keyframes float {
+	0% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+	50% {
+		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+		transform: translatey(-20px);
+	}
+	100% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+}
+
+
+@keyframes neonAnim {
+	from {
+		text-shadow: 0 0 0px rgba(255, 85, 0, 0.7),
+			0 0 40px rgba(255, 85, 0, 0.7), 0 0 0px rgba(255, 85, 0, 0.7);
+	}
+	to {
+		text-shadow: 0 0 5px rgba(255, 85, 0, 0.7),
+			0 0 20px rgba(255, 85, 0, 0.7), 0 0 40px rgba(255, 85, 0, 0.7);
+	}
+}
+
+:root{
+    --glow: neonAnim 1.2s alternate-reverse infinite;
+    --float: float 5.69s ease-in-out infinite;
+    --pulse: pulse 1s;
+}
+
+.glow{
+    animation: var(--glow);
+
+}
+
+.pulse{
+    animation: var(--pulse);
+}
+
+.float{
+    animation: var(--float);
+}

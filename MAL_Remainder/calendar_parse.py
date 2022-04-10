@@ -38,16 +38,19 @@ def to_frame(events: typing.List[Event]) -> typing.Tuple[list, list]:
     converts a list of events to a pandas dataframe
     """
     local_zone = datetime.today().astimezone().tzinfo
-    started = []
-    ended = []
 
-    [
-        started.append(normalize(event.start, local_zone))
-        or ended.append(normalize(event.end, local_zone))
-        for event in events
-        if not event.all_day
+    events = [
+        event for event in events if not event.all_day
     ]
 
+    started = [
+        [normalize(event.start, local_zone), event.description, event.summary] for event in events if event.start.day == datetime.today().day
+    ]
+
+    ended = [
+        normalize(event.end, local_zone) for event in events
+        if event.end.day == datetime.today().day
+    ]
     return started, ended
 
 
@@ -68,12 +71,13 @@ def quick_save(url="", is_local=True):
     return internal
 
 
+# I guess you don't need to worry about timezones 🤡
+
 def _events(internal, start_date: datetime, end_date: datetime):
     return to_frame(
         parse_events(
             internal,
-            start=normalize(start_date),
-            end=normalize(end_date)
+            default_span=_end_of_day() - datetime.now()
             # don't schedule things based on the microseconds :)
         )
         if internal
@@ -106,9 +110,10 @@ def schedule_events(force=False):
         return
 
     started, ended = from_now()
+
     if not ended:
-        return 
-    
+        return
+
     triggers_for_end = ",".join(
         event_time.strftime("%H:%M:%S") for event_time in ended
     )
@@ -121,4 +126,4 @@ def schedule_events(force=False):
 
 
 if __name__ == "__main__":
-    schedule_events()
+    print(from_now())

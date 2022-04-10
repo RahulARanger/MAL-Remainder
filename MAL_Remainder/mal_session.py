@@ -1,6 +1,8 @@
 import requests
 from collections import namedtuple
 import typing
+import pathlib
+from urllib.parse import urlparse
 
 
 class MALSession:
@@ -60,3 +62,22 @@ class MALSession:
         response.raise_for_status()
 
         return response.json()
+
+    def profile_picture(self, about_me):
+        url = about_me["picture"]
+
+        save_to = (
+                pathlib.Path(__file__).parent
+                / "static"
+                / ("Profile" + pathlib.Path(urlparse(url).path).suffix)
+        )
+
+        with save_to.open("wb") as save_as:
+            response = self.session.get(url, stream=True)
+
+            for chunk in response:
+                save_as.write(chunk)
+
+        about_me["picture"] = save_to.suffix
+
+        return about_me

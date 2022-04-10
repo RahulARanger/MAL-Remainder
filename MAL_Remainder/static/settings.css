@@ -16,11 +16,13 @@ main > section:first-of-type > img {
 	z-index: 1;
 	top: 35%;
 
+	animation-delay: 0.2s;
+
 	box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px,
 		rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
-
-.tool-button {
+footer > .float{
+	animation-delay: 1s;
 }
 
 #days,
@@ -35,9 +37,17 @@ main > section:first-of-type > img {
 }
 
 button[name="reset"] {
-	border: 2px groove red;
+	border: 1px solid red;
 }
 
 form > a {
 	color: red;
+}
+
+form > a:hover{
+	animation: var(--pulse);
+}
+
+.center {
+	top: 10%;
 }

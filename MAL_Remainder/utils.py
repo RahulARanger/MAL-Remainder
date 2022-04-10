@@ -8,7 +8,7 @@ from MAL_Remainder.common_utils import ensure_data
 class Settings:
     def __init__(self, source=None):
         self.connection = sqlite3.connect(
-            source if source else (ensure_data() / "settings.db"),
+            source if source else ensure_data().joinpath("settings.db"),
             timeout=6,
             check_same_thread=False,
         )

@@ -1,8 +1,10 @@
-import random
-from flask import Flask, render_template, redirect, url_for, request, abort
-import requests
+import os
 import pathlib
-from urllib.parse import urlparse, urljoin
+import random
+import tempfile
+from flask import Flask, render_template, redirect, url_for, request, abort, send_from_directory
+import requests
+from urllib.parse import urljoin
 from concurrent.futures.thread import ThreadPoolExecutor
 from multiprocessing import Process, Queue, ProcessError
 import webbrowser
@@ -13,9 +15,9 @@ import traceback
 
 if __name__ == "__main__":
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, current_executable, EnsurePort, \
-        ROOT
+        ROOT, raise_top
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
-    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token
+    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, ensure_data, Settings
     from MAL_Remainder.mal_session import MALSession
     from MAL_Remainder.calendar_parse import quick_save, schedule_events
 
@@ -24,32 +26,6 @@ if __name__ == "__main__":
 app = Flask(
     "Remainder Settings"
 )
-
-
-def profile_pic(about_me: dict):
-    url = about_me["picture"]
-
-    save_to = (
-            pathlib.Path(__file__).parent
-            / "static"
-            / ("Profile" + pathlib.Path(urlparse(url).path).suffix)
-    )
-
-    with save_to.open("wb") as save_as:
-        response = session.get(url, stream=True)
-
-        for chunk in response:
-            save_as.write(chunk)
-
-    about_me["picture"] = save_to.suffix
-
-    return about_me
-
-
-@app.errorhandler(404)
-@app.route("/404/<failed>")
-def _404(failed="Error: 404, No Page Found"):
-    return render_template("404.html", name="404.html", failed=failed), 404
 
 
 @app.errorhandler(410)
@@ -65,40 +41,118 @@ def show_exception(message):
     return webbrowser.open(urljoin(request.url_root, "404/?failed=" + message))
 
 
-def traceback_error():
-    return _404(traceback.format_exc())
+class ErrorPages:
+    @classmethod
+    @app.errorhandler(404)
+    @app.route("/404/<failed>")
+    def e_404(cls, failed="Error: 404, No Page Found"):
+        raise_top()
+        return render_template(
+            "error.html",
+            failed=failed,
+            error_code=404,
+            sub_title="Most Probably this is not a valid page. If it was valid, Maybe there was error in .",
+            show_settings=True
+        ), 404
+
+    @classmethod
+    def server_error(cls):
+        return abort(404, traceback.format_exc())
 
 
-class Server:
-    def __init__(self):
+class Server(ErrorPages):
+    def __init__(self, auto):
         self.settings = SETTINGS
         self.executor = ThreadPoolExecutor(thread_name_prefix="Remainder-Server")
         self._MAL = None
         self._MAL = self.mal_session() if is_there_token() else False
         self.OAUTH_process = None
+        self.auto = auto
+
+    def update_things(self):
+        try:
+            watch_list = list(self.mal_session().watching())
+        except AttributeError:
+            return abort(404,
+                         "Failed to fetch your watch list! Maybe you don't have a valid token? Are you sure it's not expired\nGo to Settings to know more!"
+                         )
+
+        except Exception as _:
+            return self.server_error()
+
+        watch_list, overflown = watch_list[:-1], watch_list[-1]
+
+        return render_template(
+            "mini_board.html",
+            watch_list=watch_list,
+            len=len,
+            reversed=reversed,
+            settings=self.settings,
+        )
+
+    def update_but_before_ensure(self):
+        try:
+            self.actually_refresh_tokens()
+            self.update_profile()
+        except Exception as _:
+            abort(
+                404, "Failed to either refresh tokens which is most probable thing to happen now or update your profile"
+            )
+
+        return redirect("/")
 
     def mal_session(self):
         if self._MAL:
             return self._MAL
 
         try:
-            self._MAL = MALSession(session, get_headers(), self.check_and_ask_for_refresh_token)
+            self._MAL = MALSession(session, get_headers(), self.check_and_then_refresh_tokens)
             return self.mal_session()
         except Exception as _:
             return False
 
-    def check_and_ask_for_refresh_token(self):
+    def update_profile(self):
+        # Fetching your name and profile picture
+        response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
+        response.raise_for_status()
+        self.settings.from_dict(self.mal_session().profile_pic(response.json()))
+
+    # TOKEN RELATED THINGS STARTS HERE
+
+    def actually_refresh_tokens(self):
+        response = session.post(
+            f"{OAUTH}/token",
+            data={
+                "grant_type": "refresh_token",
+                "refresh_token": self.settings("refresh_token"),
+                "client_id": self.settings("CLIENT_ID"),
+                "client_secret": self.settings("CLIENT_SECRET"),
+            },
+        )
+        response.raise_for_status()
+        self.settings.from_dict(update_now_in_seconds(response.json()))
+
+    def refresh_tokens(self):
+        try:
+            self.actually_refresh_tokens()
+            return redirect("/settings")
+        except Exception as _:
+            return self.settings_page("Failed to refresh tokens")
+
+    def check_and_then_refresh_tokens(self):
         expires_in, expired = get_remaining_seconds(
             int(self.settings["expires_in"]) + int(self.settings["now"])
         )
-        self.refresh(self.settings.to_dict()) if expired else ...
+        self.actually_refresh_tokens() if expired else ...
         return expires_in
 
-    def settings_page(self):
-        error = [0, ""]
+    # Settings Page
+
+    def settings_page(self, failed=""):
+        error = [0, failed]
 
         try:
-            error[0] = self.check_and_ask_for_refresh_token()
+            error[0] = self.check_and_then_refresh_tokens()
 
         except ValueError:
             error[-1] = "Failed to check the expiry date of the refresh tokens!," \
@@ -116,82 +170,40 @@ class Server:
             expire_time=error[0],
         )
 
-    def reset_settings(self):
+    def edit_settings(self):
         raw = request.form
 
-        if "refresh" in raw:
-            return self.refresh(raw)
+        if "calendar" in raw:
+            try:
+                self.fetch_events(raw["calendar_url"])
+                return redirect("/settings")
+            except ConnectionRefusedError:
+                return redirect(url_for("/settings", failed="Failed to fetch calendar from the given URL"))
+            except ProcessError:
+                return redirect(url_for("/settings", failed="Failed to schedule events"))
+
+        if "replace" in raw:
+            return self.import_settings()
+
+        self.settings.from_dict(raw, False)
 
         try:
-            self.settings.from_dict(request.form, False)
             self.close_oauth()
             self.force_oauth()
-            self.refresh(raw)
-
+            self.actually_refresh_tokens()
+            self.update_profile()
         except Exception as _:
-            return traceback_error()
+            return self.server_error()
 
         self.settings.connection.commit()
         return redirect("/settings")
 
-    def refer_settings(self):
-        try:
-            current_executable("-ask")
-            return redirect("/settings")
-        except Exception as _:
-            return abort(404, traceback.format_exc())
-
-    def refresh(self, raw):
-        # Refreshing Tokens...
-        refresh_cal = "calendar" in raw and raw["calendar"] and raw["calendar"] != self.settings["calendar"]
-
-        response = session.post(
-            f"{OAUTH}/token",
-            data={
-                "grant_type": "refresh_token",
-                "refresh_token": self.settings("refresh_token"),
-                "client_id": self.settings("CLIENT_ID"),
-                "client_secret": self.settings("CLIENT_SECRET"),
-            },
-        )
-        response.raise_for_status()
-        self.settings.from_dict(update_now_in_seconds(response.json()))
-
-        # Fetching your name and profile picture
-        response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
-        response.raise_for_status()
-
-        self.settings.from_dict(profile_pic(response.json()))
-
-        self.refresh_events(raw["calendar"]) if refresh_cal else ...
-
-        return redirect("./settings")
-
-    def update_things(self):
-        try:
-            watch_list = list(self.mal_session().watching())
-        except AttributeError:
-            return abort(404,
-                         "Failed to fetch your watch list! Maybe you don't have a valid token? Are you sure it's not expired\nGo to Settings to know more!")
-        except Exception as error:
-            return abort(404, repr(error))
-
-        watch_list, overflown = watch_list[:-1], watch_list[-1]
-
-        return render_template(
-            "mini_board.html",
-            watch_list=watch_list,
-            len=len,
-            reversed=reversed,
-            settings=self.settings,
-        )
-
-    def refresh_events(self, url=""):
+    def fetch_events(self, url=None):
         url = url if url else self.settings["calendar"]
         if not url:
-            return
+            raise ConnectionRefusedError("No calendar url given")
 
-        quick_save(url if url else self.settings("calendar"), False)
+        quick_save(url, False)
 
         failed = schedule_events(True)
 
@@ -199,14 +211,6 @@ class Server:
             raise ProcessError(failed)
         else:
             self.settings["calendar"] = url
-
-    def calendar_refresh(self):
-        try:
-            self.refresh_events()
-        except ProcessError:
-            return abort(404, "Failed to schedule events!, Here's the logs:\n" + traceback.format_exc())
-
-        return redirect("/settings")
 
     def update_things_in_site(self):
         form = request.form
@@ -224,8 +228,7 @@ class Server:
 
         if sys.argv[0] == "automatic":
             # yes, it's not good practice, but since it's not meant to be used manually, it's fine this way for now.
-            interrupt_main()
-            return abort(410)
+            return redirect("./close-session")
 
         return redirect("./settings")
 
@@ -269,39 +272,62 @@ class Server:
         print(self.settings.to_dict())
         return redirect("./settings")
 
-    def refresh_and_update(self):
-        self.refresh(self.settings.to_dict())
-        return redirect("./")
+    def close_session(self):
+        self.settings.close()
+        Timer(0.5, lambda: interrupt_main()).start()
+        return render_template(
+            "error.html",
+            error_code=102,
+            sub_title="Session closed as requested!",
+            sugestion="Please close the browser window",
+            show_settings=False
+        )
 
+    def import_settings(self):
+        file = request.files["settings-file"]
+        if not file:
+            self.settings_page("No file selected")
 
-def gen_url(_port):
-    arguments = sys.argv[1:]
-    arguments.append("automatic") if len(arguments) == 0 else ...
-    route = "" if len(arguments) == 1 else arguments[-1]
+        _, path = tempfile.mkstemp(suffix=".db", prefix="settings")
+        os.close(_)
+        temp = pathlib.Path(path)
+        file.save(temp)
 
-    return f"http://localhost:{_port}/{route}"
+        try:
+            _ = Settings(temp)
+            self.settings.from_dict(_.to_dict())
+            _.close()
+        except Exception as _:
+            return self.settings_page("Failed to import settings")
+        else:
+            return self.settings_page("Successfully imported settings")
+        finally:
+            temp.unlink()
 
 
 if __name__ == "__main__":
     app.static_folder = str(ROOT / "static")
     app.template_folder = str(ROOT / "templates")
 
-    SERVER = Server()
+    sys.argv.append("automatic") if len(sys.argv) == 1 else ...
+    sys.argv.append("") if len(sys.argv) == 2 else ...
 
-    app.add_url_rule("/settings", view_func=SERVER.settings_page)
-    app.add_url_rule("/save-settings", view_func=SERVER.reset_settings, methods=["POST"])
-    app.add_url_rule("/import-settings", view_func=SERVER.refer_settings)
+    SERVER = Server(sys.argv[1] == "automatic")
 
     app.add_url_rule("/", view_func=SERVER.update_things)
-    app.add_url_rule("/force-scheduler", view_func=SERVER.refresh_and_update)
-    app.add_url_rule("/save-events", view_func=SERVER.calendar_refresh)
+    app.add_url_rule("/ensure", view_func=SERVER.update_but_before_ensure)
+
+    app.add_url_rule("/settings", view_func=SERVER.settings_page)
+    app.add_url_rule("/edit-settings", view_func=SERVER.edit_settings, methods=["POST"])
+    app.add_url_rule("/refresh-tokens", view_func=SERVER.refresh_tokens)
 
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]
     )
     app.add_url_rule("/close-oauth_session", view_func=SERVER.close_oauth)
+    app.add_url_rule("/close-session", view_func=SERVER.close_session)
 
-    app.add_url_rule("/dep-db", view_func=SERVER.dep_db)
+    app.add_url_rule("/test", view_func=SERVER.dep_db)
 
     trust = EnsurePort("/settings", "mal-remainder")
 
@@ -313,7 +339,7 @@ if __name__ == "__main__":
 
     Timer(
         random.uniform(0.69, 1),
-        lambda: webbrowser.open(gen_url(port)),
+        lambda: webbrowser.open(f"http://localhost:{port}/{sys.argv[-1]}"),
     ).start()
 
     app.run(host="localhost", port=port, debug=False)

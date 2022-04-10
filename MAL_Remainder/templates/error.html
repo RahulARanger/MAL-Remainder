@@ -10,16 +10,16 @@
 	<style></style>
 	<body data-alert="{{failed}}">
 		<header>
-			<a href="./settings" target="_blank">⚙️Settings</a>
+			{% if show_settings %}
+				<a href="./settings" target="_blank" class="button">⚙️Settings</a>
+			{% endif %}
 		</header>
-		<main class="center main">
-			<h1 class="neon">410</h1>
-			<span> This page is no longer available</span>
-			<footer>
-				<div>
-					You may close this page and wait for the another tab to open
-				</div>
-			</footer>
+		<main class="center main float">
+			<h1 class="neon">{{error_code}}</h1>
+			<span>{{sub_title}}</span>
+			<footer><div>{{suggestion}}</div></footer>
 		</main>
+
+		<script src="../static/alert.js"></script>
 	</body>
 </html>
