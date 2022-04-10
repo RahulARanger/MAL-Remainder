@@ -7,7 +7,7 @@ permalink: /docs/
 
 # Introduction
 
-> MAL-Remainder is an Application that allows you to update the number of episodes that you have on your `watch list` in [MyAnimeList]("https://myanimelist.net" "MyAnimeList") by regularly reminding you on the basis of events scheduled in [Google Calendar](https://www.google.com/calendar/about/)'s [ICalendar File](https://en.wikipedia.org/wiki/ICalendar ".ics file").
+> MAL-Remainder is an Application that allows you to update the number of episodes that you have on your `watch list` in [MyAnimeList](https://myanimelist.net "MyAnimeList") by regularly reminding you on the basis of events scheduled in [Google Calendar](https://www.google.com/calendar/about/ "Google Calendar")'s [ICalendar File](https://en.wikipedia.org/wiki/ICalendar ".ics file").
 
 ---
 
@@ -17,7 +17,7 @@ permalink: /docs/
 
 ## Pre-Requisites
 
--   Familiarity with the [MAL](https://myanimelist.net)
+-   Familiarity with the [MAL](https://myanimelist.net "MyAnimeList")
 -   Must be ok with Initial Setup as it is bit lengthy like creating an API, filling settings, etc...
 
 ---

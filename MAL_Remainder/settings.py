@@ -44,8 +44,8 @@ def show_exception(message):
 class ErrorPages:
     @classmethod
     @app.errorhandler(404)
-    @app.route("/404/<failed>")
-    def e_404(cls, failed="Error: 404, No Page Found"):
+    def e_404(cls):
+        failed = traceback.format_exc()
         raise_top()
         return render_template(
             "error.html",
@@ -54,10 +54,6 @@ class ErrorPages:
             sub_title="Most Probably this is not a valid page. If it was valid, Maybe there was error in .",
             show_settings=True
         ), 404
-
-    @classmethod
-    def server_error(cls):
-        return abort(404, traceback.format_exc())
 
 
 class Server(ErrorPages):
@@ -78,7 +74,7 @@ class Server(ErrorPages):
                          )
 
         except Exception as _:
-            return self.server_error()
+            return abort(404)
 
         watch_list, overflown = watch_list[:-1], watch_list[-1]
 
@@ -106,7 +102,7 @@ class Server(ErrorPages):
             return self._MAL
 
         try:
-            self._MAL = MALSession(session, get_headers(), self.check_and_then_refresh_tokens)
+            self._MAL = MALSession(session, get_headers, self.check_and_then_refresh_tokens)
             return self.mal_session()
         except Exception as _:
             return False
@@ -137,7 +133,9 @@ class Server(ErrorPages):
             self.actually_refresh_tokens()
             return redirect("/settings")
         except Exception as _:
-            return self.settings_page("Failed to refresh tokens")
+            return self.settings_page(
+                "Failed to refresh tokens, Maybe your refresh tokens and access tokens are not valid. Try to ReOauth"
+            )
 
     def check_and_then_refresh_tokens(self):
         expires_in, expired = get_remaining_seconds(
@@ -193,7 +191,8 @@ class Server(ErrorPages):
             self.actually_refresh_tokens()
             self.update_profile()
         except Exception as _:
-            return self.server_error()
+            print(_)
+            return abort(404)
 
         self.settings.connection.commit()
         return redirect("/settings")

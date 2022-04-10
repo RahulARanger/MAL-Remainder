@@ -1,4 +1,4 @@
-let expires_in = document.querySelector("footer > div:first-of-type").dataset
+let expires_in = document.querySelector("footer > div.float").dataset
 	.time;
 
 const set_to = (id, value) => {
@@ -33,7 +33,7 @@ const timer_id = setInterval(count_down, 1000);
 	set_to("seconds", seconds);
 })();
 
-function count_down(id, value) {
+function count_down() {
 	const seconds = get_id("seconds");
 	if (seconds) {
 		return set_to("seconds", seconds - 1);
@@ -66,17 +66,18 @@ function count_down(id, value) {
 	set_to("days", 0);
 
 	document
-		.querySelector("header > div:first-of-type")
+		.querySelector("footer > div.float")
 		.classList.add("expired");
 
 	clearInterval(timer_id);
 }
 
 
-document.querySelector(".corner.right").addEventListener("click", (e) =>
-	confirm("Close this session ?\nYou will need to open a new session if required") || e.preventDefault()
-);
-
-
-
+document.querySelector("button[name='replace']").addEventListener("click", function(e) {
+	const settings_file = document.getElementById("save-settings");
+	
+	(settings_file.value && confirm(
+		"Are you sure you want to replace the current settings file?\n"
+	)) || e.preventDefault();
+})
 	

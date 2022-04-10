@@ -89,7 +89,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border: 1px double black;
 }
 
-input[type="range"]:active {
+input[type="range"]:active, button:active {
 	animation: var(--pulse);
 	box-shadow: 0 0 0 2em transparent;
 }

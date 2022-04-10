@@ -5,8 +5,19 @@ import pathlib
 from urllib.parse import urlparse
 
 
+def sanity_check(response: requests.Response):
+    raw = response.json()
+
+    if "error" in raw:
+        raise ConnectionError("MAL Session:\n" + raw["error"])
+    else:
+        response.raise_for_status()
+
+    return raw
+
+
 class MALSession:
-    def __init__(self, session: requests.Session, headers: dict, refresh_func: typing.Callable):
+    def __init__(self, session: requests.Session, headers: typing.Callable, refresh_func: typing.Callable):
         self.api_url = "https://api.myanimelist.net/v2/"
         self.session = session
         self.headers = headers
@@ -23,13 +34,10 @@ class MALSession:
     def watching(self, sort_order="list_updated_at"):
         self.prevent()
 
-        response = self.session.get(
+        raw = sanity_check(self.session.get(
             self.postfix() + "@me/animelist",
-            params={"status": "watching", "sort": sort_order, "fields": "list_status"}, headers=self.headers
-        )
-        response.raise_for_status()
-
-        raw = response.json()
+            params={"status": "watching", "sort": sort_order, "fields": "list_status"}, headers=self.headers()
+        ))
 
         for node in raw["data"]:
             node["list_status"].update(self.total_episodes(node["node"]["id"]))
@@ -41,29 +49,25 @@ class MALSession:
     def total_episodes(self, anime_id):
         self.prevent()
 
-        response = self.session.get(
-            self.postfix("anime", str(anime_id)), headers=self.headers, params={
+        return sanity_check(self.session.get(
+            self.postfix("anime", str(anime_id)), headers=self.headers(), params={
                 "fields": "num_episodes,start_date,end_date"
             }
-        )
-
-        response.raise_for_status()
-
-        return response.json()
+        ))
 
     def post_changes(self, anime_id, watched, total):
         self.prevent()
 
-        response = self.session.patch(self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers,
-                                      data={
-                                          "num_watched_episodes": watched,
-                                          "status": "completed" if watched == total else "watching"
-                                      })
-        response.raise_for_status()
+        return sanity_check(
+            self.session.patch(
+                self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers(),
+                data={
+                    "num_watched_episodes": watched,
+                    "status": "completed" if watched == total else "watching"
+                }
+            ))
 
-        return response.json()
-
-    def profile_picture(self, about_me):
+    def profile_pic(self, about_me):
         url = about_me["picture"]
 
         save_to = (

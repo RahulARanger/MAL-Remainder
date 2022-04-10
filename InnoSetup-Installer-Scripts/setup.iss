@@ -113,7 +113,7 @@ Type: files; Name: "{app}\python.zip";
 Type: files; Name: "{app}\python\lib\*.pyc";
 
 Type: filesandordirs; Name: "{app}\MAL_Remainder\__pycache__";
-Type: filesandordirs; Name: "{app}\MAL_Remainder\data";
+Type: filesandordirs; Name: "{app}\MAL_Remainder\static\data";
 Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
 Type: files; Name: "{app}\MAL_Remainder\static\Profile*";
 
