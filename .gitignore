@@ -9,6 +9,7 @@
 
 # directories
 MAL_Remainder/Logs/
+MAL_Remainder/static/Data/*
 Media/
 .idea
 .cache

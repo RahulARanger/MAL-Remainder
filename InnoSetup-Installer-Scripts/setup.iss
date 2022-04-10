@@ -3,7 +3,7 @@
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.6.4"
+#define Version="0.6.5"
 #define Mutex="Mal-Remainder"
 
 [Setup]
@@ -88,7 +88,7 @@ Source: "../gate.ps1"; DestDir: "{app}";
 Source: "../setup.cmd"; DestDir: "{app}";
 
 Source: "../MAL_Remainder\templates\*"; DestDir: "{app}/MAL_Remainder/templates";
-Source: "../MAL_Remainder\static\*"; DestDir: "{app}/MAL_Remainder/static"; Excludes: "Profile.jpg";
+Source: "../MAL_Remainder\static\*"; DestDir: "{app}/MAL_Remainder/static"; Excludes: "Profile.jpg,Data\*";
 Source: "../MAL_Remainder\*"; DestDir: "{app}/MAL_Remainder";
 
 

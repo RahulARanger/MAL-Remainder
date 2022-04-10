@@ -146,27 +146,6 @@ public static extern bool SetWindowPos(
 }
 
 
-function Get-Settings{
-write-output "asked"
-    Add-Type -AssemblyName PresentationFramework
-    # https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.openfiledialog?view=windowsdesktop-6.0
-    $Dialog = New-Object Microsoft.Win32.OpenFileDialog
-    $Dialog.DefaultExt=".db"
-    $Dialog.Filter="sqlite3-DB (.db)|*.db"
-    $Dialog.Title="Select Setting.db"
-    $Dialog.CheckFileExists=$true
-    $Dialog.CheckPathExists=$true
-    $Dialog.FileName = "settings"
-    $Dialog.Multiselect=$false
-
-    Show-Top
-
-    if($Dialog.ShowDialog() -eq $true){
-        return $Dialog.FileName
-    }
-    return ""
-}
-
 switch($true){
     {$open.IsPresent}{
         Start-PythonScript -arguments @("automatic");
