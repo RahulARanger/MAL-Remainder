@@ -1,37 +1,27 @@
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that.
-
-# If you need help with YAML syntax, here are some quick references for you:
-# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
-# https://learnxinyminutes.com/docs/yaml/
-
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-
 title: MAL-Remainder
 
 email: saihanumarahul66@gmail.com
 
 description: >- # this means to ignore newlines until "baseurl:"
-    Write an awesome description for your new site here. You can edit this
-    line in _config.yml. It will appear in your document head meta (for
-    Google search results) and in your feed.xml site description.
+    MALRemainder is an Application that could automate the process of 
+    updating the list in MyAnimeList by regularly reminding to do that in a simple way.
 
 # FOR GITHUB-PAGES
 baseurl: "/MAL-Remainder/"
 url: "https://rahularanger.github.io/"
 # END FOR GITHUB - PAGES
 
-# FOR LOCAL SETUP
+# # FOR LOCAL SETUP
 # url: ""
 # baseurl: ""
 # theme: "just-the-docs"
-# END FOR LOCAL SETUP
+# # END FOR LOCAL SETUP
 
 github_username: RahulARanger
+
+toggle_color_scheme: dark     
+toggle_page_url: "/"        
+toggle_auto_mode: true   
 
 
 remote_theme: pdmosses/just-the-docs@callouts
@@ -98,9 +88,19 @@ heading_anchors: true
 
 # footer things
 
-footer_content: "Copyright (c) 2021 RahulARanger, Distributed by <a href='https://github.com/RahulARanger/MAL-Remainder/blob/master/LICENSE.txt'>MIT LICENSE.</a>"
+footer_content: "<a href='https://saythanks.io/to/RahulARanger'><img src='https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg' title='If you like this project then let me know 😄'></a><br><br>Copyright (c) 2021 RahulARanger, Distributed by <a href='https://github.com/RahulARanger/MAL-Remainder/blob/master/LICENSE.txt'>MIT LICENSE.</a>"
 last_edit_timestamp: true
 last_edit_time_format: "%b %e %Y at %I:%M %p" # i like this default format
+
+
+gh_edit_link: true # show or hide edit this page link
+gh_edit_link_text: "Edit this page on GitHub."
+gh_edit_repository: "https://github.com/RahulARanger/MAL-Remainder" # the github URL for your repo
+gh_edit_branch: "master"
+gh_edit_source: docs
+gh_edit_view_mode: "blob" 
+
+
 
 callouts:
     comfy:

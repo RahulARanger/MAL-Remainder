@@ -17,7 +17,7 @@
 			class="small button"
 				href="https://myanimelist.net/animelist/{{settings['name']}}"
 				target="_blank"
-				>➡️ Redirect to your Anime list</a
+				>➡️ Anime list</a
 			>
 			<a href="./" title="Opens up a Force Scheduler Page" class="button"
 				>⏰ Force-Remainder</a
@@ -114,6 +114,16 @@
 		</main>
 
 		<footer>
+			<h3 class="float" style="animation-delay: 1.5s;">MAL-Remainder<sub>{{version}}</sub></h3>
+			<form action="./auto-update" method="POST">
+				<div>
+					<label for="auto-update">Auto Update:&nbsp;</label>
+					<label>
+						<input type="checkbox" name="auto-update" id="auto-update" {% if settings['auto-update'] and settings['auto-update'] == '1' %}checked{% endif %}>
+						<div></div>
+					</label>
+				</div>
+			</form>
 			<div class="float" data-time="{{expire_time}}" title="Time Left for your Access Tokens.Note:It doesn't know if the Access Tokens are valid or not!">
 				<span>Expires in:&nbsp;</span>
 				<span id="days"></span> day<span></span>

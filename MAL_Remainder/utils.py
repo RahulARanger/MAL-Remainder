@@ -36,12 +36,12 @@ class Settings:
         self.connection.commit()
         cursor.close()
 
-    def from_dict(self, container: dict, commit: bool=True):
+    def from_dict(self, container: dict, commit: bool = True):
         cursor = self.connection.executemany(
             "INSERT OR REPLACE INTO SETTINGS (key, value) Values(?, ?);",
             {_: container[_] for _ in container if container[_]}.items(),
         )
-        self.connection.commit() if commit else ... 
+        self.connection.commit() if commit else ...
         cursor.close()
 
     def to_dict(self):
@@ -68,6 +68,12 @@ class Settings:
 
     def close(self):
         self.connection.close()
+
+    def get(self, key, default=""):
+        store = self[key]
+        if not store:
+            return default
+        return store
 
 
 SETTINGS = Settings()
@@ -101,9 +107,6 @@ class Tock:
         return [
             "ID", "Title", "Image", "Done", "Total", "Genre"
         ]
-
-
-
 
 
 if __name__ == "__main__":

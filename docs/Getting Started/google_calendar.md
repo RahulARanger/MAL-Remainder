@@ -7,14 +7,26 @@ nav_order: 3
 ---
 
 {: .note}
-This is the optional section. This section but this reminds you to update. else it updates when explicitly opened.
+This is the optional section. But it would make this [second feature](../../#automation) not possible
 
-We use Google Calendar to generate `ics` file. MAL-Remainder when provided with this file reads only the events.
+MAL-Remainder requires a URL for `ics` file and the currently it was only tested with [Google Calendar](https://www.google.com/calendar/about/). 
 
-# Connecting Calendar
+
+## Why Calendar ?
+---
+
+* Refers only the events
+* May refer the Event's Description or Summary in future
+* Refers the Start and End time of the event.
+
+
+Thanks to **[icalevents](https://github.com/jazzband/icalevents)** for providing an easy way to parse events. 
+
+## Connecting Calendar from Google Calendar
+---
 
 MAL-Remainder just requires you provide the link for your `ics` calendar.
-Follow the below steps.
+You may refer the below links for reference.
 
 * [Creating a Calendar](https://support.google.com/calendar/answer/37095?hl=en "Creating a calendar")
 * [Making it Public](https://support.google.com/calendar/answer/37083 "Making your calendar public")

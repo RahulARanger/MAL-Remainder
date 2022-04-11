@@ -7,19 +7,16 @@ permalink: /docs/Getting Started/win_installation
 ---
 
 ## Pre-requisites
+---
 
 -   Make sure you have Powershell installed on your machine and accessible with the cmdlet `powershell`. [i guess you don't need to worry about this, as it is provided by default.]
 
+<br>
 
----
-
-## Installing Executable
-
-> Head over to the repository's release page for download link.
-
----
+[MAL Remainder.exe](https://github.com/RahulARanger/MAL-Remainder/releases/latest/download/MALRemainder.exe){: .btn .btn-blue}
 
 ## Installation Process
+---
 
 -   **Application's Setup is build using [innosetup](https://jrsoftware.org/isinfo.php)**
 
@@ -31,9 +28,15 @@ As warned above, it is recommended not to interrupt the shell process, But if yo
 -   For installation, it asks either you need to cancel the installation, if yes it removes whatever it did up until now, else it reopens the shell window ~~😈~~ to continue the process.
 -   For un-installation, closing the window, would proceed with a way [_less informative_] to uninstall files
 
+{: .highlight}
+Since this is a personal Project and it is made in simple way. So you may see certain warnings like the ones listed below. I would recommend you to ignore them. But It is possible to build this [`locally`](../Local%20Setup/Windows)
+
+
+{: .note }
+
 
 {: .warning }
-It is sometimes possible for your anti-virus software to warn you about this application and may sometimes cancel the installation for the first time it does because of this [setup.cmd](https://github.com/RahulARanger/MAL-Remainder/blob/master/setup.cmd). Make sure to add it to excludes.
+It is possible for your anti-virus software to warn you about this application and may sometimes cancel the installation for the first time, it does because of this [setup.cmd](https://github.com/RahulARanger/MAL-Remainder/blob/master/setup.cmd). Make sure to add it to excludes.
 
 
 {: .warning}
@@ -57,9 +60,12 @@ Since this Application is not signed you will definitely see this error <br><br>
 
 Most of the errors that could occur while installation would raise this message box but with different message.
 
-----
+
 
 ## End Result
+----
+
+At the Beginning of the Installation, Application would require 45 MB but at the end it would only consume over 35 MB.
 
 - [X] Shortcut in your Startup Folder
 - [X] Shortcut in groups Folder.

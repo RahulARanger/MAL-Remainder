@@ -9,7 +9,7 @@ nav_order: 2
 # Creating ID in MAL API
 ____
 
-We need to create an **ID** in MyAnimeList API in order to communicate with MAL Server. for that refer just the step 0 from this [blog](https://myanimelist.net/blog.php?eid=835707) but make sure to to note this [Fixed Parameters in the form](#fixed-parameters-in-the-form).
+We will need to create an **ID** in MyAnimeList API in order to communicate with MAL Server. for that refer just the step 0 from this [blog](https://myanimelist.net/blog.php?eid=835707#:~:text=Step%200%20%2D%20Register%20your%20application) but make sure to to note this [Fixed Parameters in the form](#fixed-parameters-in-the-form).
 
 ### Fixed parameters in the form
 
@@ -19,7 +19,7 @@ There are certain things to note while creating API
 -   `App Redirect URL` as http://**{host}**:**{port}**//save 
 
 {: .note}
-"//save" shouldn't be written as "/save" and note the protocol `http` and not `https`
+"//save" shouldn't be written as "/save" and the protocol `http` is used and not `https`
 
 
 Other than `App type` and `App Redirect URL`, you can fill the rest with your own values.

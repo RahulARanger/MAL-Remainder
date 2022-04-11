@@ -12,9 +12,9 @@ from threading import Timer
 import sys
 from _thread import interrupt_main
 import traceback
-import csv
 
 if __name__ == "__main__":
+    from MAL_Remainder import __VERSION__
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
         ROOT, raise_top, current_executable
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
@@ -65,6 +65,7 @@ class Server(ErrorPages):
         self._MAL = self.mal_session() if is_there_token() else False
         self.OAUTH_process = None
         self.auto = auto
+        self.confirmed = self.settings.get("auto-update", "0") == "1"
 
     def update_things(self):
         try:
@@ -172,6 +173,7 @@ class Server(ErrorPages):
             profile=url_for("static", filename="Profile" + self.settings["picture"]),
             error=error[-1],
             expire_time=error[0],
+            version=__VERSION__
         )
 
     def edit_settings(self):
@@ -279,8 +281,10 @@ class Server(ErrorPages):
         return redirect("./settings")
 
     def close_session(self):
+        self.confirmed = self.settings.get("auto-update", "0") == "1"
         self.settings.close()
-        Timer(0.5, lambda: interrupt_main()).start()
+
+        Timer(0.9, lambda: interrupt_main()).start()
         return render_template(
             "error.html",
             error_code=102,
@@ -317,6 +321,11 @@ class Server(ErrorPages):
 
         return self.settings_page(store[-1])
 
+    def auto_update(self):
+        print("auto-update" in request.form)
+        self.settings["auto-update"] = "auto-update" in request.form
+        return redirect('./settings')
+
 
 if __name__ == "__main__":
     app.static_folder = str(ROOT / "static")
@@ -337,6 +346,8 @@ if __name__ == "__main__":
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]
     )
+    app.add_url_rule("/auto-update", view_func=SERVER.auto_update, methods=["POST"])
+
     app.add_url_rule("/close-oauth_session", view_func=SERVER.close_oauth)
     app.add_url_rule("/close-session", view_func=SERVER.close_session)
 
@@ -356,8 +367,9 @@ if __name__ == "__main__":
     ).start()
 
     app.run(host="localhost", port=port, debug=False)
+
     trust.release()
 
-    current_executable("-update")
+    current_executable("-update") if SERVER.confirmed else ...
 
 # Reference: https://myanimelist.net/blog.php?eid=835707

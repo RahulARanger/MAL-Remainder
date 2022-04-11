@@ -3,6 +3,7 @@
 	--bg: #212121;
 	--fg: white;
 	--light-bg: #333333;
+	--orange: #ff5500;
 	
 }
 * {
@@ -10,7 +11,7 @@
 }
 
 
-button, span{
+.button, label, a, div, img, button, span{
 	user-select: none
 }
 
@@ -57,21 +58,27 @@ body {
 
 footer, header {
 	display: flex;
-	justify-content: space-evenly;
+	position: fixed;
+	justify-content: space-around;
 	align-items: center;
+	color: #ff5500;
+	width: 100%;
+}
+
+header{
 	top: 0.5%;
 	left: 0.5%;
-	position: fixed;
-	width: 100%;
-	color: #ff5500;
 }
+
 
 footer{
-	top: 92%;
-	left: -1%;
-	justify-content: flex-end;
+	bottom: 0.5%;
+	left: 0%;
 }
 
+footer > form > div{
+	align-items: flex-end;
+}
 
 
 .center > section > img{

@@ -11,12 +11,11 @@ permalink: /docs/Know More/Win_Installation
 
 This Application depends on the Shell Scripts for the following reasons:
 
--   used local FileDialog for importing Settings.
--   **Adding a Task on your system's scheduler**
+-   **Adding a Task on your system's scheduler** 
 -   Supporting script for setup [_Unzipping folder, deleting a directory, etc..._]
 
-I believe this makes our application consume less space than before.
 
+Those reasons are why that this application is OS-Specific. For now i was able to implement this in Windows. If you want in other os then if you are able to replicate the above steps, You can easily have this application in your System.
 
 # Roles
 
@@ -24,7 +23,9 @@ I believe this makes our application consume less space than before.
 
 ---
 
-🌉 between powershell and python script. In Windows, running the command `setup` would trigger the batch script
+🌉 between powershell and python script. cmd scripts are recognized which means they can run without explicitly specifying the extension. In linux i guess we can do that with .sh files.
+
+So using this cmd script, I was trying to execute powershell script without specifying its extension.
 
 ```python
 import subprocess
@@ -33,8 +34,6 @@ subprocess.run([
 'setup', *sys.argv
 ], cwd=...)
 ```
-
-> So by this way, i can access setup file irrespective of extension of the setup file. In linux, i guess we can do this with `setup.bat`.
 
 ## Powershell Script
 
@@ -46,3 +45,5 @@ subprocess.run([
 -   Executes Python Scripts whenever required
 -   Registers Tasks
 -   Edits Tasks
+
+You can refer [gate.ps1](https://github.com/RahulARanger/MAL-Remainder/blob/master/gate.ps1) and [setup.cmd](https://github.com/RahulARanger/MAL-Remainder/blob/master/setup.cmd)

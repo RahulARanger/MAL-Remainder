@@ -20,22 +20,25 @@ In this page, we provide the required values.
 
 ![Settings Page](../../assets/settings.jpg "Settings Page")
 
+{: .note}
+It is recommended to use `localhost` for the `host`. You can also prefer `127.0.0.1` like format
+
 {: .important}
 After feeding values, `Reset OAuth` it does what it supposed to [do](../Know More/api)
 
 
-
-## Forcing ReSchedule
-----
-
- > MAL-Remainder first checks whenever you [log-in](https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/new-scheduledtasktrigger?view=windowsserver2022-ps#example-5-register-a-scheduled-task-that-starts-when-a-user-logs-on). if not scheduled for that day, it reschedules from your Google Calendar.
-
- > To force the above action, use the `ReSchedule` on settings page.
+{: .note}
+Make Sure Client ID and Client Secret are valid else you will face [this] error. if your Access Token and Refresh Tokens are not valid then you will face [this] error. And if your host or port doesn't match with the ones in API app then you will face [this] error
 
 
+{: .highlight}
+You can also import the settings and then submit it using `Refer`. But make sure if those credentials and tokens valid or not.
 
-## End Result 
-----
 
-> For now you are done with setup. Rest of the processes are most probably automated, if you want to know more you can refer [here](../Know More)
+Refer this [sections]() for more information
 
+
+
+Now that you have let the application know everything that it requries.
+
+Now you can use Application's Update Page

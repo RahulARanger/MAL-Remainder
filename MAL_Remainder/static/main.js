@@ -80,4 +80,9 @@ document.querySelector("button[name='replace']").addEventListener("click", funct
 		"Are you sure you want to replace the current settings file?\n"
 	)) || e.preventDefault();
 })
-	
+
+
+document.getElementById("auto-update").addEventListener("click", () => setTimeout(
+	() => document.querySelector("form[action='./auto-update']").submit(),  1000
+)
+)

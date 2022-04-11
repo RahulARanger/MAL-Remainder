@@ -42,7 +42,7 @@ function indexChange() {
 		`#animes>option:nth-of-type(${anime_list.selectedIndex + 1})`
 	).value;
 
-	image_of_anime = option.image;
+	image_of_anime.value = option.image;
 	changeRange();
 }
 

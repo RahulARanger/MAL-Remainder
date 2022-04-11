@@ -44,8 +44,6 @@ if($help.IsPresent){
     Exit;
 }
 
-$VERSION = "0.6.6"
-
 # Some Static Constants
 
 $TaskName = "MAL-Remainder"
@@ -152,11 +150,13 @@ function Get-Update{
         
     $response = Invoke-RestMethod -Uri "https://api.github.com/repos/RahulARanger/MAL-Remainder/releases/latest" -Method "GET" 
 
+    $update_it = $response.tag_name -gt $Matches.1
+
     if (-not $update_it){
         return
     }
-
-    $update_it = $response.tag_name -gt $VERSION
+    
+    
     $download_url = $response.assets.browser_download_url
     $temp = Join-Path -Path $env:TEMP -ChildPath $response.assets.Name
     write-Output $temp
@@ -214,8 +214,12 @@ switch($true){
     }
 
     {$update.IsPresent}{
+        
         Write-Debug "Checking for any updates";
-        Get-Update;
+
+        if((Get-Content -Path (Join-Path -Path (Join-Path -Path $ScriptPath -ChildPath "MAL_Remainder") -ChildPath "__init__.py")) -match '=?"(.*)"'){
+            Get-update
+        }
     }
 
      Default{

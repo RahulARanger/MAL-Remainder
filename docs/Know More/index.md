@@ -8,4 +8,4 @@ permalink: /docs/Know More/
 
 ## Know More
 
-If you do want to know more about this application, you can refer this section. But if you want to know more, you can always contact me through mail or through repo.
+This section is optional to read but good to know.
