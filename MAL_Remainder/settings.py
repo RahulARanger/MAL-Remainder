@@ -16,7 +16,7 @@ import traceback
 if __name__ == "__main__":
     from MAL_Remainder import __VERSION__
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
-        ROOT, raise_top, current_executable
+        ROOT, raise_top, current_executable, ask_for_update
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
     from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, Tock
     from MAL_Remainder.mal_session import MALSession
@@ -370,6 +370,6 @@ if __name__ == "__main__":
 
     trust.release()
 
-    current_executable("-update", wait=False) if SERVER.confirmed else ...
+    ask_for_update() if SERVER.confirmed else ...
 
 # Reference: https://myanimelist.net/blog.php?eid=835707

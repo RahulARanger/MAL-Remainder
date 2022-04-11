@@ -85,16 +85,27 @@ class EnsurePort:
         del self.conn
         return self.root.unlink()
 
-def current_executable(*args, wait=True):
-    const = subprocess.run if wait else subprocess.Popen
-    check = const(["setup", *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, cwd=pathlib.Path(__file__).parent.parent)
-    if wait:
-        return check.stderr.decode("utf-8")
-    return check
+def current_executable(*args):
+    return subprocess.run(
+        ["setup", *args],
+        capture_output=True,
+         shell=True,
+          cwd=pathlib.Path(__file__).parent.parent
+        ).stderr.decode("utf-8")
 
 
 def raise_top():
     current_executable("--top")
+
+def ask_for_update():
+    subprocess.Popen(
+        ["setup", "--update"], 
+        stdout=subprocess.PIPE,
+         stderr=subprocess.PIPE, 
+         shell=True,
+          cwd=pathlib.Path(__file__).parent.parent,
+           start_new_session=True
+    )
 
 
 if __name__ == "__main__":

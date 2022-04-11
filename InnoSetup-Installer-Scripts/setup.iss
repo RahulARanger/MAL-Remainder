@@ -3,7 +3,7 @@
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.6.9"
+#define Version="0.6.8"
 #define Mutex="Mal-Remainder"
 
 [Setup]
@@ -93,7 +93,7 @@ Source: "../MAL_Remainder\*"; DestDir: "{app}/MAL_Remainder";
 
 
 [Dirs]
-Name: "{app}/MAL_Remainder"; Permissions: everyone-modify;
+Name: "{app}/MAL_Remainder"; Permissions: everyone-modify;
 
 ; For more quality progress while uninistalling
 Name: "{app}/python"; Permissions: everyone-full;
@@ -123,7 +123,7 @@ Name: "{group}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-open";
 Name: "{autostartup}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
 
 [Run]
-Filename: "{app}\setup.cmd"; Description: "Open MAL-Remainder"; Parameters: "-settings"; WorkingDir: "{app}"; Flags: postinstall shellexec runasoriginaluser
+Filename: "{app}\setup.cmd"; Description: "Open MAL-Remainder"; Parameters: "-settings"; WorkingDir: "{app}"; Flags: postinstall runasoriginaluser
 
 [Code]
 // https://stackoverflow.com/questions/28221394/proper-structure-syntax-for-delphi-pascal-if-then-begin-end-and
