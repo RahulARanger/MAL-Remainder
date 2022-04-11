@@ -370,6 +370,6 @@ if __name__ == "__main__":
 
     trust.release()
 
-    current_executable("-update") if SERVER.confirmed else ...
+    current_executable("-update", wait=False) if SERVER.confirmed else ...
 
 # Reference: https://myanimelist.net/blog.php?eid=835707

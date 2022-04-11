@@ -150,7 +150,7 @@ function Get-Update{
         
     $response = Invoke-RestMethod -Uri "https://api.github.com/repos/RahulARanger/MAL-Remainder/releases/latest" -Method "GET" 
 
-    $update_it = $response.tag_name -gt $Matches.1
+    $update_it = $response.tag_name -ne $Matches.1
 
     if (-not $update_it){
         return
