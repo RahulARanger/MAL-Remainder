@@ -91,7 +91,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border: 1px double black;
 }
 
-input[type="checkbox"]:checked, input[type="range"]:active, button:active {
+input[type="checkbox"]:checked, input[type="range"]:active, .button:active, input:hover {
 	animation: var(--pulse);
 	box-shadow: 0 0 0 2em transparent;
 }

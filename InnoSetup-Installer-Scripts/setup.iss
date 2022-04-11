@@ -123,7 +123,7 @@ Name: "{group}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-open";
 Name: "{autostartup}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
 
 [Run]
-Filename: "{app}\setup.cmd"; Description: "Open MAL-Remainder"; Parameters: "-settings"; WorkingDir: "{app}"; Flags: postinstall
+Filename: "{app}\setup.cmd"; Description: "Open MAL-Remainder"; Parameters: "-settings"; WorkingDir: "{app}"; Flags: postinstall shellexec runasoriginaluser
 
 [Code]
 // https://stackoverflow.com/questions/28221394/proper-structure-syntax-for-delphi-pascal-if-then-begin-end-and
