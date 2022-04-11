@@ -85,26 +85,12 @@ class EnsurePort:
         del self.conn
         return self.root.unlink()
 
-
 def current_executable(*args, wait=True):
-    args = [
-        ["setup",  *args]
-    ]
-
-    kwargs = {
-        "cwd": pathlib.Path(__file__).parent.parent,
-        "shell": True
-    }
-    
-    if not wait:
-        return subprocess.Popen(args, **kwargs)
-    
-    check = subprocess.run(
-        ["setup", *args],
-        capture_output=True,
-        **kwargs
-    )
-    return check.stderr.decode("utf-8")
+    const = subprocess.run if wait else subprocess.Popen
+    check = const(["setup", *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, cwd=pathlib.Path(__file__).parent.parent)
+    if wait:
+        return check.stderr.decode("utf-8")
+    return check
 
 
 def raise_top():
