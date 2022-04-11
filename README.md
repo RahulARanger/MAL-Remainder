@@ -26,4 +26,4 @@ For now,
 _Currently Reminds only for the end of the event._
 
 
-### Refer more from [Documentation](https://rahularanger.github.io/MAL-Remainder/docs)
+### Refer more from [Documentation](https://rahularanger.github.io/MAL-Remainder)
