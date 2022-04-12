@@ -1,10 +1,11 @@
 #include "misc_utils.iss"
 
+#define Version="0.6.8"
+#define Version="0.6.8"
 #define Name="MALRemainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
-#define Version="0.6.8"
-#define Mutex="Mal-Remainder"
+#define Mx="Mal-Remainder"
 
 [Setup]
 ; Basic Meta
@@ -66,8 +67,8 @@ DisableWelcomePage=no
 LicenseFile="../LICENSE.txt"
 
 ; doesn't allow more than one setup to run at the same time
-SetupMutex={#Mutex}
-AppMutex={#Mutex}
+SetupMutex={#Mx}
+AppMutex={#Mx}
 
 InfoBeforeFile="README.rtf"
 
@@ -123,7 +124,7 @@ Name: "{group}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-open";
 Name: "{autostartup}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
 
 [Run]
-Filename: "{app}\setup.cmd"; Description: "Open MAL-Remainder"; Parameters: "-settings"; WorkingDir: "{app}"; Flags: postinstall runasoriginaluser
+Filename: "powershell.exe"; Description: "Open MAL-Remainder"; Parameters: "-file ""{app}\gate.ps1"" -settings"; WorkingDir: "{app}"; Flags: postinstall runasoriginaluser runminimized
 
 [Code]
 // https://stackoverflow.com/questions/28221394/proper-structure-syntax-for-delphi-pascal-if-then-begin-end-and

@@ -13,8 +13,9 @@ import sys
 from _thread import interrupt_main
 import traceback
 
+
 if __name__ == "__main__":
-    from MAL_Remainder import __VERSION__
+    from MAL_Remainder import __version__
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
         ROOT, raise_top, current_executable, ask_for_update
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
@@ -173,7 +174,7 @@ class Server(ErrorPages):
             profile=url_for("static", filename="Profile" + self.settings["picture"]),
             error=error[-1],
             expire_time=error[0],
-            version=__VERSION__
+            version=__version__
         )
 
     def edit_settings(self):
