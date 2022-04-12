@@ -47,7 +47,7 @@ function indexChange() {
 	// Image of the anime
 	document.querySelector(".center > section > img").src = option.image;
 
-	ep_input.max = ep_range.max = option.to;
+	ep_input.max = ep_range.max = option.total;
 	ep_input.min = ep_range.min = -Number(option.done);
 	ep_input.value = ep_range.value = 0;
 	
