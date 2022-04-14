@@ -12,6 +12,7 @@ class Settings:
             timeout=6,
             check_same_thread=False,
         )
+        self.error = False
         self.connection.executescript(
             pathlib.Path(__file__).parent.joinpath("init.sql").read_text()
         )
@@ -75,27 +76,26 @@ class Settings:
             return default
         return store
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+        return False
+
 
 SETTINGS = Settings()
-
-
-def get_raw_tokens():
-    return SETTINGS.from_keys(
-        ["access_token", "expires_in", "refresh_token", "token_type"]
-    )
 
 
 def is_there_token():
     return SETTINGS["token_type"] and SETTINGS["access_token"] and SETTINGS["CLIENT_ID"] and SETTINGS["CLIENT_SECRET"]
 
 
-def get_token():
-    raw = get_raw_tokens()
-    return f'{raw["token_type"]} {raw["access_token"]}'
-
-
 def get_headers():
-    return {"Authorization": get_token()}
+    raw = SETTINGS.from_keys(
+        ["access_token", "expires_in", "refresh_token", "token_type"]
+    )
+    return {"Authorization": f'{raw["token_type"]} {raw["access_token"]}'}
 
 
 class Tock:

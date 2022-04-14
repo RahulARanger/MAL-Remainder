@@ -99,7 +99,7 @@ function Deploy-Remainder{
     $action = New-ScheduledTaskAction -Execute (Join-Path -Path $ScriptPath -ChildPath "setup.cmd") -WorkingDirectory $ScriptPath -Argument "-open"
 
     # Creating Triggers from the time stamps
-    $action_triggers = $arguments | ForEach-Object {
+    $action_triggers = $arguments[0].Split(",") | ForEach-Object {
         New-ScheduledTaskTrigger -Once -At (Get-Date $_)
     }
     
@@ -110,7 +110,7 @@ function Deploy-Remainder{
     $principal =  New-ScheduledTaskPrincipal  -UserId (Get-UserName) -LogonType ServiceAccount
 
     # -Force if already Task Exists, Deletes the Old one by replacing with the new one
-    Register-ScheduledTask -TaskName $TaskName -Description $TaskDescription -Action $action -Trigger $action_triggers -Settings $settings -Principal $principal -Force
+    if($action_triggers.Length -gt 0) {Register-ScheduledTask -TaskName $TaskName -Description $TaskDescription -Action $action -Trigger $action_triggers -Settings $settings -Principal $principal -Force} else {}
 }
 
 function UnRegister-Remainder{
@@ -228,5 +228,3 @@ switch($true){
         if($store.length -gt 0){exit 5} else {}  # exiting with the bad mood 😤
      }
 }
-
-

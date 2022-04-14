@@ -4,15 +4,16 @@ import random
 import tempfile
 from flask import Flask, render_template, redirect, url_for, request, abort
 import requests
-from urllib.parse import urljoin
-from concurrent.futures.thread import ThreadPoolExecutor
+from urllib.parse import urlencode
 from multiprocessing import Process, Queue, ProcessError
 import webbrowser
 from threading import Timer
 import sys
 from _thread import interrupt_main
 import traceback
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
     from MAL_Remainder import __version__
@@ -20,8 +21,9 @@ if __name__ == "__main__":
         ROOT, raise_top, current_executable, ask_for_update
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
     from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, Tock
-    from MAL_Remainder.mal_session import MALSession
+    from MAL_Remainder.mal_session import MALSession, sanity_check
     from MAL_Remainder.calendar_parse import quick_save, schedule_events
+    from MAL_Remainder.custom_exc import connection_related_exc, calendar_exc
 
     session = requests.Session()
 
@@ -32,36 +34,39 @@ app = Flask(
 
 @app.errorhandler(410)
 def _410(_):
-    return render_template("410.html", name="410.html"), 410
-
-
-def get_absolute_route(route):
-    return urljoin(request.root_url, route)
-
-
-def show_exception(message):
-    return webbrowser.open(urljoin(request.url_root, "404/?failed=" + message))
+    return render_template(
+        "error.html",
+        failed=_,
+        show_settings=True,
+        sub_title="Please refer the below message",
+        suggestion=_
+    ), 410
 
 
 class ErrorPages:
     @classmethod
     @app.errorhandler(404)
     def e_404(cls):
+        # logging.exception("Internal Exception", exc_info=True, stack_info=True)
         failed = traceback.format_exc()
         raise_top()
         return render_template(
             "error.html",
             failed=failed,
             error_code=404,
-            sub_title="Most Probably this is not a valid page. If it was valid, Maybe there was error in .",
+            sub_title="Not a Valid Route!",
+            suggestion="Mal-Remainder only has few valid routes,like /settings, /force-remainder, /.",
             show_settings=True
         ), 404
+
+    @classmethod
+    def call_settings_with_error(cls, msg):
+        return redirect("/settings?" + urlencode({"failed": msg}))
 
 
 class Server(ErrorPages):
     def __init__(self, auto):
         self.settings = SETTINGS
-        self.executor = ThreadPoolExecutor(thread_name_prefix="Remainder-Server")
         self._MAL = None
         self._MAL = self.mal_session() if is_there_token() else False
         self.OAUTH_process = None
@@ -69,20 +74,16 @@ class Server(ErrorPages):
         self.confirmed = self.settings.get("auto-update", "0") == "1"
 
     def update_things(self):
-        try:
+        logging.info("Opening Mini-DashBoard")
+
+        with connection_related_exc() as exc:
             if not self.settings["name"]:
                 self.update_profile()
 
             watch_list = list(self.mal_session().watching())
-        except AttributeError:
-            return abort(
-                404,
-                "Failed to fetch your watch list! Maybe you don't have a valid token? Are you sure it's not expired\n"
-                "Go to Settings to know more!"
-            )
 
-        except Exception as _:
-            return abort(404)
+        if exc.unsafe:
+            return abort(410, exc.unsafe)
 
         watch_list, overflown = watch_list[:-1], watch_list[-1]
 
@@ -95,13 +96,14 @@ class Server(ErrorPages):
         )
 
     def update_but_before_ensure(self):
-        try:
+        logging.info("proceeding in a safe way before redirecting to mini dashboard")
+
+        with connection_related_exc() as exc:
             self.actually_refresh_tokens()
             self.update_profile()
-        except Exception as _:
-            abort(
-                404, "Failed to either refresh tokens which is most probable thing to happen now or update your profile"
-            )
+
+        if exc.unsafe:
+            abort(410, exc.unsafe)
 
         return redirect("/")
 
@@ -109,99 +111,106 @@ class Server(ErrorPages):
         if self._MAL:
             return self._MAL
 
-        try:
-            self._MAL = MALSession(session, get_headers, self.check_and_then_refresh_tokens)
-            return self.mal_session()
-        except Exception as _:
-            return False
+        if not is_there_token():
+            raise ConnectionRefusedError(
+                "Failed to get required Credentials for contacting MAL Server"
+                ". Make Sure to fill Client ID, Client Secret, access_token, refresh_token"
+            )
+
+        self._MAL = MALSession(session, get_headers, self.check_and_then_refresh_tokens)
+        return self.mal_session()
 
     def update_profile(self):
-        # Fetching your name and profile picture
-        response = session.get(self.mal_session().postfix("users", "@me"), headers=get_headers())
-        response.raise_for_status()
-        self.settings.from_dict(self.mal_session().profile_pic(response.json()))
+        self.settings.from_dict(
+            self.mal_session().about_me()
+        )
 
     # TOKEN RELATED THINGS STARTS HERE
 
     def actually_refresh_tokens(self):
-        response = session.post(
-            f"{OAUTH}/token",
-            data={
-                "grant_type": "refresh_token",
-                "refresh_token": self.settings("refresh_token"),
-                "client_id": self.settings("CLIENT_ID"),
-                "client_secret": self.settings("CLIENT_SECRET"),
-            },
-        )
-        response.raise_for_status()
-        self.settings.from_dict(update_now_in_seconds(response.json()))
+        logging.info("Asking to refresh the access tokens")
+        self.settings.from_dict(update_now_in_seconds(sanity_check(
+            session.post(
+                f"{OAUTH}/token",
+                data={
+                    "grant_type": "refresh_token",
+                    "refresh_token": self.settings("refresh_token"),
+                    "client_id": self.settings("CLIENT_ID"),
+                    "client_secret": self.settings("CLIENT_SECRET"),
+                },
+            ))))
 
-    def refresh_tokens(self):
-        try:
-            self.actually_refresh_tokens()
-            return redirect("/settings")
-        except Exception as _:
-            return self.settings_page(
-                "Failed to refresh tokens, Maybe your refresh tokens and access tokens are not valid. Try to ReOauth"
-            )
-
-    def check_and_then_refresh_tokens(self):
+    def check_and_then_refresh_tokens(self, force=False):
         expires_in, expired = get_remaining_seconds(
             int(self.settings["expires_in"]) + int(self.settings["now"])
         )
-        self.actually_refresh_tokens() if expired else ...
+        self.actually_refresh_tokens() if force or expired else ...
         return expires_in
 
     # Settings Page
 
-    def settings_page(self, failed: str = ""):
-        error = [0, failed]
+    def settings_page(self):
+        # Automatic mode is off
+        logging.info("Rendering Settings Page...")
+        expiry_time = 0
+        error_message = request.args.get("failed", "")
 
-        try:
-            error[0] = self.check_and_then_refresh_tokens()
+        if not error_message:
+            with connection_related_exc(
+                    {ValueError: "Invalid or Missing Tokens! Please try to Reset OAuth or feed missing values"}
+            ) as exc:
+                expiry_time = self.check_and_then_refresh_tokens(request.args.get("force-refresh", False, type=bool))
 
-        except ValueError:
-            error[-1] = "Failed to check the expiry date of the refresh tokens!," \
-                        "Maybe we don't have your refresh token.\nGo get one! "
+            error_message = exc.unsafe
 
-        except Exception as _:
-            error[-1] = traceback.format_exc()
+        # if you face Operational Error, then you must really raise an Issue
+        logging.error(error_message) if error_message else ...
 
         return render_template(
             "settings.html",
             name="settings.html",
             settings=self.settings,
-            profile=url_for("static", filename="Profile" + self.settings["picture"]),
-            error=error[-1],
-            expire_time=error[0],
+            profile=url_for("static", filename="/Data/Profile" + self.settings["picture"]),
+            error=error_message,
+            expire_time=expiry_time,
             version=__version__
         )
 
     def edit_settings(self):
         raw = request.form
 
+        logging.info("Requested to edit settings into")
+        logging.info(raw)
+
         if "calendar" in raw:
-            try:
+            logging.info("Precisely requested for calendar things")
+
+            with calendar_exc() as exc:
                 self.fetch_events(raw["calendar_url"])
-                return redirect("/settings")
-            except ConnectionRefusedError:
-                return redirect(url_for("/settings", failed="Failed to fetch calendar from the given URL"))
-            except ProcessError:
-                return redirect(url_for("/settings", failed="Failed to schedule events"))
+                exc.unsafe = "Rescheduled Events!"
+
+            return ErrorPages.call_settings_with_error(exc.unsafe)
 
         if "replace" in raw:
-            return self.import_settings()
+            logging.info("Importing Settings")
+            logging.warning(
+                "Are you sure, if your client tokens or refresh tokens are valid!"
+                "Importing doesn't check them.Know the status by Resetting the Oauth if normal Operations fails."
+            )
+            with connection_related_exc() as exc:
+                exc.unsafe = self.import_settings()
+            return ErrorPages.call_settings_with_error(exc.unsafe)
 
         self.settings.from_dict(raw, False)
 
-        try:
+        with connection_related_exc() as exc:
             self.close_oauth()
             self.force_oauth()
             self.actually_refresh_tokens()
             self.update_profile()
-        except Exception as _:
-            print(_)
-            return abort(404)
+
+        if exc.unsafe:
+            return ErrorPages.call_settings_with_error(exc.unsafe)
 
         self.settings.connection.commit()
         return redirect("/settings")
@@ -211,6 +220,7 @@ class Server(ErrorPages):
         if not url:
             raise ConnectionRefusedError("No calendar url given")
 
+        logging.info("Fetching events from %s", url)
         quick_save(url, False)
 
         failed = schedule_events(True)
@@ -222,26 +232,24 @@ class Server(ErrorPages):
 
     def update_things_in_site(self):
         form = request.form
-        print(form)
 
-        self.mal_session().post_changes(
-            form["animes"],
-            int(form["up_until"]) + int(form["watched"]),
-            int(form["total"]),
-        ) if (
-                form.get("watched", 0)
-                and "animes" in form
-                and "up_until" in form
-                and "total" in form
-        ) else ...
+        with connection_related_exc() as exc:
+            self.mal_session().post_changes(
+                form["animes"],
+                int(form["up_until"]) + int(form["watched"]),
+                int(form["total"]),
+            ) if (
+                    form.get("watched", 0)
+                    and "animes" in form
+                    and "up_until" in form
+                    and "total" in form
+            ) else ...
 
-        if sys.argv[0] == "automatic":
-            # yes, it's not good practice, but since it's not meant to be used manually, it's fine this way for now.
-            return redirect("./close-session")
-
-        return redirect("./settings")
+        return abort(410, exc.unsafe) if exc.unsafe else redirect("/close-session" if self.auto else "/settings")
 
     def force_oauth(self):
+        logging.info("Starting OAuth Session")
+
         pipe = Queue()
         process = Process(
             target=gen_session,
@@ -270,16 +278,17 @@ class Server(ErrorPages):
 
     def close_oauth(self):
         if self.OAUTH_process:
+            logging.warning("Killing the Currently Running OAuth Session! Please avoid violence.")
             pipe, process = self.OAUTH_process
             pipe.close()
             process.terminate()
             self.OAUTH_process = None
 
-        return redirect("./settings")
+        return redirect("/settings")
 
     def dep_db(self):
         print(self.settings.to_dict())
-        return redirect("./settings")
+        return redirect("/settings")
 
     def close_session(self):
         self.confirmed = self.settings.get("auto-update", "0") == "1"
@@ -297,35 +306,32 @@ class Server(ErrorPages):
     def import_settings(self):
         file = request.files["settings-file"]
         if not file:
-            self.settings_page("No file selected")
+            raise FileNotFoundError("Sent Empty File")
 
         _, path = tempfile.mkstemp(suffix=".db", prefix="settings")
         os.close(_)
         temp = pathlib.Path(path)
         file.save(temp)
 
-        store = [""]
-        try:
-            _ = Settings(temp)
-            self.settings.from_dict(_.to_dict())
-            _.close()
-            store[-1] = "Successfully imported settings"
-        except Exception as _:
-            store[-1] = "Failed to import settings"
-        else:
-            try:
-                self.update_profile()
-            except Exception as _:
-                store[-1] = "Failed to update profile"
-        finally:
-            temp.unlink()
+        with connection_related_exc() as exc:
+            with Settings(temp) as _:
+                self.settings.from_dict(_.to_dict())
+                exc.unsafe = "Successfully imported settings"
+                print(exc.unsafe, "here")
 
-        return self.settings_page(store[-1])
+        temp.unlink()
+        self.fresh_load()
+
+        return exc.unsafe
 
     def auto_update(self):
-        print("auto-update" in request.form)
+        logging.info("Toggling the auto-update status")
         self.settings["auto-update"] = "auto-update" in request.form
-        return redirect('./settings')
+        return redirect('/settings')
+
+    def fresh_load(self):
+        self.update_profile()
+        self.fetch_events() if self.settings["calendar"] else ...
 
 
 if __name__ == "__main__":
@@ -340,9 +346,9 @@ if __name__ == "__main__":
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/ensure", view_func=SERVER.update_but_before_ensure)
 
+    app.add_url_rule("/settings/<failed>/<force_refresh>", view_func=SERVER.settings_page)
     app.add_url_rule("/settings", view_func=SERVER.settings_page)
     app.add_url_rule("/edit-settings", view_func=SERVER.edit_settings, methods=["POST"])
-    app.add_url_rule("/refresh-tokens", view_func=SERVER.refresh_tokens)
 
     app.add_url_rule(
         "/update-status", view_func=SERVER.update_things_in_site, methods=["POST"]

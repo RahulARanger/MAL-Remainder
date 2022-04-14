@@ -23,7 +23,7 @@
 				>⏰ Force-Remainder</a
 			>
 			<a class="small button" href="./close-session" title="Closes the current session">Close Session ❌</a>
-			<a class="small button" href="./refresh-tokens" title="Refreshes Tokens">Refresh Tokens 🔄</a>
+			<a class="small button" href="/settings?force-refresh=true" title="Refreshes Tokens">Refresh Tokens 🔄</a>
 			<a class="small button" href="./static/data/settings.db" title="Download Current Settings File">Save Settings ⚙️</a>
 			
 			<!--<a href="./dash-board" target="_blank">Save Data</a> !-->
@@ -31,7 +31,7 @@
 		</header>
 		<main class="center">
 			<section>
-				<img class="float" src="{{url_for('static', filename='Profile.jpg')}}" />
+				<img class="float" src="{{ profile }}" />
 			</section>
 			<section class="float main">
 				<form action="./edit-settings" method="POST" enctype="multipart/form-data">
@@ -108,7 +108,7 @@
 						id="close-link"
 						>./close-oauth_session</a
 					>
-					<button class="button" name="reset">Reset Oauth</button>
+					<button class="button" name="reset">Reset OAuth</button>
 				</form>
 			</section>
 		</main>

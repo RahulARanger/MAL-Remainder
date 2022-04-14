@@ -6,6 +6,8 @@
 *.ics
 *.exe
 *Profile.jpg
+*.pfx
+*get_cert.ps1
 
 # directories
 MAL_Remainder/Logs/

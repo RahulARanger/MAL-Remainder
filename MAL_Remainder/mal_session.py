@@ -2,17 +2,15 @@ import requests
 from collections import namedtuple
 import typing
 import pathlib
+import logging
 from urllib.parse import urlparse
 
 
 def sanity_check(response: requests.Response):
     raw = response.json()
-
-    if "error" in raw:
-        raise ConnectionError("MAL Session:\n" + raw["error"])
-    else:
-        response.raise_for_status()
-
+    if raw.get("error", ""):
+        raise ConnectionRefusedError(raw.get("error"))
+    response.raise_for_status()
     return raw
 
 
@@ -33,10 +31,12 @@ class MALSession:
 
     def watching(self, sort_order="list_updated_at"):
         self.prevent()
+        logging.info("Fetching your watch-list")
 
         raw = sanity_check(self.session.get(
             self.postfix() + "@me/animelist",
-            params={"status": "watching", "sort": sort_order, "fields": "list_status"}, headers=self.headers()
+            params={"status": "watching", "sort": sort_order, "fields": "list_status"},
+            headers=self.headers()
         ))
 
         for node in raw["data"]:
@@ -49,6 +49,7 @@ class MALSession:
     def total_episodes(self, anime_id):
         self.prevent()
 
+        logging.info("Fetching the total number of episodes for anime %s", anime_id)
         return sanity_check(self.session.get(
             self.postfix("anime", str(anime_id)), headers=self.headers(), params={
                 "fields": "num_episodes,genres,rank,popularity,mean"
@@ -58,21 +59,21 @@ class MALSession:
     def post_changes(self, anime_id, watched, total):
         self.prevent()
 
-        return sanity_check(
-            self.session.patch(
-                self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers(),
-                data={
-                    "num_watched_episodes": watched,
-                    "status": "completed" if watched == total else "watching"
-                }
-            ))
+        logging.info("Updating your preferences for anime %s with %s out of %s", anime_id, watched, total)
+        return sanity_check(self.session.patch(
+            self.postfix("anime", str(anime_id), "my_list_status"), headers=self.headers(),
+            data={
+                "num_watched_episodes": watched,
+                "status": "completed" if watched == total else "watching"
+            }
+        ))
 
     def profile_pic(self, about_me):
         url = about_me["picture"]
-
+        logging.info("Fetching your profile picture")
         save_to = (
                 pathlib.Path(__file__).parent
-                / "static"
+                / "static" / "data"
                 / ("Profile" + pathlib.Path(urlparse(url).path).suffix)
         )
 
@@ -85,3 +86,11 @@ class MALSession:
         about_me["picture"] = save_to.suffix
 
         return about_me
+
+    def about_me(self):
+        logging.info("Fetching details about you")
+        return self.profile_pic(
+            sanity_check(
+                self.session.get(self.postfix("users", "@me"), headers=self.headers())
+            )
+        )

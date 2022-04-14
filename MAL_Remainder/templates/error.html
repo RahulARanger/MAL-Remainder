@@ -11,12 +11,11 @@
 	<body data-alert="{{failed}}">
 		<header>
 			{% if show_settings %}
-				<a href="./settings" target="_blank" class="button">⚙️Settings</a>
+				<a href="/settings" target="_blank" class="button">⚙️Settings</a>
 			{% endif %}
 		</header>
 		<main class="center main float">
 			<h1 class="neon">{{error_code}}</h1>
-			<hr>
 			<h3>{{sub_title}}</h3>
 			<footer><i>{{suggestion}}</i></footer>
 		</main>

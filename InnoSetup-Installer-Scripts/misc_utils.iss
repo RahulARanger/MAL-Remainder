@@ -2,12 +2,9 @@
 
 var       
   DownloadPage: TDownloadWizardPage;  // downloads packages
-
   Ask: Boolean;   // Ask is Flag for like, say we click Click button to exit setup
   // Ask = true for asking confirmation else False [we set False if we need to exit by force]
-
   ImplicitExitCode: Integer; // like this has ability to dected implicit closes of powershell scripts
-
   Downloaded: Boolean;
 
 
@@ -21,8 +18,6 @@ begin
     ShowCmd := SW_SHOW
   else
     ShowCmd := SW_HIDE;
-
-
   Result := ShellExec(
               '',
               'powershell',
@@ -36,7 +31,6 @@ begin
               ewWaitUntilTerminated,
               ResultCode
           );
-  
 end;      
 
 
@@ -96,7 +90,6 @@ begin
     if not Downloaded then 
     
     begin
-    
       WizardForm.Hide;
       
       repeat

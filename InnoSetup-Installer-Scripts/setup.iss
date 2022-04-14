@@ -1,11 +1,11 @@
 #include "misc_utils.iss"
 
-#define Version="0.6.8"
-#define Version="0.6.8"
-#define Name="MALRemainder"
+#define Version="0.6.9"
+#define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
 #define Mx="Mal-Remainder"
+#define SignTool="Sign"
 
 [Setup]
 ; Basic Meta
@@ -76,6 +76,9 @@ InfoBeforeFile="README.rtf"
 ExtraDiskSpaceRequired=40022016
 ReserveBytes=58576896
 
+; Comment this line if you want to locally setup
+SignTool=SignThis
+
 
 
 [Files]
@@ -119,12 +122,18 @@ Type: filesandordirs; Name: "{app}\MAL_Remainder\static";
 Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
 Type: files; Name: "{app}\MAL_Remainder\static\Profile*";
 
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
 [Icons]
-Name: "{group}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-open"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized
-Name: "{autostartup}\MAL-Remainder"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
+Name: "{autodesktop}\{#Name}"; Filename: "{app}/setup.cmd"; Parameters: "-open"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized; Tasks: desktopicon 
+Name: "{autostartup}\{#Name}"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
+Name: "{group}\{#Name}"; Filename: "{app}/setup.cmd"; Parameters: "-settings"; WorkingDir: "{app}"; Comment: "Opens up the settings of the Mal-Remainder"; Flags: runminimized
+
 
 [Run]
-Filename: "powershell.exe"; Description: "Open MAL-Remainder"; Parameters: "-file ""{app}\gate.ps1"" -settings"; WorkingDir: "{app}"; Flags: postinstall runasoriginaluser runminimized
+Filename: "powershell.exe"; Description: "Open Settings for the MAL-Remainder"; Parameters: "-file ""{app}\gate.ps1"" -settings"; WorkingDir: "{app}"; Flags: postinstall runasoriginaluser runminimized
+
 
 [Code]
 // https://stackoverflow.com/questions/28221394/proper-structure-syntax-for-delphi-pascal-if-then-begin-end-and

@@ -4,8 +4,10 @@ import pathlib
 from sqlite3 import connect
 import webbrowser
 import socket
+import logging
 
 ROOT = pathlib.Path(__file__).parent
+
 
 def get_remaining_seconds(seconds):
     expired = int(seconds - datetime.now().timestamp())
@@ -85,26 +87,30 @@ class EnsurePort:
         del self.conn
         return self.root.unlink()
 
+
 def current_executable(*args):
-    return subprocess.run(
+    temp = subprocess.run(
         ["setup", *args],
         capture_output=True,
-         shell=True,
-          cwd=pathlib.Path(__file__).parent.parent
-        ).stderr.decode("utf-8")
+        shell=True,
+        cwd=pathlib.Path(__file__).parent.parent
+    )
+    logging.info(temp.stdout.decode())
+    return temp.stderr.decode("utf-8")
 
 
 def raise_top():
     current_executable("--top")
 
+
 def ask_for_update():
     subprocess.Popen(
-        ["setup", "--update"], 
+        ["setup", "--update"],
         stdout=subprocess.PIPE,
-         stderr=subprocess.PIPE, 
-         shell=True,
-          cwd=pathlib.Path(__file__).parent.parent,
-           start_new_session=True
+        stderr=subprocess.PIPE,
+        shell=True,
+        cwd=pathlib.Path(__file__).parent.parent,
+        start_new_session=True
     )
 
 

@@ -2,6 +2,8 @@ const anime_list = document.getElementById("animes");
 const ep_range = document.getElementById("ep-range");
 const ep_input = document.querySelector("input[name=ep-range]");
 
+ep_range.focus();
+
 function formatDate(text) {
 	const date = new Date(text);
 	const [minutes, hours] = [

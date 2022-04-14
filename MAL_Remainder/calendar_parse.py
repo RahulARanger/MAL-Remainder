@@ -1,11 +1,11 @@
 import typing
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from icalevents.icaldownload import ICalDownload
 from icalevents.icalparser import parse_events, Event, normalize
 
 from MAL_Remainder.common_utils import ensure_data, current_executable
 from MAL_Remainder.utils import SETTINGS
+import logging
 
 """
 NOTES regarding the ics file,
@@ -29,10 +29,6 @@ END:VEVENT
 """
 
 
-def _end_of_day(date=datetime.now()):
-    return date.replace(hour=23, minute=59, second=59, microsecond=0)
-
-
 def to_frame(events: typing.List[Event]) -> typing.Tuple[list, list]:
     """
     converts a list of events to a pandas dataframe
@@ -44,7 +40,8 @@ def to_frame(events: typing.List[Event]) -> typing.Tuple[list, list]:
     ]
 
     started = [
-        [normalize(event.start, local_zone), event.description, event.summary] for event in events if event.start.day == datetime.today().day
+        [normalize(event.start, local_zone), event.description, event.summary] for event in events if
+        event.start.day == datetime.today().day
     ]
 
     ended = [
@@ -73,20 +70,20 @@ def quick_save(url="", is_local=True):
 
 # I guess you don't need to worry about timezones 🤡
 
-def _events(internal, start_date: datetime, end_date: datetime):
+def from_now():
+    internal = quick_save()
+
+    if not internal:
+        return
+
     return to_frame(
         parse_events(
             internal,
-            default_span=_end_of_day() - datetime.now()
-            # don't schedule things based on the microseconds :)
+            start=datetime.now(),
+            default_span=timedelta(days=1)
+            # schedules events within 1 day. After that it needs to reschedule
         )
-        if internal
-        else []
     )
-
-
-def from_now():
-    return _events(quick_save(), datetime.now(), _end_of_day())
 
 
 FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -109,6 +106,7 @@ def schedule_events(force=False):
     if are_we_done_today() and not force:
         return
 
+    logging.info("Scheduling Events")
     started, ended = from_now()
 
     if not ended:
@@ -117,6 +115,8 @@ def schedule_events(force=False):
     triggers_for_end = ",".join(
         event_time.strftime("%H:%M:%S") for event_time in ended
     )
+
+    print(triggers_for_end)
     reason_for_failure = current_executable(
         "-sch", "-arguments", triggers_for_end
     )
