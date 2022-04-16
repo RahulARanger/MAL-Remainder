@@ -152,16 +152,17 @@ class Server(ErrorPages):
     def settings_page(self):
         # Automatic mode is off
         logging.info("Rendering Settings Page...")
-        expiry_time = 0
         error_message = request.args.get("failed", "")
+        expiry_time: int = 0
+        expiry_time -= 0  # just to avoid type hint
 
-        if not error_message:
-            with connection_related_exc(
-                    {ValueError: "Invalid or Missing Tokens! Please try to Reset OAuth or feed missing values"}
-            ) as exc:
-                expiry_time = self.check_and_then_refresh_tokens(request.args.get("force-refresh", False, type=bool))
+        with connection_related_exc(
+                {ValueError: "Invalid or Missing Tokens! Please try to Reset OAuth or feed missing values"}
+        ) as exc:
+            expiry_time = self.check_and_then_refresh_tokens(request.args.get("force-refresh", False, type=bool))
 
-            error_message = exc.unsafe
+        if exc.unsafe:
+            error_message += "\n" + exc.unsafe
 
         # if you face Operational Error, then you must really raise an Issue
         logging.error(error_message) if error_message else ...
@@ -223,12 +224,8 @@ class Server(ErrorPages):
         logging.info("Fetching events from %s", url)
         quick_save(url, False)
 
-        failed = schedule_events(True)
-
-        if failed:
-            raise ProcessError(failed)
-        else:
-            self.settings["calendar"] = url
+        schedule_events(True)
+        self.settings["calendar"] = url
 
     def update_things_in_site(self):
         form = request.form

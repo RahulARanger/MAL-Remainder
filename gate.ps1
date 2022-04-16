@@ -92,13 +92,16 @@ function Get-UserName{
 
 
 function Deploy-Remainder{
-
     # Task = Action + Trigger(s) + Settings + Prinicpal
     # Task = "What to do" + "When to do" + "With some config." + "for whom we need to do, security things"
     
     $action = New-ScheduledTaskAction -Execute (Join-Path -Path $ScriptPath -ChildPath "setup.cmd") -WorkingDirectory $ScriptPath -Argument "-open"
 
     # Creating Triggers from the time stamps
+    if(-not $arguments[0]){
+        return
+    }
+
     $action_triggers = $arguments[0].Split(",") | ForEach-Object {
         New-ScheduledTaskTrigger -Once -At (Get-Date $_)
     }
@@ -110,8 +113,9 @@ function Deploy-Remainder{
     $principal =  New-ScheduledTaskPrincipal  -UserId (Get-UserName) -LogonType ServiceAccount
 
     # -Force if already Task Exists, Deletes the Old one by replacing with the new one
-    if($action_triggers.Length -gt 0) {Register-ScheduledTask -TaskName $TaskName -Description $TaskDescription -Action $action -Trigger $action_triggers -Settings $settings -Principal $principal -Force} else {}
+    Register-ScheduledTask -TaskName $TaskName -Description $TaskDescription -Action $action -Trigger $action_triggers -Settings $settings -Principal $principal -Force
 }
+
 
 function UnRegister-Remainder{
     $Task = Get-ScheduledTask | Where-Object {$_.TaskName -like $TaskName }

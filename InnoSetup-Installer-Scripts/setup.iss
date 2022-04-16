@@ -1,6 +1,6 @@
 #include "misc_utils.iss"
 
-#define Version="0.6.9"
+#define Version="0.7.0"
 #define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
@@ -92,7 +92,7 @@ Source: "../gate.ps1"; DestDir: "{app}";
 Source: "../setup.cmd"; DestDir: "{app}";
 
 Source: "../MAL_Remainder\templates\*"; DestDir: "{app}/MAL_Remainder/templates";
-Source: "../MAL_Remainder\static\*"; DestDir: "{app}/MAL_Remainder/static"; Excludes: "Profile.jpg,Data\*";
+Source: "../MAL_Remainder\static\*"; DestDir: "{app}/MAL_Remainder/static"; Excludes: "Data\*";
 Source: "../MAL_Remainder\*"; DestDir: "{app}/MAL_Remainder";
 
 
@@ -120,7 +120,6 @@ Type: filesandordirs; Name: "{app}\MAL_Remainder\__pycache__";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\static\data";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\static";
 Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
-Type: files; Name: "{app}\MAL_Remainder\static\Profile*";
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked

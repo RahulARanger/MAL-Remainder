@@ -1,8 +1,7 @@
+import subprocess
 import traceback
 import logging
-
 import requests
-from multiprocessing import ProcessError
 
 
 class ExcHandler:
@@ -43,5 +42,5 @@ def calendar_exc():
         ConnectionRefusedError: "Refused to Connect because of missing URL or connection related issue",
         requests.ConnectionError: "Failed to connect to make a request due to connection",
         requests.HTTPError: "Invalid Calendar URL",
-        ProcessError: "Failed to Schedule Events, Maybe powershell guy didn't cooperate with us"
+        subprocess.CalledProcessError: "Failed to Schedule Events, Maybe powershell guy didn't cooperate with us"
     })

@@ -89,14 +89,17 @@ class EnsurePort:
 
 
 def current_executable(*args):
+    logging.info("Calling shell with %s", args)
+
     temp = subprocess.run(
         ["setup", *args],
         capture_output=True,
         shell=True,
+        check=True,
         cwd=pathlib.Path(__file__).parent.parent
     )
     logging.info(temp.stdout.decode())
-    return temp.stderr.decode("utf-8")
+    return
 
 
 def raise_top():

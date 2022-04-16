@@ -113,16 +113,14 @@ def schedule_events(force=False):
         return
 
     triggers_for_end = ",".join(
-        event_time.strftime("%H:%M:%S") for event_time in ended
+        event_time.strftime(FORMAT) for event_time in ended
     )
 
-    print(triggers_for_end)
-    reason_for_failure = current_executable(
+    current_executable(
         "-sch", "-arguments", triggers_for_end
     )
 
     say_we_are_done_today()
-    return reason_for_failure
 
 
 if __name__ == "__main__":
