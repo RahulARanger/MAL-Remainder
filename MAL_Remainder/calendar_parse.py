@@ -2,7 +2,6 @@ import typing
 from datetime import datetime, timedelta
 from icalevents.icaldownload import ICalDownload
 from icalevents.icalparser import parse_events, Event, normalize
-
 from MAL_Remainder.common_utils import ensure_data, current_executable
 from MAL_Remainder.utils import SETTINGS
 import logging
@@ -29,26 +28,45 @@ END:VEVENT
 """
 
 
-def to_frame(events: typing.List[Event]) -> typing.Tuple[list, list]:
-    """
-    converts a list of events to a pandas dataframe
-    """
-    local_zone = datetime.today().astimezone().tzinfo
+def _events(start=datetime.now(), default_span=timedelta(days=1)):
+    internal = quick_save()
 
-    events = [
-        event for event in events if not event.all_day
-    ]
+    if not internal:
+        return
 
-    started = [
-        [normalize(event.start, local_zone), event.description, event.summary] for event in events if
-        event.start.day == datetime.today().day
-    ]
+    yield from [event for event in
+                parse_events(
+                    internal,
+                    start=start, default_span=default_span
+                ) if not event.all_day]
 
-    ended = [
-        normalize(event.end, local_zone) for event in events
-        if event.end.day == datetime.today().day
-    ]
-    return started, ended
+
+def previously():
+    store = sorted(_events(
+        start=datetime.now() - timedelta(days=1)
+    ), key=lambda x: x.start)
+
+    if not store:
+        return -1
+
+    length = len(store)
+    left = 0
+    right = length - 1
+
+    asked = datetime.now().timestamp()
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if store[mid].start.timestamp() == asked:
+            return mid
+
+        if store[mid].start.timestamp() < asked:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return store[left] if left < length else store[right]
 
 
 def quick_save(url="", is_local=True):
@@ -76,21 +94,29 @@ def from_now():
     if not internal:
         return
 
-    return to_frame(
-        parse_events(
-            internal,
-            start=datetime.now(),
-            default_span=timedelta(days=1)
-            # schedules events within 1 day. After that it needs to reschedule
-        )
-    )
+    local_zone = datetime.today().astimezone().tzinfo
+
+    events = list(_events())
+
+    started = [
+        normalize(event.start, local_zone) for event in events
+    ]
+
+    ended = [
+        normalize(event.end, local_zone) for event in events
+    ]
+
+    return started, ended
 
 
 FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-def say_we_are_done_today():
-    SETTINGS["schedule_events"] = datetime.now().strftime(FORMAT)
+def say_we_are_done_today(say=False):
+    note = datetime.now().strftime(FORMAT)
+    if say:
+        SETTINGS["schedule_events"] = note
+    return note
 
 
 def are_we_done_today():
@@ -124,4 +150,6 @@ def schedule_events(force=False):
 
 
 if __name__ == "__main__":
-    print(from_now())
+    # This is needed for automatic refresh
+    schedule_events()
+

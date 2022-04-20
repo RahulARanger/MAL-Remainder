@@ -11,6 +11,10 @@ input{
 	appearance: none;
 }
 
+input[type="number"]{
+	font-family: cursive;
+}
+
 
 input[type=file]::file-selector-button , input {
 	background-color: var(--bg);
@@ -26,11 +30,10 @@ input:hover {
   opacity: 1;
 }
 
-
 .button{
-  color: #ffa260;
-  background: none;
+	  color: rgb(251,150,113);
   border: 2px solid;
+  background-color: transparent;
   line-height: 1;
   margin: 0.5em;
   padding: 1em 2em;
@@ -49,8 +52,8 @@ input:hover {
 
 
 .button:hover{
-	box-shadow: 0 0.5em 0.5em -0.4em #e5ff60;
-	color: white;
+	box-shadow: 0 0.5em 0.5em -0.4em gold;
+	color: hsl(23deg 86% 57%);
 	transform: translateY(-0.25em);
 }
 
@@ -130,27 +133,12 @@ input[readonly]{
 	box-shadow: none;
 }
 
-select{
-	background-color: dodgerblue;
-	color: yellow;
-	padding: 3px;
-	border: none;
-	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-	-webkit-appearance: button;
-	appearance: button;
-	outline: none;
-	
-}
-
-select option{
-	padding: 30px;
-}
-
 input[type='file']{
 	overflow: hidden;
 	width: 135px;
 	font-style: italic;
 }
+
 
 input[type="checkbox"] { 
 	float: left;
@@ -193,4 +181,39 @@ input[type="checkbox"]:checked{
 	transform: translate(25.5px, 0.3px);
 	background-color: #ffffff;
 	box-shadow: var(--tight-shadow);
+}
+
+
+select{
+	-webkit-appearance: none;
+  padding: 7px 9px 7px 9px;
+  color: white;
+  box-shadow: var(--tight-shadow);
+  cursor: pointer;
+  font-size: 16px;
+  background-color: rgb(265, 100, 0);
+  transition: all 0.5s ease-in-out;
+}
+
+select:hover{
+	border-radius: 5px;
+	border: 1.5px solid black;
+}
+
+select option{
+	background-color: var(--bg);
+	color: white;
+	animation: var(--glow);
+	border-radius: 1px;
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+
+output {
+	width: 23%;
+	border: 1px solid black;
+	height: 100%;
+	color: white;
 }

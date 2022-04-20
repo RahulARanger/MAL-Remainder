@@ -12,6 +12,7 @@
     {{ error }}
 {% endif %}"
 	>
+	<canvas id="world"></canvas>
 		<header>
 			<a
 			class="small button"
@@ -22,9 +23,9 @@
 			<a href="./" title="Opens up a Force Scheduler Page" class="button"
 				>⏰ Force-Remainder</a
 			>
-			<a class="small button" href="./close-session" title="Closes the current session">Close Session ❌</a>
-			<a class="small button" href="/settings?force-refresh=true" title="Refreshes Tokens">Refresh Tokens 🔄</a>
-			<a class="small button" href="./static/data/settings.db" title="Download Current Settings File">Save Settings ⚙️</a>
+			<a class="medium button" href="./close-session" title="Closes the current session">Close Session ❌</a>
+			<a class="medium button" href="/settings?force-refresh=true" title="Refreshes Tokens">Refresh Tokens 🔄</a>
+			<a class="medium button" href="./static/data/settings.db" title="Download Current Settings File">Save Settings ⚙️</a>
 			
 			<!--<a href="./dash-board" target="_blank">Save Data</a> !-->
 			
@@ -114,7 +115,7 @@
 		</main>
 
 		<footer>
-			<h3 class="float" style="animation-delay: 1.5s;">MAL-Remainder<sub>{{version}}</sub></h3>
+			<h3 class="glow">MAL-Remainder<sub>{{version}}</sub></h3>
 			<form action="./auto-update" method="POST">
 				<div>
 					<label for="auto-update">Auto Update:&nbsp;</label>
@@ -134,5 +135,6 @@
 		</footer>
 		<script src="../static/main.js"></script>
 		<script src="../static/alert.js"></script>
+		<script src="../static/utils.js"></script>
 	</body>
 </html>

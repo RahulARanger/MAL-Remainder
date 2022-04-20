@@ -1,8 +1,8 @@
 import typing
 import pathlib
 import sqlite3
-
-from MAL_Remainder.common_utils import ensure_data
+import csv
+from MAL_Remainder.common_utils import ensure_data, get_raw_file
 
 
 class Settings:
@@ -98,15 +98,10 @@ def get_headers():
     return {"Authorization": f'{raw["token_type"]} {raw["access_token"]}'}
 
 
-class Tock:
-    def __init__(self, source=ensure_data() / "tock.csv"):
-        self.source = source
-        self.source.touch()
-
-    def headers(self):
-        return [
-            "ID", "Title", "Image", "Done", "Total", "Genre"
-        ]
+def write_row(*details):
+    with get_raw_file().open('a', newline="") as raw:
+        raw_file = csv.writer(raw)
+        raw_file.writerow(details)
 
 
 if __name__ == "__main__":

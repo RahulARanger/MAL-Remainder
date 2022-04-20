@@ -14,6 +14,13 @@ def sanity_check(response: requests.Response):
     return raw
 
 
+def extract_genres(raw: typing.Dict[str, typing.Any]):
+    raw["gen"] = ",".join(
+        x["name"] for x in raw["genres"]
+    )
+    return raw
+
+
 class MALSession:
     def __init__(self, session: requests.Session, headers: typing.Callable, refresh_func: typing.Callable):
         self.api_url = "https://api.myanimelist.net/v2/"
@@ -50,11 +57,11 @@ class MALSession:
         self.prevent()
 
         logging.info("Fetching the total number of episodes for anime %s", anime_id)
-        return sanity_check(self.session.get(
+        return extract_genres(sanity_check(self.session.get(
             self.postfix("anime", str(anime_id)), headers=self.headers(), params={
                 "fields": "num_episodes,genres,rank,popularity,mean"
             }
-        ))
+        )))
 
     def post_changes(self, anime_id, watched, total):
         self.prevent()

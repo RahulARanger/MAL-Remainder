@@ -14,3 +14,7 @@ form > div > * {
 }
 
 
+form > footer{
+	font-size: .69rem;
+	justify-content: space-between;
+}

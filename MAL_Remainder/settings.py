@@ -5,11 +5,8 @@ import tempfile
 from flask import Flask, render_template, redirect, url_for, request, abort
 import requests
 from urllib.parse import urlencode
-from multiprocessing import Process, Queue, ProcessError
-import webbrowser
-from threading import Timer
+from multiprocessing import Process, Queue
 import sys
-from _thread import interrupt_main
 import traceback
 import logging
 
@@ -18,11 +15,11 @@ logging.basicConfig(level=logging.DEBUG)
 if __name__ == "__main__":
     from MAL_Remainder import __version__
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
-        ROOT, raise_top, current_executable, ask_for_update
+        ROOT, raise_top, current_executable, ask_for_update, close_main_thread_in_good_way, open_local_url
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
-    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, Tock
+    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, write_row
     from MAL_Remainder.mal_session import MALSession, sanity_check
-    from MAL_Remainder.calendar_parse import quick_save, schedule_events
+    from MAL_Remainder.calendar_parse import quick_save, schedule_events, say_we_are_done_today
     from MAL_Remainder.custom_exc import connection_related_exc, calendar_exc
 
     session = requests.Session()
@@ -37,6 +34,7 @@ def _410(_):
     return render_template(
         "error.html",
         failed=_,
+        error_code=410,
         show_settings=True,
         sub_title="Please refer the below message",
         suggestion=_
@@ -81,6 +79,7 @@ class Server(ErrorPages):
                 self.update_profile()
 
             watch_list = list(self.mal_session().watching())
+            print(watch_list)
 
         if exc.unsafe:
             return abort(410, exc.unsafe)
@@ -231,16 +230,32 @@ class Server(ErrorPages):
         form = request.form
 
         with connection_related_exc() as exc:
-            self.mal_session().post_changes(
-                form["animes"],
-                int(form["up_until"]) + int(form["watched"]),
-                int(form["total"]),
-            ) if (
+            posted = (
                     form.get("watched", 0)
                     and "animes" in form
                     and "up_until" in form
                     and "total" in form
-            ) else ...
+            )
+
+            self.mal_session().post_changes(
+                form["animes"],
+                int(form["up_until"]) + int(form["watched"]),
+                int(form["total"]),
+            ) if posted else ...
+
+            write_row(
+                form["animes"],
+                form["name"],
+                form["image"],
+                form["up_until"],
+                form["watched"],
+                form["total"],
+                form["genres"],
+                form["score"],
+                form["rank"],
+                form["popularity"],
+                say_we_are_done_today(False)
+            ) if posted else ...
 
         return abort(410, exc.unsafe) if exc.unsafe else redirect("/close-session" if self.auto else "/settings")
 
@@ -291,7 +306,7 @@ class Server(ErrorPages):
         self.confirmed = self.settings.get("auto-update", "0") == "1"
         self.settings.close()
 
-        Timer(0.9, lambda: interrupt_main()).start()
+        close_main_thread_in_good_way()
         return render_template(
             "error.html",
             error_code=102,
@@ -360,15 +375,12 @@ if __name__ == "__main__":
     trust = EnsurePort("/settings", "mal-remainder")
 
     if trust.deep_check():
-        sys.exit(0)
+        sys.exit(0)  # interrupt_main is good when flask is running else sys.exit
 
-    port = trust()
+    port = EnsurePort.get_free_port()
     trust.acquire(port)
 
-    Timer(
-        random.uniform(0.69, 1),
-        lambda: webbrowser.open(f"http://localhost:{port}/{sys.argv[-1]}"),
-    ).start()
+    open_local_url(port, random.uniform(0.69, 1), postfix=sys.argv[-1])
 
     app.run(host="localhost", port=port, debug=False)
 

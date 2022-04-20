@@ -1,4 +1,5 @@
 @import url("./form.css");
+
 :root {
 	--bg: #212121;
 	--fg: white;
@@ -39,11 +40,16 @@ body {
 	background-color: var(--bg);
 }
 
+#world{
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
 .neon {
-	animation: var(--glow);
-	color: #ff5500;
-	font-family: Cursive;
-	font-size: 67px;
+	animation: var(--neon);
+	color: var(--orange);
 }
 
 
@@ -61,7 +67,7 @@ footer, header {
 	position: fixed;
 	justify-content: space-around;
 	align-items: center;
-	color: #ff5500;
+	color: var(--orange);
 	width: 100%;
 }
 
@@ -84,5 +90,3 @@ footer > form > div{
 .center > section > img{
 	animation: var(--float);
 }
-
-

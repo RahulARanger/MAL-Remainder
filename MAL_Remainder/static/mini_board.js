@@ -27,29 +27,40 @@ document.querySelectorAll("#animes > option").forEach(function (option) {
 	option.title = formatted;
 });
 
+const selectedOption = () => document.querySelector(
+	`#animes>option:nth-of-type(${anime_list.selectedIndex + 1})`
+)
 const optionDataset = () =>
-	document.querySelector(
-		`#animes>option:nth-of-type(${anime_list.selectedIndex + 1})`
-	).dataset;
+	selectedOption().dataset;
+
+const getInputByName = (name) => document.querySelector(`input[name="${name}"]`)
+
+
+function setValue(id_value, value){
+	getInputByName(id_value).value = value;
+	document.getElementById(id_value).textContent = value;
+}
+
 
 function indexChange() {
 	const option = optionDataset();
+	const selected = selectedOption();
 
-	// storing the raw in hidden elements
-	const name_of_anime = document.querySelector("input[name='name']")
-	const image_of_anime = document.querySelector("input[name='image']")
+	document.querySelector("select").title = selected.title;
 	// staring raw
-	name_of_anime.value = document.querySelector(
-		`#animes>option:nth-of-type(${anime_list.selectedIndex + 1})`
-	).value;
+	getInputByName("name").value = selected.label;
+	getInputByName("image").value = option.image;
 
-	image_of_anime.value = option.image;
+	setValue("genres", option.genre);
+	setValue("rank", option.rank);
+	setValue("score", option.score);
+	setValue("popularity", option.popularity);
 
 
 	// Image of the anime
 	document.querySelector(".center > section > img").src = option.image;
 
-	ep_input.max = ep_range.max = option.total;
+	ep_input.max = ep_range.max = option.total - Number(option.done);
 	ep_input.min = ep_range.min = -Number(option.done);
 	ep_input.value = ep_range.value = 0;
 	
@@ -64,11 +75,17 @@ anime_list.addEventListener("change", indexChange);
 
 function setTotal(event){
 	const track = [ep_range, ep_input] 
-
+	
 	if(event.srcElement.type !== "range"){
 		track.reverse();
 	}
 	track[1].value = track[0].value;
+	
+	ep_range.title = (
+		track[0].value > 0
+		) ? `😄 you have watched ${track[0].value} episodes.` : (
+			track[0].value < 0
+			) ? `😉 ReWatching shows is fun!`: `So you didn't watch any episode 🤨`;
 }
 
 

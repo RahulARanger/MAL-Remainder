@@ -35,15 +35,25 @@
 }
 
 :root{
-    --glow: neonAnim 1.2s alternate-reverse infinite;
+    --neon: neonAnim 1.2s alternate-reverse infinite;
     --float: float 5.69s ease-in-out infinite;
     --pulse: pulse 1s;
 }
 
 .glow{
-    animation: var(--glow);
-
+    animation: animate 3s linear infinite;
 }
+
 .float{
     animation: var(--float);
+}
+
+
+@keyframes animate {
+  from {
+    filter: hue-rotate(0deg);
+  }
+  to {
+    filter: hue-rotate(360deg);
+  }
 }
