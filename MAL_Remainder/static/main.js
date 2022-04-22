@@ -82,7 +82,19 @@ document.querySelector("button[name='replace']").addEventListener("click", funct
 })
 
 
-document.getElementById("auto-update").addEventListener("click", () => setTimeout(
-	() => document.querySelector("form[action='./auto-update']").submit(),  1000
-)
-)
+document.getElementById("party-mode").addEventListener("click", () => togglePartyMode())
+
+document.querySelectorAll("footer > form input[type='checkbox']").forEach(
+	(element) => element.addEventListener(
+		"click",
+		() => setTimeout(
+					() => document.querySelector("form[action='./auto-update']").submit(),  
+					1000
+				)
+		)
+	)
+
+function togglePartyMode(){
+	const party_mode = document.getElementById("party-mode").parentElement;
+	party_mode.classList.toggle("glow");
+}

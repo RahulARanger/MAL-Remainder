@@ -39,6 +39,7 @@ input:hover {
   padding: 1em 2em;
   transition: 0.25s;
   text-decoration: none;
+  box-shadow: 0 0 6px rgba(255,180,180.8);
 }
 .medium{
 	margin: 0.2em;

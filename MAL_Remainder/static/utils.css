@@ -38,6 +38,7 @@
 }
 body {
 	background-color: var(--bg);
+	overflow-y: hidden;
 }
 
 #world{

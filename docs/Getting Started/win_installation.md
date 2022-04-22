@@ -13,7 +13,7 @@ permalink: /docs/Getting Started/win_installation
 
 <br>
 
-[MAL Remainder.exe](https://github.com/RahulARanger/MAL-Remainder/releases/latest/download/MALRemainder.exe){: .btn .btn-blue}
+[MAL-Remainder.exe](https://github.com/RahulARanger/MAL-Remainder/releases/latest/download/MAL-Remainder.exe "Executable file"){: .btn .btn-blue}
 
 ## Installation Process
 ---

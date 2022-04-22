@@ -148,8 +148,10 @@ def schedule_events(force=False):
 
     say_we_are_done_today()
 
+#
+# if __name__ == "__main__":
+#     # This is needed for automatic refresh
+#     schedule_events()
 
 if __name__ == "__main__":
-    # This is needed for automatic refresh
-    schedule_events()
-
+    quick_save(url= F)

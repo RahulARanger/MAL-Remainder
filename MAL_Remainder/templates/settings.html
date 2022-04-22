@@ -124,6 +124,13 @@
 						<div></div>
 					</label>
 				</div>
+				<div class="glow" title = "Not Implemented yet!">
+					<label for="party-mode">Party Mode:&nbsp;</label>
+					<label>
+						<input type="checkbox" name="party-mode" id="party-mode" {% if settings['auto-update'] and settings['auto-update'] == '1' %}checked{% endif %}>
+						<div></div>
+					</label>
+				</div>
 			</form>
 			<div class="float" data-time="{{expire_time}}" title="Time Left for your Access Tokens.Note:It doesn't know if the Access Tokens are valid or not!">
 				<span>Expires in:&nbsp;</span>
