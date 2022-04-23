@@ -3,6 +3,7 @@
 :root{
 	--tight-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
 		rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
+		0 7px 13px -5px darkorange,
 		rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
@@ -31,7 +32,7 @@ input:hover {
 }
 
 .button{
-	  color: rgb(251,150,113);
+	color: var(--color-orange);
   border: 2px solid;
   background-color: transparent;
   line-height: 1;
@@ -53,7 +54,7 @@ input:hover {
 
 
 .button:hover{
-	box-shadow: 0 0.5em 0.5em -0.4em gold;
+	box-shadow: var(--tight-shadow);
 	color: hsl(23deg 86% 57%);
 	transform: translateY(-0.25em);
 }
@@ -62,11 +63,10 @@ input:hover {
 input[type="range"] {
 	padding: 0;
 	margin: 0;
-
 	width: 400px;
 	border-radius: 5px;
 	overflow: hidden;
-	box-shadow: inset 0 0 5px rgba(0, 0, 0, 1);
+	box-shadow: inset 0 0 5px black;
 	transition: all 0.5s ease;
 	background-image: linear-gradient(
   270deg,
@@ -79,7 +79,6 @@ input[type="range"]::-webkit-slider-thumb {
 	appearance: none;
 	width:20px ;
 	height: 20px ;
-	/* border-radius: 50%; */
 	border-top-left-radius: 50%;
 	border-top-right-radius: 50%;
 	border-bottom-right-radius: 200%;
@@ -102,15 +101,12 @@ input[type="checkbox"]:checked, input[type="range"]:active, .button:active, inpu
 
 
 form {
-	display: flex;
 	flex-direction: column;
 	row-gap: 0.69rem;
 	justify-content: baseline;
 }
 
 form > * {
-	display: flex;
-	flex-flow: row;
 	justify-content: space-between;
 	align-items: baseline;
 	text-align: center;
@@ -206,11 +202,8 @@ select option{
 	color: white;
 	animation: var(--glow);
 	border-radius: 1px;
-	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--tight-shadow);
 }
-
 
 output {
 	width: 23%;

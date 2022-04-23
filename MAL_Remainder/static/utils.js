@@ -113,3 +113,8 @@
   
   }).call(this);
   
+
+  document.querySelectorAll(".float").forEach((element) => {
+    element.style.animationDelay = `${Math.random() * 5}s`;
+    console.log(element.style.animationDelay)
+  })

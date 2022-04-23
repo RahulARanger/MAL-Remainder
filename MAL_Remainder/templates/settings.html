@@ -5,7 +5,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=\, initial-scale=1.0" />
 		<title>Settings</title>
-		<link rel="stylesheet" href="../static/settings.css" />
+		<link rel="stylesheet" href="/static/settings.css" />
 	</head>
 	<body
 		data-alert="{% if error %}
@@ -23,11 +23,10 @@
 			<a href="./" title="Opens up a Force Scheduler Page" class="button"
 				>⏰ Force-Remainder</a
 			>
-			<a class="medium button" href="./close-session" title="Closes the current session">Close Session ❌</a>
+			<a class="medium button" href="/close-session" title="Closes the current session">Close Session ❌</a>
 			<a class="medium button" href="/settings?force-refresh=true" title="Refreshes Tokens">Refresh Tokens 🔄</a>
-			<a class="medium button" href="./static/data/settings.db" title="Download Current Settings File">Save Settings ⚙️</a>
-			
-			<!--<a href="./dash-board" target="_blank">Save Data</a> !-->
+			<a title="Download collected data" class="small button glow" href="/static/data/data.csv">📊 Data</a>
+			<a title="Downloads Settings so that you can import that later." class="small button " href="/static/data/settings.db">⚙️ Settings</a>
 			
 		</header>
 		<main class="center">
@@ -35,7 +34,7 @@
 				<img class="float" src="{{ profile }}" />
 			</section>
 			<section class="float main">
-				<form action="./edit-settings" method="POST" enctype="multipart/form-data">
+				<form action="/edit-settings" method="POST" enctype="multipart/form-data">
 					<div>
 						<label for="CLIENT_ID">Client ID:</label>
 						<input
@@ -104,7 +103,7 @@
 					</div>
 					
 					<a
-						href="./close-oauth_session"
+						href="/close-oauth_session"
 						title="Closes OAUTH session if active"
 						id="close-link"
 						>./close-oauth_session</a
@@ -116,7 +115,7 @@
 
 		<footer>
 			<h3 class="glow">MAL-Remainder<sub>{{version}}</sub></h3>
-			<form action="./auto-update" method="POST">
+			<form action="/auto-update" method="POST">
 				<div>
 					<label for="auto-update">Auto Update:&nbsp;</label>
 					<label>
@@ -127,7 +126,7 @@
 				<div class="glow" title = "Not Implemented yet!">
 					<label for="party-mode">Party Mode:&nbsp;</label>
 					<label>
-						<input type="checkbox" name="party-mode" id="party-mode" {% if settings['auto-update'] and settings['auto-update'] == '1' %}checked{% endif %}>
+						<input type="checkbox" name="party-mode" id="party-mode" {% if settings['party-mode'] and settings['party-mode'] == '1' %}checked{% endif %}>
 						<div></div>
 					</label>
 				</div>
@@ -140,8 +139,8 @@
 				<span id="seconds"></span> sec<span></span>
 			</div>
 		</footer>
-		<script src="../static/main.js"></script>
-		<script src="../static/alert.js"></script>
-		<script src="../static/utils.js"></script>
+		<script src="/static/main.js"></script>
+		<script src="/static/alert.js"></script>
+		<script src="/static/utils.js"></script>
 	</body>
 </html>

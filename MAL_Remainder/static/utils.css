@@ -5,12 +5,32 @@
 	--fg: white;
 	--light-bg: #333333;
 	--orange: #ff5500;
+	--color-orange:rgb(251,150,113);
+  --color-green: #1eb8b1;
+  --color-purple: #657cc4;
 	
 }
 * {
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
+body {
+	background-color: var(--bg);
+	overflow-y: hidden;
+}
+
+
+#world{
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+header, footer, form, form > * {
+	display: flex;
+}
 
 .button, label, a, div, img, button, span{
 	user-select: none
@@ -36,17 +56,6 @@
 	left: calc((100% - var(--width)) / 2);
 	
 }
-body {
-	background-color: var(--bg);
-	overflow-y: hidden;
-}
-
-#world{
-	width: 100%;
-	height: 100%;
-	padding: 0px;
-	margin: 0px;
-}
 
 .neon {
 	animation: var(--neon);
@@ -58,17 +67,14 @@ body {
 	position: relative;
 	bottom: -15%;
 	width: 100%;
-	display: flex;
-	flex-flow: row;
 	justify-content: space-evenly;
 }
 
 footer, header {
-	display: flex;
 	position: fixed;
 	justify-content: space-around;
 	align-items: center;
-	color: var(--orange);
+	color: var(--color-green);
 	width: 100%;
 }
 
