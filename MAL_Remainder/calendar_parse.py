@@ -6,27 +6,6 @@ from MAL_Remainder.common_utils import ensure_data, current_executable
 from MAL_Remainder.utils import SETTINGS
 import logging
 
-"""
-NOTES regarding the ics file,
-every line in ics is of form; name, parameter, value
-common to see lines are (name, value); parameter is optional 
-examples:
-~~~~~~~~~
-VERSION:6.9
-ATTENDEE;CN=Max Rasmussen;ROLE=REQ-PARTICIPANT:MAILTO:example@example.com
-Calendar has Components in which each component has a sub-component
-Root Component is like this ...
-BEGIN:VCALENDAR
-... vcalendar properties ...
-END:VCALENDAR
-VEVENT is a component(which we need)
-it looks like this 
-BEGIN:VEVENT
-... vevent properties ...
-END:VEVENT
-# NOTE: we won't edit the properties of the VCALENDAR, but we may for the VEVENT
-"""
-
 
 def _events(start=datetime.now(), default_span=timedelta(days=1)):
     internal = quick_save()
@@ -85,8 +64,6 @@ def quick_save(url="", is_local=True):
     parser.data_from_file(url) if internal else ...
     return internal
 
-
-# I guess you don't need to worry about timezones 🤡
 
 def from_now():
     internal = quick_save()
@@ -148,10 +125,8 @@ def schedule_events(force=False):
 
     say_we_are_done_today()
 
-#
-# if __name__ == "__main__":
-#     # This is needed for automatic refresh
-#     schedule_events()
 
+#
 if __name__ == "__main__":
-    quick_save(url= F)
+    # This is needed for automatic refresh
+    schedule_events()

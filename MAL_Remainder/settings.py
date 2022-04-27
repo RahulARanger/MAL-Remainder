@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 if __name__ == "__main__":
     from MAL_Remainder import __version__
     from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
-        ROOT, raise_top, current_executable, ask_for_update, close_main_thread_in_good_way, open_local_url
+        ROOT, raise_top, ask_for_update, close_main_thread_in_good_way, open_local_url
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
     from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, write_row
     from MAL_Remainder.mal_session import MALSession, sanity_check
@@ -79,7 +79,7 @@ class Server(ErrorPages):
                 self.update_profile()
 
             watch_list = list(self.mal_session().watching())
-            print(watch_list)
+            logging.info("Ready with Watch List")
 
         if exc.unsafe:
             return abort(410, exc.unsafe)
@@ -300,6 +300,7 @@ class Server(ErrorPages):
 
     def dep_db(self):
         print(self.settings.to_dict())
+        raise_top()
         return redirect("/settings")
 
     def close_session(self):

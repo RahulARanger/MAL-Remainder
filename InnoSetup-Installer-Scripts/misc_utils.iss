@@ -6,6 +6,7 @@ var
   // Ask = true for asking confirmation else False [we set False if we need to exit by force]
   ImplicitExitCode: Integer; // like this has ability to dected implicit closes of powershell scripts
   Downloaded: Boolean;
+  DataOutDated: Boolean;
 
 
 function ExecPSScript(file: String; show: Boolean; Params: String; var ResultCode: Integer): Boolean;

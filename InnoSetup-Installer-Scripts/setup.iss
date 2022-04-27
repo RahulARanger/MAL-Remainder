@@ -1,11 +1,16 @@
 #include "misc_utils.iss"
 
-#define Version="0.7.3"
+#define Version="0.7.4"
 #define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
 #define Mx="Mal-Remainder"
 #define SignTool="Sign"
+#define OpenSettings = "../Mal_Remainder/settings.py -manual settings"
+#define RegularReSchedule = "../Mal_Remainder/calendar_parse.py"
+#define ForceSchedule = "../Mal_Remainder/settings.py -automatic"
+#define PyRoot = "{app}/python"
+#define DataLastRefreshed = "28-04-2022 01:33"
 
 [Setup]
 ; Basic Meta
@@ -100,38 +105,44 @@ Source: "../MAL_Remainder\*"; DestDir: "{app}/MAL_Remainder";
 Name: "{app}/MAL_Remainder"; Permissions: everyone-modify;
 
 ; For more quality progress while uninistalling
-Name: "{app}/python"; Permissions: everyone-full;
-Name: "{app}/python/__pycache__"; Permissions: everyone-modify;
-Name: "{app}/python/scripts"; Permissions: everyone-full;
-Name: "{app}/python/pip"; Permissions: everyone-modify;
+Name: "{#PyRoot}"; Permissions: everyone-full;
+Name: "{#PyRoot}/__pycache__"; Permissions: everyone-modify;
+Name: "{#PyRoot}/scripts"; Permissions: everyone-full;
+Name: "{#PyRoot}/pip"; Permissions: everyone-modify;
 
 
 [UninstallDelete]
 ; files which have been skipped must be explicitly mentioned in this section 
-Type: filesandordirs; Name: "{app}\python";
+Type: filesandordirs; Name: "{#PyRoot}";
 
 Type: files; Name: "{app}\requirements.txt";
 Type: files; Name: "{app}\setup.ps1";
 Type: files; Name: "{app}\get-pip.py";  
 Type: files; Name: "{app}\python.zip";
 Type: files; Name: "{app}\python\lib\*.pyc";
+Type: files; Name: "{app}\meta.ini";
 
 Type: filesandordirs; Name: "{app}\MAL_Remainder\__pycache__";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\static\data";
 Type: filesandordirs; Name: "{app}\MAL_Remainder\static";
-Type: filesandordirs; Name: "{app}\python\scripts\*.exe";
+Type: filesandordirs; Name: "{#PyRoot}\scripts\*.exe";
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Icons]
-Name: "{autodesktop}\{#Name}"; Filename: "{app}/setup.cmd"; Parameters: "-open"; WorkingDir: "{app}"; Comment: "Remainder for your AnimeList"; Flags: runminimized; Tasks: desktopicon 
-Name: "{autostartup}\{#Name}"; Filename: "{app}/setup.cmd"; Parameters: "-set"; WorkingDir: "{app}"; Comment: "Auto fetches the Timings from calender"; Flags: runminimized
-Name: "{group}\{#Name}"; Filename: "{app}/setup.cmd"; Parameters: "-settings"; WorkingDir: "{app}"; Comment: "Opens up the settings of the Mal-Remainder"; Flags: runminimized
+Name: "{autodesktop}\{#Name}"; Filename: "{#PyRoot}/python.exe"; Parameters: "{#ForceSchedule}"; WorkingDir: "{#PyRoot}"; Comment: "Remainder for your AnimeList"; Flags: runminimized; Tasks: desktopicon 
+Name: "{autostartup}\{#Name}"; Filename: "{#PyRoot}/pythonw.exe"; Parameters: "{#RegularReSchedule}"; WorkingDir: "{#PyRoot}"; Comment: "Auto Fetches the Timings from Calendar and Schedules it in your Machine"; Flags: runminimized
+Name: "{group}\{#Name}"; Filename: "{#PyRoot}/python.exe"; Parameters: "{#OpenSettings}"; WorkingDir: "{#PyRoot}"; Comment: "Opens up the settings of the Mal-Remainder"; Flags: runminimized
 
 
 [Run]
+// any other than powershell.exe will trigger false positive virus test.
 Filename: "powershell.exe"; Description: "Open Settings for the MAL-Remainder"; Parameters: "-file ""{app}\gate.ps1"" -settings"; WorkingDir: "{app}"; Flags: postinstall runasoriginaluser runminimized
+
+
+[INI]
+Filename: "{app}\meta.ini"; Section: "Data"; Key: "Refreshed"; String: "{#DataLastRefreshed}"
 
 
 [Code]
@@ -139,12 +150,14 @@ Filename: "powershell.exe"; Description: "Open Settings for the MAL-Remainder"; 
 
 // we start with this event
 procedure InitializeWizard;
+
 begin
   Ask := True;
   ImplicitExitCode := -1073741510;
   Downloaded := True;
-
   DownloadPage := CreateDownloadPage('Downloading Python...', 'Downloading & Extracting Embedded python 3.8.9.zip', @OnDownloadProgress);
+
+  DataOutDated := False;
 end;
                                     
 function PrepareToInstall(var NeedsRestart: Boolean): String;
@@ -180,4 +193,31 @@ begin
     // close this script to NOT see detailed progress
     ExecPSScript('gate.ps1', True, '-evil', ResultCode);
   end;
+end;
+
+
+
+Procedure CurStepChanged(CurStep: TSetupStep);
+var
+SavePath: String;
+DataFile: String;
+
+begin
+  if CurStep = ssInstall then 
+    begin 
+      DataFile := ExpandConstant('{app}/meta.ini');
+      DataOutDated := FileExists(DataFile) and (GetIniString('Data', 'Refreshed', '', DataFile) <> ExpandConstant('{#DataLastRefreshed}'));
+    end;
+      
+  if CurStep = ssPostInstall then
+    begin
+      DataFile := ExpandConstant('{app}/MAL_Remainder/static/data/data.csv')
+      
+      if DataOutDated then
+          begin 
+            if (SuppressibleMsgBox('It seems that there was some changes in the Data Format.'#13#10''#13#10'Sorry for the inconvenience, We would now delete the old File.'#13#10'Would you like to Save before deleting this file ?', mbInformation, MB_YESNO or MB_SETFOREGROUND, IDYES) = IDYES) and GetSaveFileName('Save Data in', SavePath, '', 'Data Files (*.csv)', 'csv') then
+              FileCopy(DataFile, SavePath, False);
+            DeleteFile(DataFile);
+          end;
+    end;
 end;

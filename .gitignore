@@ -8,6 +8,8 @@
 *Profile.jpg
 *.pfx
 *get_cert.ps1
+bump.ps1
+data.csv
 
 # directories
 MAL_Remainder/Logs/

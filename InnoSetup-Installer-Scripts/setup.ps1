@@ -69,14 +69,6 @@ if (Test-Path -Path $temp_file) {& $executable @("-m", "pip", "install", "-r", $
 Write-Debug "Deleting Requirements.txt"
 Remove-Item -Path $temp_file
 
-
-$temp_file = Join-Path -Path $PythonPath -ChildPath "pythonw.exe"
-
-if(Test-Path -Path $temp_file){
-    Write-Debug "Deleting pythonw.exe";
-    Remove-Item -Path $temp_file;
-}
-
 Write-Debug "Deleting One Time Use Modules";
 & $executable @("-m", "pip", "uninstall", "setuptools", "wheel", "pip", "-y");
 
