@@ -103,16 +103,11 @@ def current_executable(*args):
         cwd=pathlib.Path(__file__).parent.parent
     )
     logging.info(temp.stdout.decode())
-    return
-
-
-def raise_top():
-    current_executable("--top")
 
 
 def ask_for_update():
     subprocess.Popen(
-        ["setup", "--update"],
+        ["setup", "-update"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         shell=True,

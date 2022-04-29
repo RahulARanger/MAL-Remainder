@@ -29,7 +29,6 @@ param(
     [switch]$help,
     [switch]$open,
     [switch]$settings,
-    [switch]$top,
     [switch]$deset,
     [switch]$sch,
     [switch]$set,
@@ -55,6 +54,7 @@ $TaskDescription = "Remainder for updating your watch status regularly or maybe 
 $ScriptPath = (Get-Location).Path
 $PythonPath = Join-Path -Path $ScriptPath -ChildPath "Python";
 $executable = Join-Path -Path $PythonPath -ChildPath "python.exe";
+$MAL = Join-Path -Path $ScriptPath -ChildPath "MAL_Remainder"
 
 
 function Get-RunningProjects{
@@ -128,39 +128,16 @@ function UnRegister-Remainder{
     
 }
 
-
-function Show-Top{
-    $signature = @'
-[DllImport("user32.dll")]
-public static extern bool SetWindowPos(
-    IntPtr hWnd,
-    IntPtr hWndInsertAfter,
-    int X,
-    int Y,
-    int cx,
-    int cy,
-    uint uFlags);
-'@
-
-    $type = Add-Type -MemberDefinition $signature -Name SetWindowPosition -Namespace SetWindowPos -Using System.Text -PassThru
-
-    $handle = (Get-Process -id $Global:PID).MainWindowHandle
-    $alwaysOnTop = New-Object -TypeName System.IntPtr -ArgumentList (-1)
-    $type::SetWindowPos($handle, $alwaysOnTop, 0, 0, 0, 0, 0x0003)
-}
-
-
 function Get-Update{
         
-    $response = Invoke-RestMethod -Uri "https://api.github.com/repos/RahulARanger/MAL-Remainder/releases/latest" -Method "GET" 
-
+    $response = Invoke-RestMethod -Uri "https://api.github.com/repos/RahulARanger/MAL-Remainder/releases/latest" -Method "GET"
     $update_it = $response.tag_name -ne $Matches.1
 
     if (-not $update_it){
         return
     }
-    
-    
+
+
     $download_url = $response.assets.browser_download_url
     $temp = Join-Path -Path $env:TEMP -ChildPath $response.assets.Name
     write-Output $temp
@@ -168,7 +145,8 @@ function Get-Update{
     Invoke-WebRequest -Uri $download_url -OutFile $temp
 
     Start-Process -FilePath $temp -Wait
-    Remove-Item -Path $temp 
+    Remove-Item -Path $temp
+
     
 }
 
@@ -176,14 +154,10 @@ function Get-Update{
 switch($true){
     {$open.IsPresent}{
         Start-PythonScript -arguments @("automatic");
-     }
+    }
 
     {$settings.IsPresent}{
         Start-PythonScript -file "settings" -arguments @("manual", "settings");
-    }
-    
-    {$top.IsPresent}{
-        Show-Top
     }
 
     {$deset.IsPresent}{
@@ -218,17 +192,14 @@ switch($true){
     }
 
     {$update.IsPresent}{
-        
         Write-Debug "Checking for any updates";
-
-        if((Get-Content -Path (Join-Path -Path (Join-Path -Path $ScriptPath -ChildPath "MAL_Remainder") -ChildPath "__init__.py")) -match '=?"(.*)"'){
-            Get-update
-        }
+        ((Get-Content -Path (Join-Path -Path $MAL -ChildPath "__init__.py") -Raw) -match '^__version__\s?=\s?"(.*)"') |
+            Get-Update
     }
 
-     Default{
+    Default{
         $store = @(Get-RunningProjects);
         if($store.length -gt 0){$store | Out-GridView -passthru -Title "These processes must be closed in-order to proceed forward!"}
         if($store.length -gt 0){exit 5} else {}  # exiting with the bad mood 😤
-     }
+    }
 }
