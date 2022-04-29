@@ -14,12 +14,12 @@ logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
     from MAL_Remainder import __version__
-    from MAL_Remainder.common_utils import update_now_in_seconds, get_remaining_seconds, EnsurePort, \
+    from MAL_Remainder.common_utils import EnsurePort, \
         ROOT, raise_top, ask_for_update, close_main_thread_in_good_way, open_local_url
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
-    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, write_row
+    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, write_row, get_remaining_seconds
     from MAL_Remainder.mal_session import MALSession, sanity_check
-    from MAL_Remainder.calendar_parse import quick_save, schedule_events, say_we_are_done_today
+    from MAL_Remainder.calendar_parse import quick_save, schedule_events, stamp, update_now_in_seconds
     from MAL_Remainder.custom_exc import connection_related_exc, calendar_exc
 
     session = requests.Session()
@@ -140,9 +140,7 @@ class Server(ErrorPages):
             ))))
 
     def check_and_then_refresh_tokens(self, force=False):
-        expires_in, expired = get_remaining_seconds(
-            int(self.settings["expires_in"]) + int(self.settings["now"])
-        )
+        expires_in, expired = get_remaining_seconds()
         self.actually_refresh_tokens() if force or expired else ...
         return expires_in
 
@@ -154,6 +152,7 @@ class Server(ErrorPages):
         error_message = request.args.get("failed", "")
         expiry_time: int = 0
         expiry_time -= 0  # just to avoid type hint
+        self.auto = False
 
         with connection_related_exc(
                 {ValueError: "Invalid or Missing Tokens! Please try to Reset OAuth or feed missing values"}
@@ -221,9 +220,9 @@ class Server(ErrorPages):
             raise ConnectionRefusedError("No calendar url given")
 
         logging.info("Fetching events from %s", url)
-        quick_save(url, False)
+        quick_save(url)
 
-        schedule_events(True)
+        schedule_events()
         self.settings["calendar"] = url
 
     def update_things_in_site(self):
@@ -254,7 +253,7 @@ class Server(ErrorPages):
                 form["score"],
                 form["rank"],
                 form["popularity"],
-                say_we_are_done_today(False)
+                stamp()
             ) if posted else ...
 
         return abort(410, exc.unsafe) if exc.unsafe else redirect("/close-session" if self.auto else "/settings")
@@ -354,7 +353,7 @@ if __name__ == "__main__":
     sys.argv.append("automatic") if len(sys.argv) == 1 else ...
     sys.argv.append("") if len(sys.argv) == 2 else ...
 
-    SERVER = Server(sys.argv[1] == "automatic")
+    SERVER = Server(sys.argv[1].startswith("auto"))
 
     app.add_url_rule("/", view_func=SERVER.update_things)
     app.add_url_rule("/ensure", view_func=SERVER.update_but_before_ensure)

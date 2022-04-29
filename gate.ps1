@@ -179,7 +179,7 @@ switch($true){
      }
 
     {$settings.IsPresent}{
-        Start-PythonScript -file "settings" -arguments @("-manual", "settings");
+        Start-PythonScript -file "settings" -arguments @("manual", "settings");
     }
     
     {$top.IsPresent}{

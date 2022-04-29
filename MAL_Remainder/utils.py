@@ -2,6 +2,8 @@ import typing
 import pathlib
 import sqlite3
 import csv
+from datetime import datetime
+
 from MAL_Remainder.common_utils import ensure_data, get_raw_file
 
 
@@ -102,6 +104,16 @@ def write_row(*details):
     with get_raw_file().open('a', newline="") as raw:
         raw_file = csv.writer(raw)
         raw_file.writerow(details)
+
+
+def get_remaining_seconds():
+    """
+
+    :return:
+    """
+    seconds = int(SETTINGS["expires_in"]) + int(SETTINGS["now"])
+    expired = int(seconds - datetime.now().timestamp())
+    return (expired if expired >= 0 else 0), expired < 1000
 
 
 if __name__ == "__main__":

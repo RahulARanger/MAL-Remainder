@@ -1,14 +1,14 @@
 #include "misc_utils.iss"
 
-#define Version="0.7.4"
+#define Version="0.7.5"
 #define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
 #define Mx="Mal-Remainder"
 #define SignTool="Sign"
-#define OpenSettings = "../Mal_Remainder/settings.py -manual settings"
+#define OpenSettings = "../Mal_Remainder/settings.py manual settings"
 #define RegularReSchedule = "../Mal_Remainder/calendar_parse.py"
-#define ForceSchedule = "../Mal_Remainder/settings.py -automatic"
+#define ForceSchedule = "../Mal_Remainder/settings.py automatic"
 #define PyRoot = "{app}/python"
 #define DataLastRefreshed = "28-04-2022 01:33"
 

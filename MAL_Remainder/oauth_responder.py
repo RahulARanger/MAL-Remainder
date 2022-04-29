@@ -1,10 +1,10 @@
 import random
 import requests
-from flask import Flask, request, redirect, abort, render_template
+from flask import Flask, request, redirect
 from threading import Timer
 from _thread import interrupt_main
 import webbrowser
-from MAL_Remainder.common_utils import update_now_in_seconds
+from MAL_Remainder.calendar_parse import update_now_in_seconds
 import socket
 from datetime import timedelta
 from queue import Queue
@@ -94,7 +94,8 @@ class Session:
     def close(self, msg=""):
         self.failed = msg
         interrupt_main()
-        return "You may close this window!"
+        # TODO: use one of the templates
+        return "You may close this window"
 
 
 def _gen_session(host, port, client_id, client_secret):

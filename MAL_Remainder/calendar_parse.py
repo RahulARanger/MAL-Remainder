@@ -1,58 +1,28 @@
 import typing
 from datetime import datetime, timedelta
 from icalevents.icaldownload import ICalDownload
-from icalevents.icalparser import parse_events, Event, normalize
+from icalevents.icalparser import parse_events, normalize, Event
 from MAL_Remainder.common_utils import ensure_data, current_executable
-from MAL_Remainder.utils import SETTINGS
 import logging
 
 
-def _events(start=datetime.now(), default_span=timedelta(days=1)):
-    internal = quick_save()
+"""
+This Module is for datetime related things and most specifically for parsing calendar files .ics
 
-    if not internal:
-        return
-
-    yield from [event for event in
-                parse_events(
-                    internal,
-                    start=start, default_span=default_span
-                ) if not event.all_day]
+Can also schedule events in your local machine indirectly.
+"""
 
 
-def previously():
-    store = sorted(_events(
-        start=datetime.now() - timedelta(days=1)
-    ), key=lambda x: x.start)
-
-    if not store:
-        return -1
-
-    length = len(store)
-    left = 0
-    right = length - 1
-
-    asked = datetime.now().timestamp()
-
-    while left <= right:
-        mid = (left + right) // 2
-
-        if store[mid].start.timestamp() == asked:
-            return mid
-
-        if store[mid].start.timestamp() < asked:
-            left = mid + 1
-        else:
-            right = mid - 1
-
-    return store[left] if left < length else store[right]
-
-
-def quick_save(url="", is_local=True):
+def quick_save(url: str = "") -> str:
+    """
+    :param url: if fetch from URL then specify its url else leave it empty.
+    :return: Raw string from ICS file either from local or from embedded URL.
+    """
     source = ensure_data() / "source.ics"
     source.touch()
 
-    url = url if url else source
+    is_local = bool(url)
+    url = source if is_local else url
 
     parser = ICalDownload()
     if not is_local:
@@ -65,52 +35,55 @@ def quick_save(url="", is_local=True):
     return internal
 
 
-def from_now():
+def _events(start=datetime.now(), default_span=timedelta(days=1)) -> typing.Generator[Event, None, None]:
+    """
+    Yields all events in the given time span. But also make sures the events are not all day along.
+
+    :param start: Start looking for events from this time.
+    :param default_span: Default time span to look for events.
+    :return:Generator of Events
+    """
     internal = quick_save()
 
     if not internal:
         return
 
+    yield from [event for event in
+                parse_events(
+                    internal,
+                    start=start, default_span=default_span
+                ) if not event.all_day]
+
+
+def from_now() -> typing.Optional[typing.List[datetime]]:
+    """
+    Same as getting events for now until the next day, but it makes sure to normalize with your local time zone
+    :return: List of datetime objects of events that are going to end today.
+    """
+    events = list(_events())
     local_zone = datetime.today().astimezone().tzinfo
 
-    events = list(_events())
-
-    started = [
-        normalize(event.start, local_zone) for event in events
-    ]
-
+    # started = [
+    #     normalize(event.start, local_zone) for event in events
+    # ]
     ended = [
         normalize(event.end, local_zone) for event in events
     ]
 
-    return started, ended
+    return ended
 
 
-FORMAT = "%Y-%m-%d %H:%M:%S"
+FORMAT: str = "%Y-%m-%d %H:%M:%S"
 
 
-def say_we_are_done_today(say=False):
-    note = datetime.now().strftime(FORMAT)
-    if say:
-        SETTINGS["schedule_events"] = note
-    return note
+def schedule_events() -> typing.NoReturn:
+    """
+    Indirectly Schedules events in your system by passing in the timestamps for today.
 
-
-def are_we_done_today():
-    event_stamp = SETTINGS["schedule_events"]
-
-    if not event_stamp:
-        return False
-
-    return (datetime.today() - datetime.strptime(event_stamp, FORMAT)).days == 0
-
-
-def schedule_events(force=False):
-    if are_we_done_today() and not force:
-        return
-
+    :return: None
+    """
     logging.info("Scheduling Events")
-    started, ended = from_now()
+    ended = from_now()
 
     if not ended:
         return
@@ -123,10 +96,20 @@ def schedule_events(force=False):
         "-sch", "-arguments", triggers_for_end
     )
 
-    say_we_are_done_today()
+
+def stamp() -> str:
+    """
+    returns the timestamp for now
+    :return:
+    """
+    return datetime.now().strftime(FORMAT)
 
 
-#
+def update_now_in_seconds(x: dict):
+    x["now"] = int(datetime.now().timestamp())
+    return x
+
+
 if __name__ == "__main__":
     # This is needed for automatic refresh
     schedule_events()
