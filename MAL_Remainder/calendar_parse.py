@@ -21,7 +21,7 @@ def quick_save(url: str = "") -> str:
     source = ensure_data() / "source.ics"
     source.touch()
 
-    is_local = bool(url)
+    is_local = not bool(url)
     url = source if is_local else url
 
     parser = ICalDownload()

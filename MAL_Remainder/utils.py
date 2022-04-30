@@ -1,10 +1,9 @@
 import typing
 import pathlib
 import sqlite3
-import csv
 from datetime import datetime
 
-from MAL_Remainder.common_utils import ensure_data, get_raw_file
+from MAL_Remainder.common_utils import ensure_data
 
 
 class Settings:
@@ -98,12 +97,6 @@ def get_headers():
         ["access_token", "expires_in", "refresh_token", "token_type"]
     )
     return {"Authorization": f'{raw["token_type"]} {raw["access_token"]}'}
-
-
-def write_row(*details):
-    with get_raw_file().open('a', newline="") as raw:
-        raw_file = csv.writer(raw)
-        raw_file.writerow(details)
 
 
 def get_remaining_seconds():

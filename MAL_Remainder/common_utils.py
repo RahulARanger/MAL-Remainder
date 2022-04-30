@@ -116,28 +116,5 @@ def ask_for_update():
     )
 
 
-def get_cols():
-    return [
-        "ID",
-        "Title",
-        "Image",
-        "Done",
-        "Watched",
-        "Total",
-        "Genre",
-        "Score",
-        "Rank",
-        "Popularity Rank",
-        "Today"
-    ]
-
-
-def get_raw_file():
-    file = ensure_data() / "data.csv"
-    file.exists() or file.write_text(",".join(get_cols()) + "\n")
-    file.touch()
-    return file
-
-
 if __name__ == "__main__":
     current_executable("-help")

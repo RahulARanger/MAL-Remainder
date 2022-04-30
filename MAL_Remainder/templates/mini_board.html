@@ -24,7 +24,7 @@
 			</section>
 			<section class="main float">
 				<form action="./update-status" method="POST">
-					<select name="animes" id="animes">
+					<select name="id" id="animes">
 						{% for anime in reversed(watch_list)%}
 						<option
 							label="{{anime.title}}"
@@ -39,6 +39,8 @@
 							data-rank="{{anime.list_status['rank']}}"
 							data-popularity="{{anime.list_status['popularity']}}"
 							data-score="{{anime.list_status['mean']}}"
+							data-duration="{{anime.list_status['average_episode_duration']}}"
+							data-rating="{{anime.list_status['rating']}}"
 						></option>
 						{% endfor %}
 					</select>
@@ -75,11 +77,13 @@
 					<input type="hidden" name="score">
 					<input type="hidden" name="popularity">
 					<input type="hidden" name="duration">
+					<input type="hidden" name="rating">
 					<footer>
 						<span id="genres" title="Genres"></span>
 						<span id="score" title="Average Score"></span>
 						<span id="rank" title="Rank"></span>
 						<span id="popularity" title="Popularity Rank"></span>
+						<span id="rating" title="Rating"></span>
 					</footer>
 				</form>
 			</section>

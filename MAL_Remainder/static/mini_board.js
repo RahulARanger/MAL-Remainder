@@ -50,11 +50,13 @@ function indexChange() {
 	// staring raw
 	getInputByName("name").value = selected.label;
 	getInputByName("image").value = option.image;
+	getInputByName("duration").value = option.duration;
 
 	setValue("genres", option.genre);
 	setValue("rank", option.rank);
 	setValue("score", option.score);
 	setValue("popularity", option.popularity);
+	setValue("rating", option.rating);
 
 
 	// Image of the anime

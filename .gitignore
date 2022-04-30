@@ -9,7 +9,7 @@
 *.pfx
 *get_cert.ps1
 bump.ps1
-data.csv
+MAL_Remainder/data.csv
 
 # directories
 MAL_Remainder/Logs/

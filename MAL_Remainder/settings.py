@@ -17,10 +17,11 @@ if __name__ == "__main__":
     from MAL_Remainder.common_utils import EnsurePort, \
         ROOT, ask_for_update, close_main_thread_in_good_way, open_local_url
     from MAL_Remainder.oauth_responder import OAUTH, gen_session
-    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, write_row, get_remaining_seconds
+    from MAL_Remainder.utils import get_headers, SETTINGS, is_there_token, Settings, get_remaining_seconds
     from MAL_Remainder.mal_session import MALSession, sanity_check
-    from MAL_Remainder.calendar_parse import quick_save, schedule_events, stamp, update_now_in_seconds
+    from MAL_Remainder.calendar_parse import quick_save, schedule_events, update_now_in_seconds
     from MAL_Remainder.custom_exc import connection_related_exc, calendar_exc
+    from MAL_Remainder.data_collections import write_from_form
 
     session = requests.Session()
 
@@ -241,19 +242,7 @@ class Server(ErrorPages):
                 int(form["total"]),
             ) if posted else ...
 
-            write_row(
-                form["animes"],
-                form["name"],
-                form["image"],
-                form["up_until"],
-                form["watched"],
-                form["total"],
-                form["genres"],
-                form["score"],
-                form["rank"],
-                form["popularity"],
-                stamp()
-            ) if posted else ...
+            write_from_form(form)
 
         return abort(410, exc.unsafe) if exc.unsafe else redirect("/close-session" if self.auto else "/settings")
 

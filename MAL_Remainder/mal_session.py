@@ -59,7 +59,7 @@ class MALSession:
         logging.info("Fetching the total number of episodes for anime %s", anime_id)
         return extract_genres(sanity_check(self.session.get(
             self.postfix("anime", str(anime_id)), headers=self.headers(), params={
-                "fields": "num_episodes,genres,rank,popularity,mean,start_date,end_date,average_episode_duration"
+                "fields": "num_episodes,genres,rank,popularity,mean,start_date,end_date,average_episode_duration,rating"
             }
         )))
 

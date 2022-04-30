@@ -5,13 +5,28 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-start;
+	padding-left: 1px;
+	padding-right: 1px;
 }
 
 h1 {
-	font-size: 6rem;
 	text-align: center;
+	font-size: 2rem;
+}
+h3{
+	color: var(--color-purple);
 }
 
 span {
 	font-size: 1.69rem;
+}
+
+div{
+	height: 75%;
+	overflow-y: auto;
+	width: 100%;
+	word-wrap: break-word;
+	color: var(--color-orange);
+	padding: 3px;
+	box-sizing: border-box;
 }

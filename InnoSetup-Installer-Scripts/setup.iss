@@ -1,6 +1,6 @@
 #include "misc_utils.iss"
 
-#define Version="0.7.6"
+#define Version="0.7.7"
 #define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
@@ -10,7 +10,7 @@
 #define RegularReSchedule = "../Mal_Remainder/calendar_parse.py"
 #define ForceSchedule = "../Mal_Remainder/settings.py automatic"
 #define PyRoot = "{app}/python"
-#define DataLastRefreshed = "28-04-2022 01:33"
+#define DataLastRefreshed = "30-04-2022 14:41"
 
 [Setup]
 ; Basic Meta
@@ -18,9 +18,9 @@ AppName="{#Name}"
 AppVersion="{#Version}"
 AppPublisher="{#Author}"
 AppPublisherURL="{#Repo}"
-AppSupportURL="{#Repo}"
-AppUpdatesURL="{#Repo}"
-AppContact="{#Repo}"
+AppSupportURL="https://rahularanger.github.io/MAL-Remainder"
+AppUpdatesURL="{#Repo}/releases/latest"
+AppContact="{#Repo}/issues"
 
 
 BackColor=clBlue
@@ -196,12 +196,10 @@ begin
 end;
 
 
-
 Procedure CurStepChanged(CurStep: TSetupStep);
 var
 SavePath: String;
 DataFile: String;
-
 begin
   if CurStep = ssInstall then 
     begin 
