@@ -8,7 +8,7 @@ gem "jekyll", "~> 4.2.2"
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
   # START FOR GITHUB PAGES
-  # gem "github-pages"
+  gem "github-pages"
   # END FOR GITHUB-PAGES
 end
 
