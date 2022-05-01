@@ -120,14 +120,14 @@
 				<div>
 					<label for="auto-update">Auto Update:&nbsp;</label>
 					<label>
-						<input type="checkbox" name="auto-update" id="auto-update" {% if settings['auto-update'] and settings['auto-update'] == '1' %}checked{% endif %}>
+						<input class="switch" type="checkbox" name="auto-update" id="auto-update" {% if settings['auto-update'] and settings['auto-update'] == '1' %}checked{% endif %}>
 						<div></div>
 					</label>
 				</div>
 				<div class="glow" title = "Not Implemented yet!">
 					<label for="party-mode">Party Mode:&nbsp;</label>
 					<label>
-						<input type="checkbox" name="party-mode" id="party-mode" {% if settings['party-mode'] and settings['party-mode'] == '1' %}checked{% endif %}>
+						<input class="switch" type="checkbox" name="party-mode" id="party-mode" {% if settings['party-mode'] and settings['party-mode'] == '1' %}checked{% endif %}>
 						<div></div>
 					</label>
 				</div>

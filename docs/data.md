@@ -17,9 +17,9 @@ Data that was recorded, is never stored in cloud or sent to any server. so you m
 
 | id   | name       | up_until | watched | total | genres                           | rating | score | rank | popularity | duration | updated          |
 |------|------------|----------|---------|-------|----------------------------------|--------|-------|------|------------|----------|------------------|
-| 6702 | Fairy Tail | 113      | 1       | 175   | Action,Adventure,Fantasy,Shounen | pg_13  | 7.59  | 1367 | 44         | 1484     | 30-04-2022 15:21 |
-| 6702 | Fairy Tail | 113      | 1       | 175   | Action,Adventure,Fantasy,Shounen | pg_13  | 7.59  | 1367 | 45         | 1484     | 30-04-2022 21:16 |
-| 6702 | Fairy Tail | 113      | 3       | 175   | Action,Adventure,Fantasy,Shounen | pg_13  | 7.59  | 1367 | 45         | 1484     | 30-04-2022 22:16 | 
+| 6702 | Fairy Tail | 113      | 1       | 175   | Action,Adventure,Fantasy,Shounen | pg_13  | 7.59  | 1367 | 44         | 1484     | 2022-04-30 09:30 |
+| 6702 | Fairy Tail | 114      | 1       | 175   | Action,Adventure,Fantasy,Shounen | pg_13  | 7.59  | 1367 | 45         | 1484     |2022-04-30 09:45 |
+| 6702 | Fairy Tail | 115      | 3       | 175   | Action,Adventure,Fantasy,Shounen | pg_13  | 7.59  | 1367 | 45         | 1484     | 2022-05-01 01:45 | 
 
 
 ## Variables
@@ -90,7 +90,7 @@ raw_file = pathlib.Path(...)
 
 raw_data = pandas.read_csv(raw_file, index_col=False)
 user_data = raw_data[["id", "up_until", "watched", "updated"]]
-animes_data = raw_data.groupby("id").first()[
+animes_data = raw_data.groupby("id").last()[
     ["name", "total", "genres", "rating", "score", "rank", "popularity", "duration"]
 ]
 user_data.to_csv(..., index=False)

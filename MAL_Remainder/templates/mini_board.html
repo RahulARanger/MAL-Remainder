@@ -20,34 +20,37 @@
 		</header>
 		<main class="center">
 			<section>
-				<img alt="Main Picture of the Selected Anime" src="" />
+				<img alt="Main Picture of the Selected Anime" src=""/>
 			</section>
 			<section class="main float">
 				<form action="./update-status" method="POST">
-					<select name="id" id="animes">
-						{% for anime in reversed(watch_list)%}
-						<option
-							label="{{anime.title}}"
-							value="{{anime.id}}"
-							selected
-							title="{{anime.list_status.get('updated_at', 0)}},{{anime.list_status.get('start_date')}},{{anime.list_status.get('end_date')}}"
-							data-image="{{anime.main_picture.get('medium', anime.main_picture['large'])}}"
-							data-left="{{anime.list_status['num_episodes'] - anime.list_status['num_episodes_watched']}}"
-							data-done="{{anime.list_status['num_episodes_watched']}}"
-							data-total="{{anime.list_status['num_episodes']}}"
-							data-genre="{{anime.list_status['gen']}}"
-							data-rank="{{anime.list_status['rank']}}"
-							data-popularity="{{anime.list_status['popularity']}}"
-							data-score="{{anime.list_status['mean']}}"
-							data-duration="{{anime.list_status['average_episode_duration']}}"
-							data-rating="{{anime.list_status['rating']}}"
-						></option>
-						{% endfor %}
-					</select>
-					<input type="range" name="watched" id="ep-range" min="0" title="So you didn't watch any episode 🤨"/>
+					<div class="select">
+						<select name="id" id="anime-list">
+							{% for anime in reversed(watch_list)%}
+							<option
+								label="{{anime.title}}"
+								value="{{anime.id}}"
+								selected
+								title="{{anime.list_status.get('updated_at', 0)}},{{anime.list_status.get('start_date')}},{{anime.list_status.get('end_date')}}"
+								data-image="{{anime.main_picture.get('medium', anime.main_picture['large'])}}"
+								data-left="{{anime.list_status['num_episodes'] - anime.list_status['num_episodes_watched']}}"
+								data-done="{{anime.list_status['num_episodes_watched']}}"
+								data-total="{{anime.list_status['num_episodes']}}"
+								data-genre="{{anime.list_status['gen']}}"
+								data-rank="{{anime.list_status['rank']}}"
+								data-popularity="{{anime.list_status['popularity']}}"
+								data-score="{{anime.list_status['mean']}}"
+								data-duration="{{anime.list_status['average_episode_duration']}}"
+								data-rating="{{anime.list_status['rating']}}"
+							></option>
+							{% endfor %}
+						</select>
+					</div>
+
+					<input type="range" name="watched" id="watched" min="0" title="So you didn't watch any episode 🤨"/>
 					<div>
 						<input
-							type="text"
+							type="number"
 							name="up_until"
 							readonly
 							title="Up Until, you have watched"
@@ -55,14 +58,17 @@
 						<span>+</span>
 						<input
 							type="number"
-							name="ep-range"
+							name="today"
 							min="0"
 							class="neon"
+							id="today"
 							title="update this many episodes for today"
 						/>
+						<span>=</span>
+						<output name="total_now" for="today" id="total_now" class="neon"></output>
 						<span>/</span>
 						<input
-							type="text"
+							type="number"
 							name="total"
 							readonly
 							title="Total Episodes you have watched"

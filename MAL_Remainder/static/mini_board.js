@@ -1,9 +1,3 @@
-const anime_list = document.getElementById("animes");
-const ep_range = document.getElementById("ep-range");
-const ep_input = document.querySelector("input[name=ep-range]");
-
-ep_range.focus();
-
 function formatDate(text) {
 	const date = new Date(text);
 	const [minutes, hours] = [
@@ -19,81 +13,105 @@ function formatDate(text) {
 	)}`;
 }
 
-document.querySelectorAll("#animes > option").forEach(function (option) {
-	const [date, start, end] = option.title.split(",");
-	let formatted = `Status Updated: ${formatDate(date)}`;
-	start && (formatted += `\nStarted: ${formatDate(start)}`);
-	end && (formatted += `\nEnded: ${formatDate(end)}`);
-	option.title = formatted;
-});
-
-const selectedOption = () => document.querySelector(
-	`#animes>option:nth-of-type(${anime_list.selectedIndex + 1})`
-)
-const optionDataset = () =>
-	selectedOption().dataset;
-
-const getInputByName = (name) => document.querySelector(`input[name="${name}"]`)
-
 
 function setValue(id_value, value){
 	getInputByName(id_value).value = value;
 	document.getElementById(id_value).textContent = value;
 }
 
-
-function indexChange() {
-	const option = optionDataset();
-	const selected = selectedOption();
-
-	document.querySelector("select").title = selected.title;
-	// staring raw
-	getInputByName("name").value = selected.label;
-	getInputByName("image").value = option.image;
-	getInputByName("duration").value = option.duration;
-
-	setValue("genres", option.genre);
-	setValue("rank", option.rank);
-	setValue("score", option.score);
-	setValue("popularity", option.popularity);
-	setValue("rating", option.rating);
+const getInputByName = (name) => document.querySelector(`input[name="${name}"]`)
 
 
-	// Image of the anime
-	document.querySelector(".center > section > img").src = option.image;
-
-	ep_input.max = ep_range.max = option.total - Number(option.done);
-	ep_input.min = ep_range.min = -Number(option.done);
-	ep_input.value = ep_range.value = 0;
-	
-	
-	ep_input.previousElementSibling.previousElementSibling.value = option.done;
-	ep_input.nextElementSibling.nextElementSibling.value = option.total;
-	
-}
-
-anime_list.addEventListener("change", indexChange);
-
-
-function setTotal(event){
-	const track = [ep_range, ep_input] 
-	
-	if(event.srcElement.type !== "range"){
-		track.reverse();
+class MiniBoard {
+	constructor(){
+		this.list_id = "anime-list"
+		this.anime_list = document.getElementById(this.list_id);
+		this.ep_range = document.getElementById("watched");
+		this.ep_input = document.getElementById("today");
+		this.wear();
 	}
-	track[1].value = track[0].value;
-	
-	ep_range.title = (
-		track[0].value > 0
-		) ? `😄 you have watched ${track[0].value} episodes.` : (
-			track[0].value < 0
-			) ? `😉 ReWatching shows is fun!`: `So you didn't watch any episode 🤨`;
+
+
+	getSelected(){
+		return this.anime_list.querySelector(
+			`option:nth-of-type(${this.anime_list.selectedIndex + 1})`
+		)
+	}
+
+	getOptionDataSet(){
+		return this.getSelected().dataset;
+	}
+
+
+	wear(){
+		this.anime_list.addEventListener("change", this.handleChange.bind(this));
+
+		const from_range = this.handleSliderChange.bind(this, true)
+		const from_input = this.handleSliderChange.bind(this, false)
+		this.ep_range.addEventListener("change", from_range);
+		this.ep_range.addEventListener("mousemove", from_range);
+		this.ep_input.addEventListener("input", from_input);
+	}
+
+	handleChange(){
+		const options = this.getOptionDataSet();
+		const selected = this.getSelected();
+
+		getInputByName("name").value = selected.label;
+		getInputByName("image").value = options.image;
+		getInputByName("duration").value = options.duration;
+
+		setValue("genres", options.genre);
+		setValue("rank", options.rank);
+		setValue("score", options.score);
+		setValue("popularity", options.popularity);
+		setValue("rating", options.rating);
+
+		document.querySelector(".center > section > img").src = options.image;
+
+
+		this.ep_input.max = this.ep_range.max = options.total - Number(options.done);
+		this.ep_input.min = this.ep_range.min = -Number(options.done);
+		this.ep_input.value = this.ep_range.value = 0;
+
+		document.querySelector("input[name='up_until']").value = options.done;
+		document.querySelector("input[name='total']").value = options.total;
+		document.getElementById("total_now").value = options.done;
+		
+	}
+
+
+	handleSliderChange(from_range=true){
+		console.log(from_range);
+
+		if(from_range)
+			this.ep_input.value = this.ep_range.value;
+		else
+			this.ep_range.value = this.ep_input.value;
+		
+		const so_watched = this.ep_range.value;
+		this.ep_range.title = (
+			so_watched > 0
+			) ? `😄 you have watched ${so_watched} episodes.` : (
+				so_watched < 0
+				) ? `😉 ReWatching shows is fun!`: `So you didn't watch any episode 🤨`;
+		
+		document.getElementById("total_now").value = Number(this.ep_input.value) - Number(this.ep_input.min)
+	}
 }
 
 
-ep_range.addEventListener("change", setTotal);
-ep_range.addEventListener("mousemove", setTotal);
-ep_input.addEventListener("input", setTotal);
+const board = new MiniBoard();
+document.body.addEventListener("click", () => board.ep_range.focus())
+board.handleChange();
+board.ep_range.focus();
 
-// here order matters, first index and then range
-indexChange();
+
+
+document.querySelectorAll(`#${board.list_id}>label.option`).forEach(function(option){
+	const [date, start, end] = option.title.split(",");
+	let formatted = `Status Updated: ${formatDate(date)}`;
+	start && (formatted += `\nStarted: ${formatDate(start)}`);
+	end && (formatted += `\nEnded: ${formatDate(end)}`);
+	option.title = formatted;
+})

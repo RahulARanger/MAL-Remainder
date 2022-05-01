@@ -54,4 +54,4 @@ def check_form(form):
 
 
 def update_details(form):
-    return form["id"], form.get("watched", 0) + form["up_until"], form["total"]
+    return form["id"], int(form.get("watched", 0)) + int(form["up_until"]), int(form["total"])
