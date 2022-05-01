@@ -7,14 +7,14 @@ description: >- # this means to ignore newlines until "baseurl:"
     updating the list in MyAnimeList by regularly reminding to do that in a simple way.
 
 # FOR GITHUB-PAGES
-baseurl: "/MAL-Remainder/"
-url: "https://rahularanger.github.io/"
+# baseurl: "/MAL-Remainder/"
+# url: "https://rahularanger.github.io/"
 # END FOR GITHUB - PAGES
 
 # # FOR LOCAL SETUP
-# url: ""
-# baseurl: ""
-# theme: "just-the-docs"
+url: ""
+baseurl: ""
+theme: "just-the-docs"
 # # END FOR LOCAL SETUP
 
 github_username: RahulARanger

@@ -1,6 +1,6 @@
 #include "misc_utils.iss"
 
-#define Version="0.7.7"
+#define Version="0.7.8"
 #define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"

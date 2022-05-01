@@ -21,7 +21,7 @@ if __name__ == "__main__":
     from MAL_Remainder.mal_session import MALSession, sanity_check
     from MAL_Remainder.calendar_parse import quick_save, schedule_events, update_now_in_seconds
     from MAL_Remainder.custom_exc import connection_related_exc, calendar_exc
-    from MAL_Remainder.data_collections import write_from_form
+    from MAL_Remainder.data_collections import write_from_form, check_form, update_details
 
     session = requests.Session()
 
@@ -229,19 +229,8 @@ class Server(ErrorPages):
         form = request.form
 
         with connection_related_exc() as exc:
-            posted = (
-                    form.get("watched", 0)
-                    and "animes" in form
-                    and "up_until" in form
-                    and "total" in form
-            )
-
-            self.mal_session().post_changes(
-                form["animes"],
-                int(form["up_until"]) + int(form["watched"]),
-                int(form["total"]),
-            ) if posted else ...
-
+            post_them = check_form(form)
+            self.mal_session().post_changes(*update_details(form)) if post_them else ...
             write_from_form(form)
 
         return abort(410, exc.unsafe) if exc.unsafe else redirect("/close-session" if self.auto else "/settings")

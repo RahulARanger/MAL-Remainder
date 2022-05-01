@@ -22,6 +22,10 @@ def from_list(body, keys):
     }
 
 
+def check_keys(body, keys):
+    return all(_ in body for _ in keys)
+
+
 def write_a_row(raw, name):
     _handle, already_created = raw_file(name)
 
@@ -43,3 +47,11 @@ def write_from_form(form):
         pairs,
         "data.csv"
     )
+
+
+def check_form(form):
+    return form.get("watched", 0) and check_keys(form, ["up_until", "total"])
+
+
+def update_details(form):
+    return form["id"], form.get("watched", 0) + form["up_until"], form["total"]

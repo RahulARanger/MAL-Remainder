@@ -7,17 +7,22 @@ nav_order: 3
 ---
 
 {: .note}
-This is the optional section. But it would make this [second feature](../../#automation) not possible
+This is the optional section. But it would make this [scheduling feature](../../#automation) possible.
 
-MAL-Remainder requires a URL for `ics` file and the currently it was only tested with [Google Calendar](https://www.google.com/calendar/about/). 
+MAL-Remainder requires a URL for `.ics` file. For now I have tested only with [Google Calendar](https://www.google.com/calendar/about/). 
 
 
 ## Why Calendar ?
 ---
 
+It is easy for us to schedule events in clean UI. and some services like [Google Calendar](https://www.google.com/calendar/about/) also provides notifications for the events.
+
+## Info Used
+---
+
 * Refers only the events
 * May refer the Event's Description or Summary in future
-* Refers the Start and End time of the event.
+* Refers only the End time of the event.
 
 
 Thanks to **[icalevents](https://github.com/jazzband/icalevents)** for providing an easy way to parse events. 
