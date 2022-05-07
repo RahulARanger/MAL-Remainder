@@ -13,51 +13,54 @@
 {% endif %}"
 	>
 	<canvas id="world"></canvas>
-		<header>
+		<header title="Header, with various options">
 			<a
 			class="small button"
 				href="https://myanimelist.net/animelist/{{settings['name']}}"
 				target="_blank"
+				title="View your anime list"
 				>➡️ Anime list</a
 			>
-			<a href="./" title="Opens up a Force Scheduler Page" class="button"
-				>⏰ Force-Remainder</a
+			<a href="./" class="medium button" title="Views a Page where you can update your progress for today"
+				><big><big><big>🧚</big></big></big> Update Progress</a
 			>
-			<a class="medium button" href="/close-session" title="Closes the current session">Close Session ❌</a>
-			<a class="medium button" href="/settings?force-refresh=true" title="Refreshes Tokens">Refresh Tokens 🔄</a>
-			<a title="Download collected data" class="small button glow" href="/static/data/data.csv">📊 Data</a>
-			<a title="Downloads Settings so that you can import that later." class="small button " href="/static/data/settings.db">⚙️ Settings</a>
+			<a class="medium button" href="/close-session" title="Closes the current session and checks for updates if Auto-Updates is enabled">Close Session ❌</a>
+			<a class="medium button" href="/settings?force-refresh=true" title="Refreshes Tokens Though it is performed automatically">Refresh Tokens 🔄</a>
+			<a title="Downloads collected data" class="small button glow" href="/static/data/data.csv">📊 Data</a>
+			<a title="Downloads Settings so that you can import it later." class="small button " href="/static/data/settings.db">⚙️ Settings</a>
 			
 			
 		</header>
 		<main class="center">
 			<section>
-				<img class="float" src="{{ profile }}" />
+				<img class="float" src="{{ profile }}" title="Your Profile Picture in MyAnimeList"/>
 			</section>
 			<section class="float main">
 				<form action="/edit-settings" method="POST" enctype="multipart/form-data">
 					<div>
-						<label for="CLIENT_ID">Client ID:</label>
+						<label for="CLIENT_ID" title="One of the Important Credentials">Client ID:</label>
 						<input
 							name="CLIENT_ID"
 							type="password"
 							id="CLIENT_ID"
+							title="Make sure to fill the correct value"
 							value="{{settings['CLIENT_ID']}}"
 						/>
 					</div>
 
 					<div>
-						<label for="CLIENT_SECRET">Client Secret:&nbsp;</label>
+						<label for="CLIENT_SECRET" title="Another Important Credential after Client ID">Client Secret:&nbsp;</label>
 						<input
 							type="password"
 							value="{{settings['CLIENT_SECRET']}}"
 							name="CLIENT_SECRET"
 							id="CLIENT_SECRET"
+							title="Again Make sure to fill the right value"
 						/>
 					</div>
 
 					<div>
-						<label for="REDIRECT_HOST" title="Redirect URL Host"
+						<label for="REDIRECT_HOST" title="REDIRECT_HOST of `http://{REDIRECT_HOST}:{REDIRECT_PORT}`"
 							>Host:</label
 						>
 						<input
@@ -69,7 +72,7 @@
 					</div>
 
 					<div>
-						<label for="REDIRECT_PORT" title="Redirect URL Port"
+						<label for="REDIRECT_PORT" title="REDIRECT_PORT of `http://{REDIRECT_HOST}:{REDIRECT_PORT}`"
 							>Port:</label
 						>
 						<input
@@ -109,15 +112,15 @@
 						id="close-link"
 						>./close-oauth_session</a
 					>
-					<button class="button" name="reset">Reset OAuth</button>
+					<button class="button" name="reset" title="Using the Current Credentials we are gonna fetch Access and Refresh Tokens through OAuth Session">Reset OAuth</button>
 				</form>
 			</section>
 		</main>
 
 		<footer>
-			<h3 class="glow">MAL-Remainder<sub>{{version}}</sub></h3>
+			<h3 class="glow" title="Current Version">MAL-Remainder<sub>{{version}}</sub></h3>
 			<form action="/auto-update" method="POST">
-				<div>
+				<div title="Enabling this would auto check and download update whenever we \"close the session\"">
 					<label for="auto-update">Auto Update:&nbsp;</label>
 					<label>
 						<input class="switch" type="checkbox" name="auto-update" id="auto-update" {% if settings['auto-update'] and settings['auto-update'] == '1' %}checked{% endif %}>
@@ -132,7 +135,8 @@
 					</label>
 				</div>
 			</form>
-			<div class="float" data-time="{{expire_time}}" title="Time Left for your Access Tokens.Note:It doesn't know if the Access Tokens are valid or not!">
+			<div class="float" data-time="{{expire_time}}" title="Time Left for your Access Tokens.
+Note: It doesn't know if the Access Token is valid or not!">
 				<span>Expires in:&nbsp;</span>
 				<span id="days"></span> day<span></span>
 				<span id="hours"></span> hr<span></span>

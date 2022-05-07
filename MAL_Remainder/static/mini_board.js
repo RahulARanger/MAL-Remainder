@@ -51,6 +51,11 @@ class MiniBoard {
 		this.ep_range.addEventListener("change", from_range);
 		this.ep_range.addEventListener("mousemove", from_range);
 		this.ep_input.addEventListener("input", from_input);
+
+
+		document.querySelector(".main").addEventListener("click", function(e){
+			e.target.classList.contains("main") && this.getFocusToSlider()
+		}.bind(this));
 	}
 
 	handleChange(){
@@ -82,8 +87,6 @@ class MiniBoard {
 
 
 	handleSliderChange(from_range=true){
-		console.log(from_range);
-
 		if(from_range)
 			this.ep_input.value = this.ep_range.value;
 		else
@@ -98,14 +101,18 @@ class MiniBoard {
 		
 		document.getElementById("total_now").value = Number(this.ep_input.value) - Number(this.ep_input.min)
 	}
+
+	getFocusToSlider(){
+		this.ep_range.focus();
+	}
 }
 
 
-const board = new MiniBoard();
-document.body.addEventListener("click", () => board.ep_range.focus())
-board.handleChange();
-board.ep_range.focus();
-
+(function(){
+	const board = new MiniBoard();
+	board.handleChange();
+	board.getFocusToSlider();
+})();
 
 
 document.querySelectorAll(`#${board.list_id}>label.option`).forEach(function(option){

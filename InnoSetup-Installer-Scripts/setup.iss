@@ -1,6 +1,5 @@
 #include "misc_utils.iss"
-
-#define Version="0.7.9"
+#define Version="0.8.0"
 #define Name="MAL-Remainder"
 #define Repo="https://github.com/RahulARanger/MAL-Remainder"
 #define Author="RahulARanger"
@@ -164,7 +163,7 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
   if CheckAndQuit() <> 0 then 
     Result := 'Please Close the necessary running applications to proceed forward'
-  else 
+  else
     Result := CheckAndDownloadPython();
 end;
 
