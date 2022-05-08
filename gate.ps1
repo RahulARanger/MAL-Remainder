@@ -114,7 +114,7 @@ function Get-UserName{
 function Deploy-Remainder{
     # Task = Action + Trigger(s) + Settings + Prinicpal
     # Task = "What to do" + "When to do" + "With some config." + "for whom we need to do, security things"
-    $action = New-ScheduledTaskAction -Execute $executable -WorkingDirectory $ScriptPath -Argument '"MAL_Remainder//settings.py" -automatic'
+    $action = New-ScheduledTaskAction -Execute $executable -WorkingDirectory $ScriptPath -Argument '"MAL_Remainder//settings.py" automatic'
     # Creating Triggers from the time stamps
     if(-not $arguments[0]){
         return
