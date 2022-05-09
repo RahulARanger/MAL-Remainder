@@ -1,21 +1,18 @@
 ---
 layout: default
-title: Installation in Windows
+title: Setup on Windows
 parent: Getting Started
 nav_order: 1
-permalink: /docs/Getting Started/win_installation
+permalink: /docs/Getting Started/win_setup
 ---
 
-## Pre-requisites
----
-
--   Make sure you have Powershell installed on your machine and accessible with the cmdlet `powershell`. [i guess you don't need to worry about this, as it is provided by default.]
-
-<br>
 
 [MAL-Remainder.exe](https://github.com/RahulARanger/MAL-Remainder/releases/latest/download/MAL-Remainder.exe "Executable file"){: .btn .btn-blue}
+{: .px-9 }
 
-## Installation Process
+---
+
+# Installation Process
 ---
 
 -   **Application's Setup is build using [innosetup](https://jrsoftware.org/isinfo.php)**
@@ -25,18 +22,11 @@ While using this setup, you will definitely see PowerShell opening up in middle.
 
 As warned above, it is recommended not to interrupt the shell process, But if you did,
 
--   For installation, it will prompt for cancelling the installation, if yes it removes whatever it did up until now, else it reopens the shell window ~~😈~~ to continue the process.
+-   For installation, it will prompt for cancelling it, if yes it removes whatever it did up until now, else it reopens the shell window ~~😈~~ to continue the process.
 -   For un-installation, closing the window, would proceed with a way [_less informative_] to uninstall files
 
 {: .highlight}
 Since this is a personal Project and it is made in simple way. So you may see certain warnings like the ones listed below. I would recommend you to ignore them. But It is possible to build this [`locally`](./Local%20Setup/Windows)
-
-
-{: .note }
-
-
-{: .warning }
-It is possible for your anti-virus software to warn you about this application and may sometimes cancel the installation for the first time, it does because of this [setup.cmd](https://github.com/RahulARanger/MAL-Remainder/blob/master/setup.cmd). Make sure to add it to excludes.
 
 
 {: .warning}

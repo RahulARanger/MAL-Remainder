@@ -80,6 +80,8 @@ color_scheme: dark
 aux_links:
     "GitHub":
         - "https://github.com/RahulARanger/MAL-Remainder"
+    "Mal-Remainder.exe":
+        - "https://github.com/RahulARanger/MAL-Remainder/releases/latest/download/MAL-Remainder.exe"
 
 # Makes Aux links open in a new tab. Default is false
 aux_links_new_tab: true

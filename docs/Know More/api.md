@@ -2,7 +2,7 @@
 layout: default
 title: API
 parent: Know More
-nav_order: 2
+nav_order: 1
 permalink: /docs/Know More/api
 ---
 
@@ -20,7 +20,7 @@ MyAnimeList API uses OAuth 2.0 for authentication and authorization of the users
 ____
 
 {: .important}
-MAL uses OAuth 2.0 in order to authenticate and then authorize the user. So it's important to know certain keywords.
+MAL uses [OAuth 2.0](https://oauth.net/2/) in order to authenticate and then authorize the user. So it's important to know certain keywords.
 
 ### `Client ID` and `Client Secret`
 
@@ -40,9 +40,9 @@ MAL uses OAuth 2.0 in order to authenticate and then authorize the user. So it's
 ----
 
 
-After feeding the `Client ID` and `Client Secret` on [Settings Page](../settings). Proceed with Reset Oauth on that page. You will see this. <br><br>
+After feeding the `Client ID` and `Client Secret` on [Settings Page](./settings). Proceed with Reset Oauth on that page. You will see this. <br><br>
 
-![success oauth](../../../assets/success.jpg "Success Oauth")
+![success oauth](../../assets/success.jpg "Success Oauth")
 
 
 {: .note}
@@ -50,7 +50,7 @@ Whenever we open Oauth Session, You have maximum of [6 minutes](https://github.c
 
 
 {: .attention}
-You can either call Reset-Oauth Again to get new Oauth Session and cut off the old ones or click ./close-oauth-session on settings page to close any session if available.
+You can either call `Reset-Oauth` Again to get new Oauth Session and cut off the old ones or go with `./close-oauth-session` on settings page to close any session if available.
 
 
 {: .tip}
@@ -63,16 +63,16 @@ If sometimes, Oauth Session is stuck for some reason, You can always click on `.
 
 
 {: .error}
-Would happen if either `Client ID` or `Client Secret` is invalid or if your port doesn't match with the value of your registered API  <br><br> ![Invalid Client ID or Client Secret](../../../assets/error_oauth.jpg "Invalid Client ID or Client Secret")
+Would happen if either `Client ID` or `Client Secret` is invalid or if your port doesn't match with the value of your registered API  <br><br> ![Invalid Client ID or Client Secret](../../assets/error_oauth.jpg "Invalid Client ID or Client Secret")
 
 
 {: .error}
-Time out error for Oauth Session <br><br> ![Time out Error](../../../assets/time-out.jpg "time out error")
+Time out error for Oauth Session <br><br> ![Time out Error](../../assets/time-out.jpg "time out error")
 
 ### Alerts
 
 {: .highlight}
-Happens if you decline the OAuth or if invalid host value. <br><br> ![Wrong Host Error](../../../assets/bad_errors.jpg "Wrong Host Error")
+Happens if you decline the OAuth or if used invalid host value. <br><br> ![Wrong Host Error](../../../assets/bad_errors.jpg "Wrong Host Error")
 
 
 ## Authorization

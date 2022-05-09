@@ -24,21 +24,15 @@ In this page, we provide the required values.
 It is recommended to use `localhost` for the `host`. You can also prefer `127.0.0.1` like format
 
 {: .important}
-After feeding values, `Reset OAuth` it does what it supposed to [do](../Know More/api)
+After feeding values, go with `Reset OAuth` it does what it supposed to [do](../Know More/api)
 
 
 {: .note}
-Make Sure Client ID and Client Secret are valid else you will face [this] error. if your Access Token and Refresh Tokens are not valid then you will face [this] error. And if your host or port doesn't match with the ones in API app then you will face [this] error
+Make Sure Client ID and Client Secret are valid else you will face [this](http://localhost:4000/docs/Know%20More/api#:~:text=Possible%20Errors-,Would%20happen,-if%20either%20Client) error. if your Access Token and Refresh Tokens are not valid then you will face [this](http://localhost:4000/docs/Know%20More/api#:~:text=Alerts-,Happens%20if%20you,-decline%20the%20OAuth) error. And if your host or port doesn't match with the ones you have written in form then you will face [this](http://localhost:4000/docs/Know%20More/api#:~:text=Possible%20Errors-,Would%20happen,-if%20either%20Client) error
 
 
 {: .highlight}
-You can also import the settings and then submit it using `Refer`. But make sure if those credentials and tokens valid or not.
+You can also import the settings and then submit it using `Refer`. But make sure if those credentials and tokens are valid else you will face their respective errors.
 
 
-Refer this [sections]() for more information
-
-
-
-Now that you have let the application know everything that it requries.
-
-Now you can use Application's Update Page
+Refer this [sections](../Know More/) for more information.
