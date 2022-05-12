@@ -218,8 +218,10 @@ switch($true){
 
     Default{
         $store = @(Get-RunningProjects);
-        if($store.length -gt 0){$store | Out-GridView -passthru -Title "These processes must be closed in-order to proceed forward!"}
-        if($store.length -gt 0){exit 5} else {}
+        if($store.length -gt 0){
+            $store | Out-GridView -passthru -Title "These processes must be closed in-order to proceed forward!"
+            exit 5
+        }
     }
 }
 
