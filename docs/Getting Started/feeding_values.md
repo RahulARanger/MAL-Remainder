@@ -28,7 +28,7 @@ After feeding values, go with `Reset OAuth` it does what it supposed to [do](../
 
 
 {: .note}
-Make Sure Client ID and Client Secret are valid else you will face [this](http://localhost:4000/docs/Know%20More/api#:~:text=Possible%20Errors-,Would%20happen,-if%20either%20Client) error. if your Access Token and Refresh Tokens are not valid then you will face [this](http://localhost:4000/docs/Know%20More/api#:~:text=Alerts-,Happens%20if%20you,-decline%20the%20OAuth) error. And if your host or port doesn't match with the ones you have written in form then you will face [this](http://localhost:4000/docs/Know%20More/api#:~:text=Possible%20Errors-,Would%20happen,-if%20either%20Client) error
+Make Sure Client ID and Client Secret are valid else you will face [this](../Know%20More/api#:~:text=Possible%20Errors-,Would%20happen,-if%20either%20Client) error. if your Access Token and Refresh Tokens are not valid then you will face [this](../Know%20More/api#:~:text=Alerts-,Happens%20if%20you,-decline%20the%20OAuth) error. And if your host or port doesn't match with the ones you have written in form then you will face [this](../Know%20More/api#:~:text=Possible%20Errors-,Would%20happen,-if%20either%20Client) error
 
 
 {: .highlight}

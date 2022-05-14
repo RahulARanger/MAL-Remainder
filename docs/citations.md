@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Citations
-nav_order: 6
+nav_order: 7
 permalink: /docs/Citations/
 ---
 
@@ -24,6 +24,8 @@ And many other projects from which i got inspired to do more. Sorry for missing 
 * Python Software Foundation. Python Language Reference, version 3.8.9. Available at [python](http://www.python.org).
 
 * Inno Setup is a free installer for Windows programs by Jordan Russell and Martijn Laan. First introduced in 1997, Inno Setup today rivals and even surpasses many commercial installers in feature set and stability. For more information refer [Inno Setup Home page](https://jrsoftware.org/)
+
+* [MyAnimeList.net](https://myanimelist.net "MyAnimeList") is an anime and manga community that introduces visitors to people, anime, manga, and helps them organize their collections. The API lets users interact with the site's data programmatically. Functionality includes site search, anime and manga listing, and account verification
 
 * PowerShell is a task automation and configuration management program from Microsoft, consisting of a command-line shell and the associated scripting language. Refer more from [docs](https://docs.microsoft.com/en-us/powershell/).
 

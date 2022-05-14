@@ -12,7 +12,7 @@ MAL-Remainder is an Application that allows you to update the number of episodes
 
 ## MyAnimeList
 
-[MyAnimeList](https://myanimelist.net "MyAnimeList") is a website, known for its vast database over animes that have been released up-until now and it also maintains a list of animes that you have watched or completed, etc... These are just a subset of its features. It can even do more. 
+[MyAnimeList](https://myanimelist.net "MyAnimeList") is an anime and manga community that introduces visitors to people, anime, manga, and helps them organize their collections 
 
 
 ## Pre-Requisites

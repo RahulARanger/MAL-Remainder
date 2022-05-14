@@ -19,9 +19,6 @@ MyAnimeList API uses OAuth 2.0 for authentication and authorization of the users
 ## Keywords
 ____
 
-{: .important}
-MAL uses [OAuth 2.0](https://oauth.net/2/) in order to authenticate and then authorize the user. So it's important to know certain keywords.
-
 ### `Client ID` and `Client Secret`
 
 > These two are unique and are very important, make sure to specify them without any mistake. Wrong Values will led failed authentication.
@@ -56,9 +53,14 @@ You can either call `Reset-Oauth` Again to get new Oauth Session and cut off the
 {: .tip}
 If sometimes, Oauth Session is stuck for some reason, You can always click on `./close-oauth-session` on the settings.
 
+## Authorization
+----
 
+Authenticated User with their Client ID and Client Secret can get `Tokens` which can be used for fetching or updating details on MyAnimeList Server. _It is one of the process done while `Resetting Oauth`_. 
 
-### Possible Errors
+You would receive `Access Tokens` and `Refresh Tokens`. `Access Tokens` could expire in [31 days](https://myanimelist.net/blog.php?eid=835707#:~:text=a1b2c3d4e5...%22%2C%0A%20%20%20%20%22refresh_token%22%3A%20%22z9y8x7w6u5...%22%0A%7D-,IMPORTANT,-%3A%20currently%2C%20the%20lifetime).
+
+## Possible Errors
 ----
 
 
@@ -72,29 +74,14 @@ Time out error for Oauth Session <br><br> ![Time out Error](../../assets/time-ou
 ### Alerts
 
 {: .highlight}
-Happens if you decline the OAuth or if used invalid host value. <br><br> ![Wrong Host Error](../../../assets/bad_errors.jpg "Wrong Host Error")
+Happens if you decline the OAuth or if used invalid host value. <br><br> ![Wrong Host Error](../../assets/bad_errors.jpg "Wrong Host Error")
 
-
-## Authorization
-----
-
-Authenticated User with their Client ID and Client Secret can get `Tokens` for getting an access in database. It is one os the process done while `Resetting Oauth`. 
-
-
-You would receive `Access Tokens` and `Refresh Tokens`. `Access Tokens` could expire in [31 days](https://myanimelist.net/blog.php?eid=835707#:~:text=a1b2c3d4e5...%22%2C%0A%20%20%20%20%22refresh_token%22%3A%20%22z9y8x7w6u5...%22%0A%7D-,IMPORTANT,-%3A%20currently%2C%20the%20lifetime).
 
 
 ### Invalid Access Tokens or Refresh Tokens
----
-In-Case if you face any Error regarding `Invalid Token` you can manually `Reset Tokens`. The alert is similar to ones seen in [here](#alerts). MAL-Remainder alerts you with either `Failed to update your profile` in settings page or `Invalid Token` in Update Page.
 
+In-Case if you face any Error regarding `Invalid Tokens` you can manually `Reset Tokens`. 
+ The alert is similar to ones seen in [here](#alerts). MAL-Remainder alerts you with either `Failed to update your profile` in [Settings](./settings) or `Invalid Token` in [Update - Page](./UpdateList).
 
-### Refreshing Tokens
----
-
-If your Access Tokens is about to get expired, You would not be able to communicate with the server so if your **Refresh Token is valid**.
-
-Application tries to refresh the tokens without Oauth verification which is a _Human Task_, You can also manually `Refresh Tokens` from settings page.
-
-It updates the `Expiry Time` _see in the footer of your settings page_. 
+Application tries to refresh tokens by auto if they are near to expiration but You can also `Refresh Tokens` in [Settings](./Settings) if refresh token is valid else you would need to fetch them using `Reset Tokens`
 

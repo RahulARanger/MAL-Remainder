@@ -17,11 +17,11 @@
 
 body {
 	background-color: var(--bg);
-	overflow-y: hidden;
 }
 
 
 #world{
+	position: fixed;
 	width: 100%;
 	height: 100%;
 	padding: 0px;

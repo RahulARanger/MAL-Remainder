@@ -7,7 +7,7 @@ permalink: /docs/Local Setup/
 ---
 
 
-Since this is a personal Project. You may not want to proceed through installer as it is rising many warnings. In that case, try this Local Setup.You can edit this project with Local setup easily.
+If you want to reproduce this application locally, you can.
 
 {: .highlight}
 for now it is possible with only Windows.

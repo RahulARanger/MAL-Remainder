@@ -88,7 +88,7 @@ document.querySelectorAll("footer > form input[type='checkbox']").forEach(
 	(element) => element.addEventListener(
 		"click",
 		() => setTimeout(
-					() => document.querySelector("form[action='./auto-update']").submit(),  
+					() => document.querySelector("form[action='/auto-update']").submit(),  
 					1000
 				)
 		)
