@@ -26,7 +26,7 @@ As warned above, it is recommended not to interrupt the shell process, But if yo
 -   For un-installation, closing the window, would proceed with a way [_less informative_] to uninstall files
 
 {: .highlight}
-Since this is a personal Project and it is made in simple way. So you may see certain warnings like the ones listed below. I would recommend you to ignore them. But It is possible to build this [`locally`](./Local%20Setup/Windows)
+Since this is a personal Project and it is made in simple way. So you may see certain warnings like the ones listed below. I would recommend you to ignore them. But It is possible to build this [`locally`](../../Local%20Setup/Windows)
 
 
 {: .warning}
